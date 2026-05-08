@@ -18,7 +18,10 @@
 
   <ItemGroup>
     <Folder Include="Data/" />
+    <Folder Include="Data/Repositories/" />
     <Folder Include="DTOs/" />
+    <Folder Include="DTOs/Requests/" />
+    <Folder Include="DTOs/Responses/" />
     <Folder Include="Entities/" />
     <Folder Include="Errors/" />
     <Folder Include="Extensions/" />
