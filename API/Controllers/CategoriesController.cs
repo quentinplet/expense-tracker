@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-public class CategoryController(ICategoryRepository categoryRepository) : BaseApiController
+public class CategoriesController(ICategoryRepository categoryRepository) : BaseApiController
 {
     [HttpGet] // api/category
     public async Task<ActionResult<List<CategoryResponseDto>>> GetAll()
