@@ -13,6 +13,8 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -27,12 +29,13 @@ dataSourceBuilder.MapEnum<TransactionTypeName>();
 var dataSource = dataSourceBuilder.Build();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(dataSource)
+    options.UseNpgsql(dataSource, o => o.MapEnum<TransactionTypeName>())
 );
 
 builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 builder.Services.AddIdentityCore<AppUser>(opt =>
 {
@@ -67,6 +70,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -79,6 +83,7 @@ try
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync();
     await Seed.SeedUsers(userManager);
+    await Seed.SeedData(context);
 }
 catch (Exception ex)
 {
