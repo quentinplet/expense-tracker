@@ -3,6 +3,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "ignoreDeprecations": "5.0",
+    "paths": {
+      "@/*": ["./src/*"] // chemin absolu sans baseUrl
+    },
     "rootDir": "./src",
     "outDir": "./out-tsc/app",
     "types": []
