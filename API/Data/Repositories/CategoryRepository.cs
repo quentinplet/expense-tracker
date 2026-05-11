@@ -49,8 +49,4 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
         return await context.TransactionTypes.FirstOrDefaultAsync(t => t.Name == name);
     }
 
-    public async Task<bool> SaveChangesAsync()
-    {
-        return await context.SaveChangesAsync() > 0;
-    }
 }

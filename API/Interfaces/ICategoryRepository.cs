@@ -13,6 +13,5 @@ public interface ICategoryRepository
     void Update(Category category);
     void Delete(Category category);
     Task<TransactionType?> GetTransactionTypeByNameAsync(TransactionTypeName name);
-    Task<bool> SaveChangesAsync();
 
 }

@@ -7,7 +7,7 @@ namespace API.Data.Repositories;
 
 public class TransactionRepository(AppDbContext context) : ITransactionRepository
 {
-    public async Task<List<Transaction>> GetAllTransactionsByUserIdAsync(string userId)
+    public async Task<IReadOnlyList<Transaction>> GetAllTransactionsByUserIdAsync(string userId)
     {
         return await context.Transactions
             .Include(t => t.Category)
@@ -17,12 +17,22 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             .ToListAsync();
     }
 
-    public async Task<List<Transaction>> GetTransactionsByTypeAsync(string userId, TransactionTypeName type)
+    public async Task<IReadOnlyList<Transaction>> GetTransactionsByTypeAsync(string userId, TransactionTypeName type)
     {
         return await context.Transactions
             .Include(t => t.Category)
             .ThenInclude(c => c.TransactionType)
             .Where(t => t.UserId == userId && t.Category.TransactionType.Name == type)
+            .OrderByDescending(t => t.Date)
+            .ToListAsync();
+    }
+
+    public async Task<List<Transaction>> GetMonthlyTransactionsAsync(string userId, int month, int year)
+    {
+        return await context.Transactions
+            .Include(t => t.Category)
+            .ThenInclude(c => c.TransactionType)
+            .Where(t => t.UserId == userId && t.Date.Month == month && t.Date.Year == year)
             .OrderByDescending(t => t.Date)
             .ToListAsync();
     }
@@ -49,11 +59,5 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
     {
         context.Transactions.Remove(transaction);
     }
-
-    public async Task<bool> SaveAllAsync()
-    {
-        return await context.SaveChangesAsync() > 0;
-    }
-
 
 }
