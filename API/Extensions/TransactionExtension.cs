@@ -14,7 +14,8 @@ public static class TransactionExtension
             Amount = transaction.Amount,
             Date = transaction.Date,
             Description = transaction.Description,
-            CategoryName = transaction.Category?.Name ?? "Non spécifiée"
+            CategoryName = transaction.Category?.Name ?? "Non spécifiée",
+            Type = transaction.Category?.TransactionType?.Name.ToString() ?? "Unknown"
         };
     }
 }

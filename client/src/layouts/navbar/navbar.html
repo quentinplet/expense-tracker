@@ -1,0 +1,31 @@
+<nav
+  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16 bg-white border-b border-gray-200 shadow-sm"
+>
+  <div class="flex gap-2 items-center">
+    <a
+      routerLink="/dashboard"
+      class="flex items-center gap-2 text-primary font-bold text-xl no-underline"
+    >
+      <i class="pi pi-wallet text-2xl"></i>
+      <span>ExpenseTracker</span>
+    </a>
+    @if (busyService.busyRequestCount() > 0) {
+      <p-progressspinner
+        [style]="{ width: '2rem', height: '2rem' }"
+        strokeWidth="3"
+        fill="var(--surface-ground)"
+      />
+    }
+  </div>
+
+  <div class="flex items-center gap-3">
+    <span class="text-gray-600 font-medium">{{ accountService.currentUser()?.userName }}</span>
+    <p-menu #menu [model]="menuItems" [popup]="true" />
+    <p-avatar
+      [label]="accountService.currentUser()?.userName?.charAt(0)?.toUpperCase()"
+      shape="circle"
+      (click)="menu.toggle($event)"
+      styleClass="cursor-pointer bg-primary text-white"
+    />
+  </div>
+</nav>

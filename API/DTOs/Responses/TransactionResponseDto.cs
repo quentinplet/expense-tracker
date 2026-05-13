@@ -11,6 +11,6 @@ public class TransactionResponseDto
     public DateTime Date { get; set; }
     public string? Description { get; set; }
     public string CategoryName { get; set; } = null!;
-    public TransactionTypeName Type { get; set; }
+    public string Type { get; set; } = null!;
 
 }
