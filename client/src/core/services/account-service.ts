@@ -10,12 +10,21 @@ import { tap } from 'rxjs/internal/operators/tap';
 export class AccountService {
   private http = inject(HttpClient);
   currentUser = signal<User | null>(null);
-  private baseUrl = environment.apiUrl + 'account';
+  private baseUrl = environment.apiUrl;
 
   login(creds: LoginCreds) {
     return this.http
-      .post<User>(this.baseUrl + '/login', creds)
-      .pipe(tap((currentUser) => this.currentUser.set(currentUser)));
+      .post<User>(this.baseUrl + 'account/login', creds, {
+        withCredentials: true,
+      })
+      .pipe(
+        tap((user) => {
+          if (user) {
+            this.setCurrentUser(user);
+            this.startTokenRefreshInterval();
+          }
+        }),
+      );
   }
 
   refreshToken() {

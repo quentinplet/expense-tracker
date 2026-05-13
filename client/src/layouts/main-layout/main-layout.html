@@ -1,0 +1,9 @@
+<div class="flex flex-col h-screen">
+  <app-navbar class="h-16 w-full fixed top-0 z-50" />
+  <div class="flex flex-1 pt-16 overflow-hidden">
+    <app-sidebar class="w-64 fixed left-0 top-16 h-full" />
+    <main class="flex-1 ml-64 p-6 overflow-y-auto bg-gray-50">
+      <router-outlet />
+    </main>
+  </div>
+</div>

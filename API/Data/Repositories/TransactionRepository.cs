@@ -1,5 +1,6 @@
 using System;
 using API.Entities;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,14 +8,18 @@ namespace API.Data.Repositories;
 
 public class TransactionRepository(AppDbContext context) : ITransactionRepository
 {
-    public async Task<IReadOnlyList<Transaction>> GetAllTransactionsByUserIdAsync(string userId)
+    public async Task<PaginatedResult<Transaction>> GetAllTransactionsByUserIdAsync(TransactionParams transactionParams)
     {
-        return await context.Transactions
+        var query = context.Transactions.AsQueryable();
+
+        query = query.Where(t => t.UserId == transactionParams.CurrentUserId);
+
+        query = context.Transactions
             .Include(t => t.Category)
             .ThenInclude(c => c.TransactionType)
-            .Where(t => t.UserId == userId)
-            .OrderByDescending(t => t.Date)
-            .ToListAsync();
+            .OrderByDescending(t => t.Date);
+
+        return await PaginationHelper.CreateAsync(query, transactionParams.PageNumber, transactionParams.PageSize);
     }
 
     public async Task<IReadOnlyList<Transaction>> GetTransactionsByTypeAsync(string userId, TransactionTypeName type)

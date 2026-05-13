@@ -37,7 +37,7 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = true, // Set to true in production
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddDays(7)
         };

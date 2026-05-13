@@ -3,6 +3,7 @@ using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,15 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
 {
 
     [HttpGet]
-    public async Task<ActionResult<List<TransactionResponseDto>>> GetAllTransactions()
+    public async Task<ActionResult<List<TransactionResponseDto>>> GetAllTransactions([FromQuery] TransactionParams transactionParams)
     {
         var userId = User.GetMemberId();
-
-        var transactions = await uow.TransactionRepository.GetAllTransactionsByUserIdAsync(userId);
-        return Ok(transactions.Select(t => t.ToTransactionResponseDto()));
+        var result = await uow.TransactionRepository.GetAllTransactionsByUserIdAsync(transactionParams);
+        return Ok(new PaginatedResult<TransactionResponseDto>
+        {
+            Metadata = result.Metadata,
+            Items = [.. result.Items.Select(t => t.ToTransactionResponseDto())]
+        });
     }
 
     [HttpGet("type/{transactionType}")]

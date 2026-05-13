@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AccountService } from '../../../core/services/account-service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-auth',
@@ -32,6 +33,8 @@ export class Auth {
 
   authService = inject(AccountService);
   router = inject(Router);
+
+  private messageService = inject(MessageService);
 
   constructor() {
     this.mode.set(this.isLogin() ? 'login' : 'register');
@@ -64,11 +67,16 @@ export class Auth {
     this.authService.login({ email, password }).subscribe({
       next: () => {
         this.submiting.set(false);
-        void this.router.navigate(['/']);
+        void this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.submiting.set(false);
         console.log('Login failed:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Login Failed',
+          detail: 'Invalid email or password.',
+        });
       },
     });
   }
