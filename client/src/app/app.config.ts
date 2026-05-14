@@ -15,12 +15,13 @@ import { InitService } from '@/core/services/init-service';
 import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
 import { jwtInterceptor } from '@/core/interceptors/jwt-interceptor';
 import { loadingInterceptor } from '@/core/interceptors/loading-interceptor';
+import { errorInterceptor } from '@/core/interceptors/error-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([jwtInterceptor, loadingInterceptor])),
+    provideHttpClient(withInterceptors([jwtInterceptor, loadingInterceptor, errorInterceptor])),
     provideAppInitializer(async () => {
       const initService = inject(InitService);
       return new Promise<void>((resolve) => {

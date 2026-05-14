@@ -3,9 +3,12 @@ import { Home } from '../features/home/home';
 import { Auth } from '../features/account/auth/auth';
 import { Dashboard } from '@/features/dashboard/dashboard';
 import { Transactions } from '@/features/transactions/transactions';
-import { AuthLayout } from '@/layouts/auth-layout/auth-layout';
-import { MainLayout } from '@/layouts/main-layout/main-layout';
+import { AuthLayout } from '@/layout/auth-layout/auth-layout';
+import { MainLayout } from '@/layout/main-layout/main-layout';
 import { authGuard } from '@/core/guards/auth-guard';
+import { NotFound } from '@/shared/errors/not-found/not-found';
+import { TestErrors } from '@/features/test-errors/test-errors';
+import { ServerError } from '@/shared/errors/server-error/server-error';
 
 export const routes: Routes = [
   {
@@ -27,10 +30,14 @@ export const routes: Routes = [
       { path: 'transactions', component: Transactions },
       // { path: 'categories', component: Categories },
       // { path: 'budgets', component: Budgets },
+      {
+        path: 'test-errors',
+        component: TestErrors,
+      },
     ],
   },
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  // Pages d'erreur au niveau racine — sans layout
+  { path: 'server-error', component: ServerError },
+  { path: 'not-found', component: NotFound },
+  { path: '**', redirectTo: 'not-found' },
 ];
