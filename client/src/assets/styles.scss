@@ -8,3 +8,20 @@ body {
   margin: 0;
   font-family: 'Space Grotesk', sans-serif;
 }
+
+.p-inputtext.ng-invalid.ng-touched,
+.p-textarea.ng-invalid.ng-touched,
+.p-select.ng-invalid.ng-touched {
+  border-color: var(--p-inputtext-invalid-border-color);
+}
+
+.invalid-feedback {
+  color: var(--p-red-500);
+  font-size: 0.875rem;
+  display: none;
+}
+
+.ng-invalid.ng-dirty + .invalid-feedback,
+.ng-invalid.ng-touched + .invalid-feedback {
+  display: block;
+}

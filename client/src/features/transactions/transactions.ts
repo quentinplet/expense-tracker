@@ -1,8 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
@@ -19,9 +25,13 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TransactionService } from '@/core/services/transaction-service';
-import { Transaction, TransactionParams } from '@/types/transaction';
+import { CreateTransactionDto, Transaction, TransactionParams } from '@/types/transaction';
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { BusyService } from '@/core/services/busy-service';
+import { CategorieService } from '@/core/services/categorie-service';
+import { TabsModule } from 'primeng/tabs';
+import { Categorie } from '@/types/categorie';
+import { DatePicker } from 'primeng/datepicker';
 
 interface Column {
   field: string;
@@ -56,6 +66,9 @@ interface ExportColumn {
     IconFieldModule,
     ConfirmDialogModule,
     Paginator,
+    ReactiveFormsModule,
+    TabsModule,
+    DatePicker,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
@@ -70,6 +83,7 @@ export class Transactions implements OnInit {
 
   productDialog: boolean = false;
   transactions = signal<Transaction[]>([]);
+  categories = signal<Categorie[]>([]);
 
   // ✅ Typage correct — plus de `Transaction | {}`
   transaction: Transaction = {} as Transaction;
@@ -84,12 +98,23 @@ export class Transactions implements OnInit {
 
   cols!: Column[];
 
+  private fb = inject(FormBuilder);
+  protected transactionForm: FormGroup;
+
   constructor(
     private transactionService: TransactionService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     protected busyService: BusyService,
-  ) {}
+    protected categorieService: CategorieService,
+  ) {
+    this.transactionForm = this.fb.nonNullable.group({
+      description: ['', [Validators.required]],
+      category: ['', [Validators.required]],
+      amount: [0, [Validators.required]],
+      date: [new Date(), [Validators.required]],
+    });
+  }
 
   exportCSV() {
     this.dt.exportCSV();
@@ -100,6 +125,7 @@ export class Transactions implements OnInit {
       first: 0,
       rows: this.transactionParams.pageSize,
     } as TableLazyLoadEvent);
+    this.loadCategories();
   }
 
   loadTransactions(event: TableLazyLoadEvent) {
@@ -111,6 +137,18 @@ export class Transactions implements OnInit {
         this.transactions.set(result.items);
         this.totalRecords.set(result.metadata.totalCount);
         console.log(this.transactions());
+      },
+    });
+  }
+
+  loadCategories() {
+    this.categorieService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories.set(categories);
+        console.log('Loaded categories:', this.categories());
+      },
+      error: (error) => {
+        console.error('Failed to load categories:', error);
       },
     });
   }
@@ -146,6 +184,7 @@ export class Transactions implements OnInit {
   }
 
   openNew() {
+    console.log('Opening new transaction dialog');
     this.transaction = {} as Transaction;
     this.submitted = false;
     this.productDialog = true;
@@ -177,8 +216,43 @@ export class Transactions implements OnInit {
     });
   }
 
+  submit() {
+    if (this.transactionForm.invalid) {
+      this.transactionForm.markAllAsTouched();
+      return;
+    }
+
+    const transactionData = this.transactionForm.getRawValue();
+    this.addTransaction(transactionData);
+  }
+
+  addTransaction(transactionData: CreateTransactionDto) {
+    const categoryName = this.transactionForm.get('category')?.value;
+    const categoryId = this.categories().find((cat) => cat.name === categoryName)?.id;
+    if (!categoryId) {
+      console.error('Selected category not found');
+      return;
+    }
+
+    const newTransaction: CreateTransactionDto = {
+      ...transactionData,
+      categoryId,
+    };
+
+    console.log('Creating transaction with data:', newTransaction);
+    this.transactionService.addNewTransaction(newTransaction).subscribe({
+      next: (createdTransaction) => {
+        console.log('Transaction created:', createdTransaction);
+      },
+      error: (error) => {
+        console.error('Failed to create transaction:', error);
+      },
+    });
+  }
+
   hideDialog() {
     this.productDialog = false;
+    this.transactionForm.reset();
     this.submitted = false;
   }
 
