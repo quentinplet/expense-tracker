@@ -12,7 +12,7 @@ public static class CategoryExtension
             Id = category.Id,
             Name = category.Name,
             Enabled = category.Enabled,
-            TransactionTypeName = category.TransactionType.Name
+            Type = category.TransactionType?.Name.ToString() ?? "Unknown"
         };
     }
 

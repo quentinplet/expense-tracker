@@ -1,7 +1,13 @@
 <div class="w-full">
   <p-toolbar class="mb-6">
     <ng-template #start>
-      <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" />
+      <p-button
+        (click)="openNew()"
+        label="New"
+        icon="pi pi-plus"
+        severity="secondary"
+        class="mr-2"
+      />
       <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined />
     </ng-template>
   </p-toolbar>
@@ -87,7 +93,7 @@
         <td style="min-width: 12rem">{{ product.date | date }}</td>
         <td style="min-width: 16rem">{{ product.description }}</td>
         <td>{{ product.amount | currency: 'USD' }}</td>
-        <td>{{ product.category }}</td>
+        <td>{{ product.categoryName }}</td>
         <td>{{ product.type }}</td>
         <td>
           <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" />
@@ -96,4 +102,148 @@
       </tr>
     </ng-template>
   </p-table>
+
+  <p-dialog
+    [(visible)]="productDialog"
+    [style]="{ width: '450px' }"
+    header="Product Details"
+    [modal]="true"
+  >
+    <ng-template #content>
+      <form
+        id="transactionForm"
+        [formGroup]="transactionForm"
+        class="p-fluid"
+        (ngSubmit)="submit()"
+      >
+        <div class="flex flex-col gap-6">
+          <div>
+            <p-tabs value="0">
+              <p-tablist>
+                <p-tab value="0">Expense</p-tab>
+                <p-tab value="1">Income</p-tab>
+              </p-tablist>
+              <p-tabpanels class="mt-5 p-0!">
+                <span class="block font-bold mb-4">Category</span>
+                <!-- Onglet Expense -->
+                <p-tabpanel value="0">
+                  <div class="grid grid-cols-3 gap-5 mt-4">
+                    @for (categorie of categories(); track categorie.id) {
+                      @if (categorie.type === 'Expense') {
+                        <div class="flex items-center gap-2">
+                          <p-radiobutton
+                            formControlName="category"
+                            [inputId]="'cat-' + categorie.id"
+                            name="category"
+                            [value]="categorie.name"
+                          />
+                          <label [for]="'cat-' + categorie.id">{{ categorie.name }}</label>
+                        </div>
+                      }
+                    }
+                  </div>
+                </p-tabpanel>
+
+                <!-- Onglet Income -->
+                <p-tabpanel value="1">
+                  <div class="grid grid-cols-3 gap-5 mt-4">
+                    @for (categorie of categories(); track categorie.id) {
+                      @if (categorie.type === 'Income') {
+                        <div class="flex items-center gap-2">
+                          <p-radiobutton
+                            formControlName="category"
+                            [inputId]="'cat-' + categorie.id"
+                            name="category"
+                            [value]="categorie.name"
+                          />
+                          <label [for]="'cat-' + categorie.id">{{ categorie.name }}</label>
+                        </div>
+                      }
+                    }
+                  </div>
+                </p-tabpanel>
+                @if (
+                  transactionForm.get('category')?.invalid &&
+                  transactionForm.get('category')?.touched
+                ) {
+                  <small class="p-error text-red-500">Category is required.</small>
+                }
+              </p-tabpanels>
+            </p-tabs>
+          </div>
+          <div>
+            <label for="description" class="block font-bold mb-3">Description</label>
+            <input
+              formControlName="description"
+              type="text"
+              pInputText
+              id="description"
+              required
+              autofocus
+              fluid
+            />
+            @if (
+              transactionForm.get('description')?.invalid &&
+              transactionForm.get('description')?.touched
+            ) {
+              <small class="p-error invalid-feedback">Description is required.</small>
+            }
+          </div>
+          <!-- <div>
+            <label for="description" class="block font-bold mb-3">Description</label>
+            <textarea
+              formControlName="description"
+              id="description"
+              pTextarea
+              required
+              rows="3"
+              cols="20"
+              fluid
+            ></textarea>
+          </div> -->
+          <!-- <div>
+            <label for="inventoryStatus" class="block font-bold mb-3">Inventory Status</label>
+            <p-select
+              inputId="inventoryStatus"
+              formControlName="status"
+              [options]="statuses"
+              optionLabel="label"
+              optionValue="label"
+              placeholder="Select a Status"
+              fluid
+            />
+          </div> -->
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-6">
+              <label for="amount" class="block font-bold mb-3">Amount</label>
+              <p-inputnumber
+                formControlName="amount"
+                inputId="amount"
+                mode="currency"
+                currency="USD"
+                locale="en-US"
+                fluid
+              />
+              <small class="p-error invalid-feedback">Amount is required.</small>
+            </div>
+          </div>
+          <div>
+            <label for="date" class="block font-bold mb-3">Date</label>
+            <p-date-picker
+              formControlName="date"
+              [showButtonBar]="true"
+              inputId="date"
+              dateFormat="mm/dd/yy"
+              showIcon
+              fluid
+            ></p-date-picker>
+          </div>
+        </div>
+        <div class="mt-5 mb-2 flex justify-end items-center gap-3">
+          <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+          <p-button form="transactionForm" label="Create" icon="pi pi-check" type="submit" />
+        </div>
+      </form>
+    </ng-template>
+  </p-dialog>
 </div>

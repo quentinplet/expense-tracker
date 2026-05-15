@@ -1,6 +1,6 @@
 import { environment } from '@/environments/environment';
 import { PaginatedResult } from '@/types/pagination';
-import { Transaction } from '@/types/transaction';
+import { CreateTransactionDto, Transaction } from '@/types/transaction';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
@@ -22,5 +22,9 @@ export class TransactionService {
         pageSize: pageSize.toString(),
       },
     });
+  }
+
+  addNewTransaction(transactionData: CreateTransactionDto): Observable<Transaction> {
+    return this.http.post<Transaction>(`${this.baseUrl}transactions`, transactionData);
   }
 }
