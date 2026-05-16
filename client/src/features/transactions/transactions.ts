@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -25,9 +25,11 @@ import {
 import { Paginator, PaginatorState } from 'primeng/paginator';
 import { BusyService } from '@/core/services/busy-service';
 import { CategorieService } from '@/core/services/categorie-service';
-import { TabsModule } from 'primeng/tabs';
 import { Categorie } from '@/types/categorie';
 import { TransactionModalForm } from './transaction-modal-form/transaction-modal-form';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface Column {
   field: string;
@@ -71,12 +73,22 @@ export class Transactions implements OnInit {
   protected transactionParams = new TransactionParams();
   totalRecords = signal(0);
 
+  protected readonly transactionTypes = [
+    { label: 'Income', value: 'income' },
+    { label: 'Expense', value: 'expense' },
+  ];
+
   protected readonly Math = Math;
 
   transactionDialog: boolean = false;
   transactions = signal<Transaction[]>([]);
   categories = signal<Categorie[]>([]);
   errors = signal<Record<string, string[]>>({});
+  private searchSubject = new Subject<string>();
+  protected searchValue: string = '';
+  protected selectedCategoryId: number | null = null;
+  protected selectedTransactionType: string | null = null;
+  private destroyRef = inject(DestroyRef);
 
   selectedTransaction = signal<Transaction | null>(null);
   selectedTransactions = signal<Transaction[]>([]);
@@ -110,13 +122,102 @@ export class Transactions implements OnInit {
       rows: this.transactionParams.pageSize,
     } as TableLazyLoadEvent);
     this.loadCategories();
+    this.configureDebounce();
+  }
+
+  configureDebounce() {
+    this.searchSubject
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((searchTerm) => {
+        this.transactionParams.search = searchTerm;
+
+        // reset to first page when search term changes
+        this.transactionParams.pageNumber = 1;
+
+        this.loadTransactions({
+          first: 0,
+          rows: this.transactionParams.pageSize,
+        } as TableLazyLoadEvent);
+      });
+  }
+
+  onSearch(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value.trim();
+    this.searchValue = searchTerm;
+    this.searchSubject.next(searchTerm);
+  }
+
+  clearSearch() {
+    this.searchValue = '';
+    this.transactionParams.search = undefined;
+    this.loadTransactions({
+      first: 0,
+      rows: this.transactionParams.pageSize,
+    } as TableLazyLoadEvent);
+  }
+
+  onCategoryChange(categoryId: number | null) {
+    this.selectedCategoryId = categoryId;
+    this.transactionParams.categoryId = categoryId ?? undefined;
+
+    // reset to first page when category filter changes
+    this.transactionParams.pageNumber = 1;
+
+    this.loadTransactions({
+      first: 0,
+      rows: this.transactionParams.pageSize,
+    } as TableLazyLoadEvent);
+  }
+
+  onTypeChange(type: string | null) {
+    this.selectedTransactionType = type;
+    this.transactionParams.transactionType = type ?? undefined;
+
+    // reset to first page when type filter changes
+    this.transactionParams.pageNumber = 1;
+
+    this.loadTransactions({
+      first: 0,
+      rows: this.transactionParams.pageSize,
+    } as TableLazyLoadEvent);
+  }
+
+  resetFilters() {
+    this.searchValue = '';
+    this.selectedCategoryId = null;
+    this.selectedTransactionType = null;
+
+    this.transactionParams.search = undefined;
+    this.transactionParams.categoryId = undefined;
+    this.transactionParams.transactionType = undefined;
+    this.transactionParams.sortBy = undefined;
+    this.transactionParams.sortDirection = 'desc';
+    this.transactionParams.pageNumber = 1;
+
+    // reset PrimeNG table state
+    this.dt.reset();
+
+    this.loadTransactions({
+      first: 0,
+      rows: this.transactionParams.pageSize,
+    } as TableLazyLoadEvent);
   }
 
   loadTransactions(event: TableLazyLoadEvent) {
-    const page =
+    this.transactionParams.pageNumber =
       Math.floor((event.first ?? 0) / (event.rows ?? this.transactionParams.pageSize)) + 1;
-    const pageSize = event.rows ?? this.transactionParams.pageSize;
-    this.transactionService.getTransactions(page, pageSize).subscribe({
+
+    this.transactionParams.pageSize = event.rows ?? this.transactionParams.pageSize;
+
+    // Sort
+    if (typeof event.sortField === 'string') {
+      this.transactionParams.sortBy = event.sortField;
+    }
+    if (event.sortOrder !== undefined && event.sortOrder !== null) {
+      this.transactionParams.sortDirection = event.sortOrder === 1 ? 'asc' : 'desc';
+    }
+
+    this.transactionService.getTransactions(this.transactionParams).subscribe({
       next: (result) => {
         this.transactions.set(result.items);
         this.totalRecords.set(result.metadata.totalCount);
@@ -138,10 +239,6 @@ export class Transactions implements OnInit {
     this.transactionParams.pageNumber = page;
     this.transactionParams.pageSize = event.rows ?? this.transactionParams.pageSize;
     this.loadTransactions({ first: event.first, rows: event.rows });
-  }
-
-  onGlobalFilter(table: Table, event: Event) {
-    table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
   openNew() {

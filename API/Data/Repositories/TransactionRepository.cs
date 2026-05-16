@@ -11,14 +11,50 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
 {
     public async Task<PaginatedResult<Transaction>> GetAllTransactionsByUserIdAsync(TransactionParams transactionParams)
     {
-        var query = context.Transactions.AsQueryable();
 
-        query = query.Where(t => t.UserId == transactionParams.CurrentUserId);
-
-        query = context.Transactions
+        var query = context.Transactions
+            .Where(t => t.UserId == transactionParams.CurrentUserId)
             .Include(t => t.Category)
             .ThenInclude(c => c.TransactionType)
-            .OrderByDescending(t => t.Date);
+            .AsQueryable();
+
+
+        // Filter by category
+        if (transactionParams.CategoryId.HasValue)
+        {
+            query = query.Where(t => t.CategoryId == transactionParams.CategoryId.Value);
+        }
+
+        // Filter by transaction type
+        if (transactionParams.TransactionType.HasValue)
+        {
+            query = query.Where(t => t.Category.TransactionType.Name == transactionParams.TransactionType.Value);
+        }
+
+        // Search by description, category name
+        if (!string.IsNullOrEmpty(transactionParams.Search))
+        {
+            var search = transactionParams.Search.ToLower();
+            query = query.Where(t => EF.Functions.Like(t.Description.ToLower(), $"%{search}%") ||
+                                     EF.Functions.Like(t.Category.Name.ToLower(), $"%{search}%"));
+
+        }
+
+        // Sort
+        query = transactionParams.SortBy?.ToLower() switch
+        {
+            "date" => transactionParams.SortDirection == "asc"
+            ? query.OrderBy(t => t.Date)
+            : query.OrderByDescending(t => t.Date),
+            "amount" => transactionParams.SortDirection == "asc"
+            ? query.OrderBy(t => t.Amount)
+            : query.OrderByDescending(t => t.Amount),
+            "category" => transactionParams.SortDirection == "asc"
+            ? query.OrderBy(t => t.Category.Name)
+            : query.OrderByDescending(t => t.Category.Name),
+            _ => query.OrderByDescending(t => t.Date)
+        };
+
 
         return await PaginationHelper.CreateAsync(query, transactionParams.PageNumber, transactionParams.PageSize);
     }

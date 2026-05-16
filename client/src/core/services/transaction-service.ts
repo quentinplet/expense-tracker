@@ -1,7 +1,12 @@
 import { environment } from '@/environments/environment';
 import { PaginatedResult } from '@/types/pagination';
-import { CreateTransactionDto, Transaction, UpdateTransactionDto } from '@/types/transaction';
-import { HttpClient } from '@angular/common/http';
+import {
+  CreateTransactionDto,
+  Transaction,
+  TransactionParams,
+  UpdateTransactionDto,
+} from '@/types/transaction';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 
@@ -12,15 +17,30 @@ export class TransactionService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  getTransactions(
-    pageNumber: number = 1,
-    pageSize: number = 10,
-  ): Observable<PaginatedResult<Transaction>> {
+  getTransactions(params: TransactionParams): Observable<PaginatedResult<Transaction>> {
+    let httpParams = new HttpParams()
+      .set('pageNumber', params.pageNumber.toString())
+      .set('pageSize', params.pageSize.toString());
+
+    if (params.categoryId) {
+      httpParams = httpParams.set('categoryId', params.categoryId.toString());
+    }
+    if (params.transactionType) {
+      httpParams = httpParams.set('transactionType', params.transactionType);
+    }
+    if (params.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    if (params.sortBy) {
+      httpParams = httpParams.set('sortBy', params.sortBy);
+    }
+
+    if (params.sortDirection) {
+      httpParams = httpParams.set('sortDirection', params.sortDirection);
+    }
+
     return this.http.get<PaginatedResult<Transaction>>(`${this.baseUrl}transactions`, {
-      params: {
-        pageNumber: pageNumber.toString(),
-        pageSize: pageSize.toString(),
-      },
+      params: httpParams,
     });
   }
 
