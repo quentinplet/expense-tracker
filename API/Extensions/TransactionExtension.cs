@@ -15,6 +15,7 @@ public static class TransactionExtension
             Date = transaction.Date,
             Description = transaction.Description,
             CategoryName = transaction.Category?.Name ?? "Non spécifiée",
+            CategoryId = transaction.CategoryId,
             Type = transaction.Category?.TransactionType?.Name.ToString() ?? "Unknown"
         };
     }

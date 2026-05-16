@@ -3,12 +3,13 @@ export type Transaction = {
   amount: number;
   date: Date;
   description: string;
-  category: string;
+  categoryName: string;
+  categoryId: number;
   type?: 'income' | 'expense';
 };
 
-export type CreateTransactionDto = Omit<Transaction, 'id' | 'type' | 'category'> & {
-  categoryId: string;
+export type CreateTransactionDto = Omit<Transaction, 'id' | 'type' | 'categoryName'> & {
+  categoryId: number;
 };
 export type UpdateTransactionDto = Partial<CreateTransactionDto>;
 

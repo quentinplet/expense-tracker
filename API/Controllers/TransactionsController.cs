@@ -60,7 +60,13 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         };
 
         uow.TransactionRepository.AddTransaction(transaction);
-        if (await uow.Complete()) return CreatedAtAction(nameof(GetTransactionById), new { id = transaction.Id }, transaction.ToTransactionResponseDto());
+        if (await uow.Complete())
+        {
+            // Recharger avec la catégorie incluse
+            var created = await uow.TransactionRepository.GetTransactionByIdAsync(transaction.Id);
+            if (created == null) return BadRequest("Failed to retrieve created transaction");
+            return CreatedAtAction(nameof(GetTransactionById), new { id = transaction.Id }, created.ToTransactionResponseDto());
+        }
         return BadRequest("Failed to create transaction");
     }
 
@@ -77,7 +83,15 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         transaction.Description = dto.Description;
         transaction.CategoryId = dto.CategoryId!.Value;
         uow.TransactionRepository.UpdateTransaction(transaction);
-        if (await uow.Complete()) return NoContent();
+
+        if (await uow.Complete())
+        {
+            // Recharger avec la catégorie incluse
+            var updated = await uow.TransactionRepository.GetTransactionByIdAsync(transaction.Id);
+            if (updated == null) return BadRequest("Failed to retrieve updated transaction");
+            return Ok(updated.ToTransactionResponseDto());
+        }
+        ;
         return BadRequest("Failed to update transaction");
     }
 
@@ -92,6 +106,19 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         uow.TransactionRepository.DeleteTransaction(transaction);
         if (await uow.Complete()) return NoContent();
         return BadRequest("Failed to delete transaction");
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteTransactions([FromBody] List<int> ids)
+    {
+        var userId = User.GetMemberId();
+        var transactions = await uow.TransactionRepository.GetTransactionsByIdsAsync(ids, userId);
+        if (transactions.Count == 0) return NotFound();
+        if (transactions.Any(t => t.UserId != userId)) return Forbid();
+
+        uow.TransactionRepository.DeleteTransactions(transactions);
+        if (await uow.Complete()) return NoContent();
+        return BadRequest("Failed to delete transactions");
     }
 
 }

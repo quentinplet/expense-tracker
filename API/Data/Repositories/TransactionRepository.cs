@@ -1,4 +1,5 @@
 using System;
+using API.DTOs.Responses;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces;
@@ -42,6 +43,15 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             .ToListAsync();
     }
 
+    public async Task<List<Transaction>> GetTransactionsByIdsAsync(List<int> ids, string userId)
+    {
+        return await context.Transactions
+            .Include(t => t.Category)
+            .ThenInclude(c => c.TransactionType)
+            .Where(t => ids.Contains(t.Id) && t.UserId == userId)
+            .ToListAsync();
+    }
+
     public async Task<Transaction?> GetTransactionByIdAsync(int id)
     {
         return await context.Transactions
@@ -63,6 +73,11 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
     public void DeleteTransaction(Transaction transaction)
     {
         context.Transactions.Remove(transaction);
+    }
+
+    public void DeleteTransactions(List<Transaction> transactions)
+    {
+        context.Transactions.RemoveRange(transactions);
     }
 
 }
