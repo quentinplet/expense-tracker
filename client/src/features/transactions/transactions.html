@@ -1,4 +1,7 @@
 <div class="w-full">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold m-0">Transactions</h1>
+  </div>
   <p-toolbar class="mb-6">
     <ng-template #start>
       <p-button
@@ -37,12 +40,53 @@
   >
     <ng-template #caption>
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-10">
-          <h5 class="m-0!">Manage Transactions</h5>
-          <p-iconfield>
-            <p-inputicon class="pi pi-search" />
-            <input pInputText type="text" placeholder="Search..." class="w-100" />
-          </p-iconfield>
+        <div class="flex items-center gap-5">
+          <p-select
+            [options]="categories()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="All Category"
+            [showClear]="true"
+            [(ngModel)]="selectedCategoryId"
+            (onChange)="onCategoryChange($event.value)"
+          />
+          <p-select
+            [options]="transactionTypes"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Type"
+            [showClear]="true"
+            [(ngModel)]="selectedTransactionType"
+            (onChange)="onTypeChange($event.value)"
+          />
+          <div class="relative">
+            <p-iconfield>
+              <p-inputicon class="pi pi-search" />
+              <input
+                (input)="onSearch($event)"
+                pInputText
+                type="text"
+                placeholder="Search..."
+                [value]="searchValue"
+              />
+            </p-iconfield>
+            @if (searchValue) {
+              <button
+                type="button"
+                class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer border-none bg-transparent"
+                (click)="clearSearch()"
+              >
+                <i class="pi pi-times text-gray-400 hover:text-gray-700"></i>
+              </button>
+            }
+          </div>
+          <p-button
+            icon="pi pi-filter-slash"
+            label="Reset"
+            severity="secondary"
+            outlined
+            (onClick)="resetFilters()"
+          />
         </div>
         <div class="flex items-center gap-4">
           <span class="text-gray-500 text-sm whitespace-nowrap">

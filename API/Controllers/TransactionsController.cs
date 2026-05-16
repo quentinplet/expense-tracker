@@ -18,6 +18,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     public async Task<ActionResult<List<TransactionResponseDto>>> GetAllTransactions([FromQuery] TransactionParams transactionParams)
     {
         var userId = User.GetMemberId();
+        transactionParams.CurrentUserId = userId;
         var result = await uow.TransactionRepository.GetAllTransactionsByUserIdAsync(transactionParams);
         return Ok(new PaginatedResult<TransactionResponseDto>
         {

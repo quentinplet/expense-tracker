@@ -16,4 +16,10 @@ export type UpdateTransactionDto = Partial<CreateTransactionDto>;
 export class TransactionParams {
   pageNumber = 1;
   pageSize = 10;
+
+  categoryId?: number;
+  transactionType?: string;
+  search?: string;
+  sortBy?: string;
+  sortDirection: 'asc' | 'desc' = 'desc';
 }
