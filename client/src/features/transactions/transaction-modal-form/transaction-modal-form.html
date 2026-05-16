@@ -1,0 +1,116 @@
+<p-dialog
+  [(visible)]="visible"
+  [style]="{ width: '450px' }"
+  header="Product Details"
+  [modal]="true"
+>
+  <ng-template #content>
+    <form id="transactionForm" [formGroup]="form()" class="p-fluid" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col gap-6">
+        <div>
+          <p-tabs value="0">
+            <p-tablist>
+              <p-tab value="0">Expense</p-tab>
+              <p-tab value="1">Income</p-tab>
+            </p-tablist>
+            <p-tabpanels class="mt-5 p-0!">
+              <span class="block font-bold mb-4">Category</span>
+              <!-- Onglet Expense -->
+              <p-tabpanel value="0">
+                <div class="grid grid-cols-3 gap-5 mt-4">
+                  @for (categorie of categories(); track categorie.id) {
+                    @if (categorie.type === 'Expense') {
+                      <div class="flex items-center gap-2">
+                        <p-radiobutton
+                          formControlName="categoryId"
+                          [inputId]="'cat-' + categorie.id"
+                          name="categoryId"
+                          [value]="categorie.id"
+                        />
+                        <label [for]="'cat-' + categorie.id">{{ categorie.name }}</label>
+                      </div>
+                    }
+                  }
+                </div>
+              </p-tabpanel>
+
+              <!-- Onglet Income -->
+              <p-tabpanel value="1">
+                <div class="grid grid-cols-3 gap-5 mt-4">
+                  @for (categorie of categories(); track categorie.id) {
+                    @if (categorie.type === 'Income') {
+                      <div class="flex items-center gap-2">
+                        <p-radiobutton
+                          formControlName="categoryId"
+                          [inputId]="'cat-' + categorie.id"
+                          name="categoryId"
+                          [value]="categorie.id"
+                        />
+                        <label [for]="'cat-' + categorie.id">{{ categorie.name }}</label>
+                      </div>
+                    }
+                  }
+                </div>
+              </p-tabpanel>
+              @if (form().get('categoryId')?.invalid && form().get('categoryId')?.touched) {
+                <small class="p-error text-red-500">Category is required.</small>
+              }
+            </p-tabpanels>
+          </p-tabs>
+        </div>
+        <div>
+          <label for="description" class="block font-bold mb-3">Description</label>
+          <input
+            formControlName="description"
+            type="text"
+            pInputText
+            id="description"
+            required
+            autofocus
+            fluid
+          />
+          @if (form().get('description')?.invalid && form().get('description')?.touched) {
+            <small class="p-error invalid-feedback">Description is required.</small>
+          }
+        </div>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="col-span-8">
+            <label for="amount" class="block font-bold mb-3">Amount</label>
+            <p-inputnumber
+              formControlName="amount"
+              [inputStyleClass]="errors()['Amount'] ? 'ng-invalid ng-dirty' : ''"
+              inputId="amount"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              fluid
+            />
+            @if (errors()['Amount']) {
+              <small class="p-error text-red-500">{{ errors()['Amount'][0] }}</small>
+            }
+          </div>
+        </div>
+        <div>
+          <label for="date" class="block font-bold mb-3">Date</label>
+          <p-date-picker
+            formControlName="date"
+            [showButtonBar]="true"
+            inputId="date"
+            dateFormat="mm/dd/yy"
+            showIcon
+            fluid
+          ></p-date-picker>
+        </div>
+      </div>
+      <div class="mt-5 mb-2 flex justify-end items-center gap-3">
+        <p-button label="Cancel" icon="pi pi-times" text (click)="onClose()" />
+        <p-button
+          form="transactionForm"
+          [label]="isEditing() ? 'Update' : 'Create'"
+          icon="pi pi-check"
+          type="submit"
+        />
+      </div>
+    </form>
+  </ng-template>
+</p-dialog>

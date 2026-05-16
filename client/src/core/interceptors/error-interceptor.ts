@@ -20,7 +20,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                   modelStateErrors.push(error.error.errors[key]);
                 }
               }
-              throw modelStateErrors.flat();
+              toast.add({
+                severity: 'error',
+                summary: 'Validation Errors',
+                detail: modelStateErrors.flat().join(' '),
+              });
+              throw error.error.errors;
             } else {
               toast.add({
                 severity: 'error',
