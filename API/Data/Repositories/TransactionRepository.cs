@@ -52,6 +52,9 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             "category" => transactionParams.SortDirection == "asc"
             ? query.OrderBy(t => t.Category.Name)
             : query.OrderByDescending(t => t.Category.Name),
+            "type" => transactionParams.SortDirection == "asc"
+            ? query.OrderBy(t => t.Category.TransactionType.Name)
+            : query.OrderByDescending(t => t.Category.TransactionType.Name),
             _ => query.OrderByDescending(t => t.Date)
         };
 

@@ -12,6 +12,7 @@ public class TransactionRequestDto
     [Required(ErrorMessage = "The Transaction Date is required")]
     public DateTime? Date { get; set; }
 
+    [Required(ErrorMessage = "The Transaction Description is required")]
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "The Transaction Category is required")]

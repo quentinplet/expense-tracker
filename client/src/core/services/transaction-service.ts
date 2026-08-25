@@ -57,9 +57,10 @@ export class TransactionService {
   }
 
   deleteTransactions(transactions: Transaction[]): Observable<void> {
+    // L'API attend un tableau d'ids brut (`[FromBody] List<int>`), pas un objet enveloppe.
     const ids = transactions.map((t) => t.id);
     return this.http.request<void>('delete', `${this.baseUrl}transactions`, {
-      body: { ids },
+      body: ids,
     });
   }
 }

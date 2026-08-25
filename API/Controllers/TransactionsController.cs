@@ -15,7 +15,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
 {
 
     [HttpGet]
-    public async Task<ActionResult<List<TransactionResponseDto>>> GetAllTransactions([FromQuery] TransactionParams transactionParams)
+    public async Task<ActionResult<PaginatedResult<TransactionResponseDto>>> GetAllTransactions([FromQuery] TransactionParams transactionParams)
     {
         var userId = User.GetMemberId();
         transactionParams.CurrentUserId = userId;
@@ -55,7 +55,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         {
             Amount = dto.Amount!.Value,
             Date = dto.Date!.Value,
-            Description = dto.Description,
+            Description = dto.Description!,
             CategoryId = dto.CategoryId!.Value,
             UserId = userId
         };
@@ -81,7 +81,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
 
         transaction.Amount = dto.Amount!.Value;
         transaction.Date = dto.Date!.Value;
-        transaction.Description = dto.Description;
+        transaction.Description = dto.Description!;
         transaction.CategoryId = dto.CategoryId!.Value;
         uow.TransactionRepository.UpdateTransaction(transaction);
 
