@@ -4,17 +4,11 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
-import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { RatingModule } from 'primeng/rating';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { DialogModule } from 'primeng/dialog';
-import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TransactionService } from '@/core/services/transaction-service';
 import {
   CreateTransactionDto,
@@ -31,17 +25,6 @@ import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface Column {
-  field: string;
-  header: string;
-  customExportHeader?: string;
-}
-
-interface ExportColumn {
-  title: string;
-  dataKey: string;
-}
-
 @Component({
   selector: 'app-transactions',
   imports: [
@@ -49,17 +32,11 @@ interface ExportColumn {
     TableModule,
     FormsModule,
     ButtonModule,
-    RippleModule,
-    ToastModule,
     ToolbarModule,
-    RatingModule,
     InputTextModule,
     SelectModule,
-    DialogModule,
-    TagModule,
     InputIconModule,
     IconFieldModule,
-    ConfirmDialogModule,
     Paginator,
     ReactiveFormsModule,
     TransactionModalForm,
@@ -93,11 +70,6 @@ export class Transactions implements OnInit {
   selectedTransaction = signal<Transaction | null>(null);
   selectedTransactions = signal<Transaction[]>([]);
 
-  submitted: boolean = false;
-  exportColumns!: ExportColumn[];
-
-  cols!: Column[];
-
   private fb = inject(FormBuilder);
   private transactionService = inject(TransactionService);
   private messageService = inject(MessageService);
@@ -111,10 +83,6 @@ export class Transactions implements OnInit {
     amount: [0, Validators.required],
     date: [new Date(), Validators.required],
   });
-
-  exportCSV() {
-    this.dt.exportCSV();
-  }
 
   ngOnInit() {
     this.loadTransactions({
@@ -244,7 +212,6 @@ export class Transactions implements OnInit {
   openNew() {
     this.selectedTransaction.set(null);
     this.transactionForm.reset();
-    this.submitted = false;
     this.errors.set({});
     this.transactionDialog = true;
   }
@@ -404,7 +371,6 @@ export class Transactions implements OnInit {
     this.transactionDialog = false;
     this.selectedTransaction.set(null);
     this.transactionForm.reset();
-    this.submitted = false;
     this.errors.set({});
   }
 

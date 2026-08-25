@@ -1,7 +1,7 @@
 <p-dialog
   [(visible)]="visible"
   [style]="{ width: '450px' }"
-  header="Product Details"
+  [header]="isEditing() ? 'Edit Transaction' : 'New Transaction'"
   [modal]="true"
 >
   <ng-template #content>

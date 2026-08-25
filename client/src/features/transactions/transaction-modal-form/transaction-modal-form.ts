@@ -1,4 +1,4 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { RadioButton } from 'primeng/radiobutton';
@@ -38,9 +38,6 @@ export class TransactionModalForm {
 
   close = output<void>();
   save = output<void>();
-
-  expenseCategories = computed(() => this.categories().filter((cat) => cat.type === 'Expense'));
-  incomeCategories = computed(() => this.categories().filter((cat) => cat.type === 'Income'));
 
   onClose() {
     this.close.emit();
