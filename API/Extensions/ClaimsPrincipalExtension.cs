@@ -5,9 +5,11 @@ namespace API.Extensions;
 
 public static class ClaimsPrincipalExtension
 {
-    public static string GetMemberId(this ClaimsPrincipal user)
+    public static Guid GetMemberId(this ClaimsPrincipal user)
     {
-        return user.FindFirstValue(ClaimTypes.NameIdentifier)
+        var id = user.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? throw new Exception("Cannot get memberId from token");
+
+        return Guid.Parse(id);
     }
 }

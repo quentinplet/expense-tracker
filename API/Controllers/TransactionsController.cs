@@ -28,7 +28,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpGet("type/{transactionType}")]
-    public async Task<ActionResult<List<TransactionResponseDto>>> GetTransactionsByType(TransactionTypeName transactionType)
+    public async Task<ActionResult<List<TransactionResponseDto>>> GetTransactionsByType(TransactionType transactionType)
     {
         var userId = User.GetMemberId();
 
@@ -37,7 +37,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<TransactionResponseDto>> GetTransactionById(int id)
+    public async Task<ActionResult<TransactionResponseDto>> GetTransactionById(Guid id)
     {
         var userId = User.GetMemberId();
         var transaction = await uow.TransactionRepository.GetTransactionByIdAsync(id);
@@ -51,14 +51,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     {
         var userId = User.GetMemberId();
 
-        var transaction = new Transaction
-        {
-            Amount = dto.Amount!.Value,
-            Date = dto.Date!.Value,
-            Description = dto.Description!,
-            CategoryId = dto.CategoryId!.Value,
-            UserId = userId
-        };
+        var transaction = dto.ToEntity(userId);
 
         uow.TransactionRepository.AddTransaction(transaction);
         if (await uow.Complete())
@@ -72,17 +65,14 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateTransaction(int id, TransactionRequestDto dto)
+    public async Task<ActionResult> UpdateTransaction(Guid id, TransactionRequestDto dto)
     {
         var userId = User.GetMemberId();
         var transaction = await uow.TransactionRepository.GetTransactionByIdAsync(id);
         if (transaction == null) return NotFound();
         if (transaction.UserId != userId) return Forbid();
 
-        transaction.Amount = dto.Amount!.Value;
-        transaction.Date = dto.Date!.Value;
-        transaction.Description = dto.Description!;
-        transaction.CategoryId = dto.CategoryId!.Value;
+        dto.Apply(transaction);
         uow.TransactionRepository.UpdateTransaction(transaction);
 
         if (await uow.Complete())
@@ -97,7 +87,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteTransaction(int id)
+    public async Task<ActionResult> DeleteTransaction(Guid id)
     {
         var userId = User.GetMemberId();
         var transaction = await uow.TransactionRepository.GetTransactionByIdAsync(id);
@@ -110,7 +100,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteTransactions([FromBody] List<int> ids)
+    public async Task<ActionResult> DeleteTransactions([FromBody] List<Guid> ids)
     {
         var userId = User.GetMemberId();
         var transactions = await uow.TransactionRepository.GetTransactionsByIdsAsync(ids, userId);

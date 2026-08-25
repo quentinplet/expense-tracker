@@ -8,15 +8,15 @@
     <form id="transactionForm" [formGroup]="form()" class="p-fluid" (ngSubmit)="onSubmit()">
       <div class="flex flex-col gap-6">
         <div>
-          <p-tabs value="0">
+          <p-tabs [value]="activeTab()" (valueChange)="onTypeTabChange($event)">
             <p-tablist>
-              <p-tab value="0">Expense</p-tab>
-              <p-tab value="1">Income</p-tab>
+              <p-tab value="Expense">Expense</p-tab>
+              <p-tab value="Income">Income</p-tab>
             </p-tablist>
             <p-tabpanels class="mt-5 p-0!">
               <span class="block font-bold mb-4">Category</span>
               <!-- Onglet Expense -->
-              <p-tabpanel value="0">
+              <p-tabpanel value="Expense">
                 <div class="grid grid-cols-3 gap-5 mt-4">
                   @for (categorie of categories(); track categorie.id) {
                     @if (categorie.type === 'Expense') {
@@ -35,7 +35,7 @@
               </p-tabpanel>
 
               <!-- Onglet Income -->
-              <p-tabpanel value="1">
+              <p-tabpanel value="Income">
                 <div class="grid grid-cols-3 gap-5 mt-4">
                   @for (categorie of categories(); track categorie.id) {
                     @if (categorie.type === 'Income') {
@@ -59,19 +59,23 @@
           </p-tabs>
         </div>
         <div>
-          <label for="description" class="block font-bold mb-3">Description</label>
+          <label for="label" class="block font-bold mb-3">Label</label>
           <input
-            formControlName="description"
+            formControlName="label"
             type="text"
             pInputText
-            id="description"
+            id="label"
             required
             autofocus
             fluid
           />
-          @if (form().get('description')?.invalid && form().get('description')?.touched) {
-            <small class="p-error invalid-feedback">Description is required.</small>
+          @if (form().get('label')?.invalid && form().get('label')?.touched) {
+            <small class="p-error invalid-feedback">Label is required.</small>
           }
+        </div>
+        <div>
+          <label for="note" class="block font-bold mb-3">Note</label>
+          <input formControlName="note" type="text" pInputText id="note" fluid />
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-8">

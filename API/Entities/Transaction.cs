@@ -4,17 +4,28 @@ namespace API.Entities;
 
 public class Transaction
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
+
+    /// TOUJOURS positif. Le sens est porté par Type (§3.C, règle 15).
     public required decimal Amount { get; set; }
-    public required DateTime Date { get; set; }
-    public string Description { get; set; } = null!;
+    public required TransactionType Type { get; set; }
+
+    /// Date de l'opération, sans heure.
+    public required DateOnly Date { get; set; }
+
+    /// Libellé court, obligatoire.
+    public string Label { get; set; } = null!;
+
+    /// Texte libre, optionnel.
+    public string? Note { get; set; }
 
     //navigation properties for category
-    public int CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
     public Category Category { get; set; } = null!;
 
     //navigation properties for user
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
     public AppUser User { get; set; } = null!;
 
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

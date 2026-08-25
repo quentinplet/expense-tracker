@@ -1,4 +1,5 @@
 using System;
+using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
 
@@ -13,10 +14,32 @@ public static class TransactionExtension
             Id = transaction.Id,
             Amount = transaction.Amount,
             Date = transaction.Date,
-            Description = transaction.Description,
-            CategoryName = transaction.Category?.Name ?? "Non spécifiée",
+            Label = transaction.Label,
+            Note = transaction.Note,
+            CategoryName = transaction.Category?.Name ?? string.Empty,
             CategoryId = transaction.CategoryId,
-            Type = transaction.Category?.TransactionType?.Name.ToString() ?? "Unknown"
+            Type = transaction.Type.ToString()
         };
+    }
+
+    public static Transaction ToEntity(this TransactionRequestDto dto, Guid userId) => new()
+    {
+        Amount = dto.Amount!.Value,
+        Type = dto.Type!.Value,
+        Date = dto.Date!.Value,
+        Label = dto.Label!,
+        Note = dto.Note,
+        CategoryId = dto.CategoryId!.Value,
+        UserId = userId
+    };
+
+    public static void Apply(this TransactionRequestDto dto, Transaction transaction)
+    {
+        transaction.Amount = dto.Amount!.Value;
+        transaction.Type = dto.Type!.Value;
+        transaction.Date = dto.Date!.Value;
+        transaction.Label = dto.Label!;
+        transaction.Note = dto.Note;
+        transaction.CategoryId = dto.CategoryId!.Value;
     }
 }

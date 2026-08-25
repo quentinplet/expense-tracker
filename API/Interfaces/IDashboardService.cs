@@ -5,6 +5,6 @@ namespace API.Interfaces;
 
 public interface IDashboardService
 {
-    Task<DashboardResponseDto> GetDashboardDataAsync(string userId, int month, int year);
+    Task<DashboardResponseDto> GetDashboardDataAsync(Guid userId, int month, int year);
 
 }

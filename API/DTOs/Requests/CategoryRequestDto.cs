@@ -12,7 +12,7 @@ public class CategoryRequestDto
     public required string Name { get; set; }
 
     [Required]
-    [EnumDataType(typeof(TransactionTypeName))]
-    public TransactionTypeName TransactionType { get; set; }
+    [EnumDataType(typeof(TransactionType))]
+    public TransactionType Type { get; set; }
 
 }

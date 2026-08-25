@@ -1,39 +1,124 @@
 {
   "transactionTypes": [
-    { "id": 1, "name": "Expense" },
-    { "id": 2, "name": "Income" }
+    {
+      "id": 1,
+      "name": "Expense"
+    },
+    {
+      "id": 2,
+      "name": "Income"
+    }
   ],
-
   "categories": [
     {
       "id": 1,
       "name": "Food & Groceries",
       "enabled": true,
-      "transactionTypeId": 1
+      "transactionTypeId": 1,
+      "icon": "pi-shopping-cart",
+      "color": "#F59E0B",
+      "translationKey": "category.system.food-groceries"
     },
-    { "id": 2, "name": "Transport", "enabled": true, "transactionTypeId": 1 },
-    { "id": 3, "name": "Housing", "enabled": true, "transactionTypeId": 1 },
-    { "id": 4, "name": "Health", "enabled": true, "transactionTypeId": 1 },
+    {
+      "id": 2,
+      "name": "Transport",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-car",
+      "color": "#3B82F6",
+      "translationKey": "category.system.transport"
+    },
+    {
+      "id": 3,
+      "name": "Housing",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-home",
+      "color": "#8B5CF6",
+      "translationKey": "category.system.housing"
+    },
+    {
+      "id": 4,
+      "name": "Health",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-heart",
+      "color": "#EF4444",
+      "translationKey": "category.system.health"
+    },
     {
       "id": 5,
       "name": "Entertainment",
       "enabled": true,
-      "transactionTypeId": 1
+      "transactionTypeId": 1,
+      "icon": "pi-ticket",
+      "color": "#EC4899",
+      "translationKey": "category.system.entertainment"
     },
-    { "id": 6, "name": "Shopping", "enabled": true, "transactionTypeId": 1 },
-    { "id": 7, "name": "Utilities", "enabled": true, "transactionTypeId": 1 },
+    {
+      "id": 6,
+      "name": "Shopping",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-tag",
+      "color": "#14B8A6",
+      "translationKey": "category.system.shopping"
+    },
+    {
+      "id": 7,
+      "name": "Utilities",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-bolt",
+      "color": "#F97316",
+      "translationKey": "category.system.utilities"
+    },
     {
       "id": 8,
       "name": "Sport & Fitness",
       "enabled": true,
-      "transactionTypeId": 1
+      "transactionTypeId": 1,
+      "icon": "pi-stopwatch",
+      "color": "#22C55E",
+      "translationKey": "category.system.sport-fitness"
     },
-    { "id": 9, "name": "Salary", "enabled": true, "transactionTypeId": 2 },
-    { "id": 10, "name": "Freelance", "enabled": true, "transactionTypeId": 2 },
-    { "id": 11, "name": "Investment", "enabled": true, "transactionTypeId": 2 },
-    { "id": 12, "name": "Gift", "enabled": true, "transactionTypeId": 2 }
+    {
+      "id": 9,
+      "name": "Salary",
+      "enabled": true,
+      "transactionTypeId": 2,
+      "icon": "pi-wallet",
+      "color": "#10B981",
+      "translationKey": "category.system.salary"
+    },
+    {
+      "id": 10,
+      "name": "Freelance",
+      "enabled": true,
+      "transactionTypeId": 2,
+      "icon": "pi-briefcase",
+      "color": "#0EA5E9",
+      "translationKey": "category.system.freelance"
+    },
+    {
+      "id": 11,
+      "name": "Investment",
+      "enabled": true,
+      "transactionTypeId": 2,
+      "icon": "pi-chart-line",
+      "color": "#6366F1",
+      "translationKey": "category.system.investment"
+    },
+    {
+      "id": 12,
+      "name": "Gift",
+      "enabled": true,
+      "transactionTypeId": 2,
+      "icon": "pi-gift",
+      "color": "#A855F7",
+      "translationKey": "category.system.gift"
+    }
   ],
-
   "transactions": [
     {
       "id": 1,

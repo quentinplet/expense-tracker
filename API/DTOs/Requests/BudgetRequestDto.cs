@@ -17,6 +17,6 @@ public class BudgetRequestDto
     public int Year { get; set; }
 
     [Required]
-    public int CategoryId { get; set; }
+    public Guid CategoryId { get; set; }
 
 }

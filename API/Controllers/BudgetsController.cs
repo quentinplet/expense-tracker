@@ -22,7 +22,7 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<BudgetResponseDto>> GetBudgetById(int id)
+    public async Task<ActionResult<BudgetResponseDto>> GetBudgetById(Guid id)
     {
         var userId = User.GetMemberId();
 
@@ -52,7 +52,7 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBudget(int id, [FromBody] BudgetRequestDto dto)
+    public async Task<ActionResult> UpdateBudget(Guid id, [FromBody] BudgetRequestDto dto)
     {
         var userId = User.GetMemberId();
         if (userId == null) return Unauthorized();
@@ -70,7 +70,7 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteBudget(int id)
+    public async Task<ActionResult> DeleteBudget(Guid id)
     {
         var userId = User.GetMemberId();
         if (userId == null) return Unauthorized();

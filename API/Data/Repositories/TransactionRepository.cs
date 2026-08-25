@@ -15,7 +15,6 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
         var query = context.Transactions
             .Where(t => t.UserId == transactionParams.CurrentUserId)
             .Include(t => t.Category)
-            .ThenInclude(c => c.TransactionType)
             .AsQueryable();
 
 
@@ -28,14 +27,14 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
         // Filter by transaction type
         if (transactionParams.TransactionType.HasValue)
         {
-            query = query.Where(t => t.Category.TransactionType.Name == transactionParams.TransactionType.Value);
+            query = query.Where(t => t.Type == transactionParams.TransactionType.Value);
         }
 
         // Search by description, category name
         if (!string.IsNullOrEmpty(transactionParams.Search))
         {
             var search = transactionParams.Search.ToLower();
-            query = query.Where(t => EF.Functions.Like(t.Description.ToLower(), $"%{search}%") ||
+            query = query.Where(t => EF.Functions.Like(t.Label.ToLower(), $"%{search}%") ||
                                      EF.Functions.Like(t.Category.Name.ToLower(), $"%{search}%"));
 
         }
@@ -53,8 +52,8 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             ? query.OrderBy(t => t.Category.Name)
             : query.OrderByDescending(t => t.Category.Name),
             "type" => transactionParams.SortDirection == "asc"
-            ? query.OrderBy(t => t.Category.TransactionType.Name)
-            : query.OrderByDescending(t => t.Category.TransactionType.Name),
+            ? query.OrderBy(t => t.Type)
+            : query.OrderByDescending(t => t.Type),
             _ => query.OrderByDescending(t => t.Date)
         };
 
@@ -62,40 +61,36 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
         return await PaginationHelper.CreateAsync(query, transactionParams.PageNumber, transactionParams.PageSize);
     }
 
-    public async Task<IReadOnlyList<Transaction>> GetTransactionsByTypeAsync(string userId, TransactionTypeName type)
+    public async Task<IReadOnlyList<Transaction>> GetTransactionsByTypeAsync(Guid userId, TransactionType type)
     {
         return await context.Transactions
             .Include(t => t.Category)
-            .ThenInclude(c => c.TransactionType)
-            .Where(t => t.UserId == userId && t.Category.TransactionType.Name == type)
+            .Where(t => t.UserId == userId && t.Type == type)
             .OrderByDescending(t => t.Date)
             .ToListAsync();
     }
 
-    public async Task<List<Transaction>> GetMonthlyTransactionsAsync(string userId, int month, int year)
+    public async Task<List<Transaction>> GetMonthlyTransactionsAsync(Guid userId, int month, int year)
     {
         return await context.Transactions
             .Include(t => t.Category)
-            .ThenInclude(c => c.TransactionType)
             .Where(t => t.UserId == userId && t.Date.Month == month && t.Date.Year == year)
             .OrderByDescending(t => t.Date)
             .ToListAsync();
     }
 
-    public async Task<List<Transaction>> GetTransactionsByIdsAsync(List<int> ids, string userId)
+    public async Task<List<Transaction>> GetTransactionsByIdsAsync(List<Guid> ids, Guid userId)
     {
         return await context.Transactions
             .Include(t => t.Category)
-            .ThenInclude(c => c.TransactionType)
             .Where(t => ids.Contains(t.Id) && t.UserId == userId)
             .ToListAsync();
     }
 
-    public async Task<Transaction?> GetTransactionByIdAsync(int id)
+    public async Task<Transaction?> GetTransactionByIdAsync(Guid id)
     {
         return await context.Transactions
             .Include(t => t.Category)
-            .ThenInclude(c => c.TransactionType)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
@@ -119,7 +114,7 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
         context.Transactions.RemoveRange(transactions);
     }
 
-    public async Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(string userId, int month, int year)
+    public async Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(Guid userId, int month, int year)
     {
         var baseQuery = context.Transactions
             .Where(t => t.UserId == userId && t.Date.Month == month && t.Date.Year == year);
@@ -130,15 +125,15 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             .GroupBy(_ => 1)
             .Select(g => new
             {
-                TotalIncome = g.Where(t => t.Category.TransactionType.Name == TransactionTypeName.Income)
+                TotalIncome = g.Where(t => t.Type == TransactionType.Income)
                                 .Sum(t => (decimal?)t.Amount) ?? 0,
-                TotalExpenses = g.Where(t => t.Category.TransactionType.Name == TransactionTypeName.Expense)
+                TotalExpenses = g.Where(t => t.Type == TransactionType.Expense)
                                 .Sum(t => (decimal?)t.Amount) ?? 0,
             })
             .FirstOrDefaultAsync();
 
         var expensesByCategory = await baseQuery
-            .Where(t => t.Category.TransactionType.Name == TransactionTypeName.Expense)
+            .Where(t => t.Type == TransactionType.Expense)
             .GroupBy(t => t.Category.Name)
             .Select(g => new CategorySummaryDto
             {

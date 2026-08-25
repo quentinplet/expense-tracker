@@ -10,7 +10,7 @@ namespace API.Services;
 
 public class DashboardService(IUnitOfWork uow) : IDashboardService
 {
-    public async Task<DashboardResponseDto> GetDashboardDataAsync(string userId, int month, int year)
+    public async Task<DashboardResponseDto> GetDashboardDataAsync(Guid userId, int month, int year)
     {
         var transactionsSummary = await uow.TransactionRepository.GetTransactionsSummaryAsync(userId, month, year);
 
@@ -28,21 +28,21 @@ public class DashboardService(IUnitOfWork uow) : IDashboardService
     private static decimal CalculateTotalIncome(List<Transaction> transactions)
     {
         return transactions
-            .Where(t => t.Category.TransactionType.Name == TransactionTypeName.Income)
+            .Where(t => t.Type == TransactionType.Income)
             .Sum(t => t.Amount);
     }
 
     private static decimal CalculateTotalExpenses(List<Transaction> transactions)
     {
         return transactions
-            .Where(t => t.Category.TransactionType.Name == TransactionTypeName.Expense)
+            .Where(t => t.Type == TransactionType.Expense)
             .Sum(t => t.Amount);
     }
 
     private static List<CategorySummaryDto> CalculateExpensesByCategory(List<Transaction> transactions)
     {
         return transactions
-            .Where(t => t.Category.TransactionType.Name == TransactionTypeName.Expense)
+            .Where(t => t.Type == TransactionType.Expense)
             .GroupBy(t => t.Category.Name)
             .Select(g => new CategorySummaryDto
             {
@@ -58,7 +58,7 @@ public class DashboardService(IUnitOfWork uow) : IDashboardService
         return budgets.Select(b =>
         {
             var spent = transactions
-                .Where(t => t.CategoryId == b.CategoryId && t.Category.TransactionType.Name == TransactionTypeName.Expense)
+                .Where(t => t.CategoryId == b.CategoryId && t.Type == TransactionType.Expense)
                 .Sum(t => t.Amount);
             return new BudgetSummaryDto
             {

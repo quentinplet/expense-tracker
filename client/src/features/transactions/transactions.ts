@@ -14,6 +14,7 @@ import {
   CreateTransactionDto,
   Transaction,
   TransactionParams,
+  TransactionType,
   UpdateTransactionDto,
 } from '@/types/transaction';
 import { Paginator, PaginatorState } from 'primeng/paginator';
@@ -63,7 +64,7 @@ export class Transactions implements OnInit {
   errors = signal<Record<string, string[]>>({});
   private searchSubject = new Subject<string>();
   protected searchValue: string = '';
-  protected selectedCategoryId: number | null = null;
+  protected selectedCategoryId: string | null = null;
   protected selectedTransactionType: string | null = null;
   private destroyRef = inject(DestroyRef);
 
@@ -78,8 +79,10 @@ export class Transactions implements OnInit {
   protected categorieService = inject(CategorieService);
 
   transactionForm = this.fb.nonNullable.group({
-    description: ['', Validators.required],
-    categoryId: [0, Validators.required],
+    label: ['', Validators.required],
+    note: [''],
+    type: ['Expense' as TransactionType, Validators.required],
+    categoryId: ['', Validators.required],
     amount: [0, Validators.required],
     date: [new Date(), Validators.required],
   });
@@ -124,7 +127,7 @@ export class Transactions implements OnInit {
     } as TableLazyLoadEvent);
   }
 
-  onCategoryChange(categoryId: number | null) {
+  onCategoryChange(categoryId: string | null) {
     this.selectedCategoryId = categoryId;
     this.transactionParams.categoryId = categoryId ?? undefined;
 
@@ -226,7 +229,9 @@ export class Transactions implements OnInit {
     this.selectedTransaction.set(transaction);
 
     this.transactionForm.patchValue({
-      description: transaction.description,
+      label: transaction.label,
+      note: transaction.note ?? '',
+      type: transaction.type,
       amount: transaction.amount,
       date: new Date(transaction.date),
       categoryId: transaction.categoryId,
@@ -273,7 +278,7 @@ export class Transactions implements OnInit {
 
   deleteTransaction(transaction: Transaction) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + transaction.description + '?',
+      message: 'Are you sure you want to delete ' + transaction.label + '?',
       header: 'Confirm',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
@@ -307,8 +312,21 @@ export class Transactions implements OnInit {
     });
   }
 
+  private toPayload(): CreateTransactionDto {
+    const { label, note, type, categoryId, amount, date } = this.transactionForm.getRawValue();
+    return {
+      label,
+      note: note || null,
+      type,
+      categoryId,
+      amount,
+      // L'API attend une DateOnly : date locale au format yyyy-MM-dd, sans fuseau.
+      date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`,
+    };
+  }
+
   submit() {
-    const transactionData = this.transactionForm.getRawValue();
+    const transactionData = this.toPayload();
     if (this.selectedTransaction()) {
       this.updateTransaction(transactionData);
       return;

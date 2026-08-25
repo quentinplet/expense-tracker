@@ -140,7 +140,7 @@
           <p-tableCheckbox [value]="transaction" />
         </td>
         <td style="min-width: 12rem">{{ transaction.date | date }}</td>
-        <td style="min-width: 16rem">{{ transaction.description }}</td>
+        <td style="min-width: 16rem">{{ transaction.label }}</td>
         <td>{{ transaction.amount | currency: 'EUR' }}</td>
         <td>{{ transaction.categoryName }}</td>
         <td>{{ transaction.type }}</td>

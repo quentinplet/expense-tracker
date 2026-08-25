@@ -9,11 +9,11 @@ namespace API.Interfaces;
 public interface ITransactionRepository
 {
     Task<PaginatedResult<Entities.Transaction>> GetAllTransactionsByUserIdAsync(TransactionParams transactionParams);
-    Task<IReadOnlyList<Entities.Transaction>> GetTransactionsByTypeAsync(string userId, TransactionTypeName type);
-    Task<List<Entities.Transaction>> GetMonthlyTransactionsAsync(string userId, int month, int year);
-    Task<List<Entities.Transaction>> GetTransactionsByIdsAsync(List<int> ids, string userId);
-    Task<Entities.Transaction?> GetTransactionByIdAsync(int id);
-    Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(string userId, int month, int year);
+    Task<IReadOnlyList<Entities.Transaction>> GetTransactionsByTypeAsync(Guid userId, TransactionType type);
+    Task<List<Entities.Transaction>> GetMonthlyTransactionsAsync(Guid userId, int month, int year);
+    Task<List<Entities.Transaction>> GetTransactionsByIdsAsync(List<Guid> ids, Guid userId);
+    Task<Entities.Transaction?> GetTransactionByIdAsync(Guid id);
+    Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(Guid userId, int month, int year);
 
     void AddTransaction(Entities.Transaction transaction);
     void UpdateTransaction(Entities.Transaction transaction);

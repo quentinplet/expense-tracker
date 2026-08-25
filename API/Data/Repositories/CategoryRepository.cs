@@ -9,24 +9,19 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
 {
     public async Task<List<Category>> GetAllAsync()
     {
+        return await context.Categories.ToListAsync();
+    }
+
+    public async Task<List<Category>> GetByTypeAsync(TransactionType type)
+    {
         return await context.Categories
-            .Include(c => c.TransactionType)
+            .Where(c => c.Type == type)
             .ToListAsync();
     }
 
-    public async Task<List<Category>> GetByTypeAsync(TransactionTypeName transactionTypeName)
+    public async Task<Category?> GetByIdAsync(Guid id)
     {
-        return await context.Categories
-            .Include(c => c.TransactionType)
-            .Where(c => c.TransactionType.Name == transactionTypeName)
-            .ToListAsync();
-    }
-
-    public async Task<Category?> GetByIdAsync(int id)
-    {
-        return await context.Categories
-            .Include(c => c.TransactionType)
-            .FirstOrDefaultAsync(c => c.Id == id);
+        return await context.Categories.FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public void Add(Category category)
@@ -42,11 +37,6 @@ public class CategoryRepository(AppDbContext context) : ICategoryRepository
     public void Delete(Category category)
     {
         context.Categories.Remove(category);
-    }
-
-    public async Task<TransactionType?> GetTransactionTypeByNameAsync(TransactionTypeName name)
-    {
-        return await context.TransactionTypes.FirstOrDefaultAsync(t => t.Name == name);
     }
 
 }

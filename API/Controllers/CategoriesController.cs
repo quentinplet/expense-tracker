@@ -20,14 +20,14 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpGet("type/{transactionTypeName}")] // api/category/by-type/Expense
-    public async Task<ActionResult<List<CategoryResponseDto>>> GetByType(TransactionTypeName transactionTypeName)
+    public async Task<ActionResult<List<CategoryResponseDto>>> GetByType(TransactionType transactionTypeName)
     {
         var categories = await uow.CategoryRepository.GetByTypeAsync(transactionTypeName);
         return Ok(categories.Select(c => c.ToCategoryResponseDto()));
     }
 
     [HttpGet("{id}")] // api/category/5
-    public async Task<ActionResult<CategoryResponseDto>> GetById(int id)
+    public async Task<ActionResult<CategoryResponseDto>> GetById(Guid id)
     {
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
@@ -38,16 +38,12 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     public async Task<ActionResult<CategoryResponseDto>> Create(CategoryRequestDto categoryRequestDto)
     {
 
-        var transactionType = await uow.CategoryRepository.GetTransactionTypeByNameAsync(categoryRequestDto.TransactionType);
-        if (transactionType == null)
-        {
-            return BadRequest($"Transaction type '{categoryRequestDto.TransactionType}' does not exist.");
-        }
-
         var category = new Category
         {
             Name = categoryRequestDto.Name,
-            TransactionTypeId = transactionType.Id,
+            Type = categoryRequestDto.Type,
+            UserId = User.GetMemberId(),
+            IsSystem = false,
             Enabled = true
         };
 
@@ -58,20 +54,15 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpPut("{id}")] // api/category/5
-    public async Task<ActionResult> Update(int id, CategoryRequestDto categoryRequestDto)
+    public async Task<ActionResult> Update(Guid id, CategoryRequestDto categoryRequestDto)
     {
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
 
-        var transactionType = await uow.CategoryRepository.GetTransactionTypeByNameAsync(categoryRequestDto.TransactionType);
-        if (transactionType == null)
-
-        {
-            return BadRequest($"Transaction type '{categoryRequestDto.TransactionType}' does not exist.");
-        }
+        if (category.IsSystem) return BadRequest("System categories cannot be modified.");
 
         category.Name = categoryRequestDto.Name;
-        category.TransactionTypeId = transactionType.Id;
+        category.Type = categoryRequestDto.Type;
 
         uow.CategoryRepository.Update(category);
         if (await uow.Complete()) return NoContent();
@@ -79,7 +70,7 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpPatch("{id}/toggle")] // api/category/5/toggle
-    public async Task<ActionResult> ToggleEnabled(int id)
+    public async Task<ActionResult> ToggleEnabled(Guid id)
     {
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
@@ -90,10 +81,11 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpDelete("{id}")] // api/category/5
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Delete(Guid id)
     {
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
+        if (category.IsSystem) return BadRequest("System categories cannot be deleted.");
         uow.CategoryRepository.Delete(category);
         if (await uow.Complete()) return NoContent();
         return BadRequest("Failed to delete category");

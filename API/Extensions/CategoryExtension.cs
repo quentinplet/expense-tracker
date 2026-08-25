@@ -12,7 +12,11 @@ public static class CategoryExtension
             Id = category.Id,
             Name = category.Name,
             Enabled = category.Enabled,
-            Type = category.TransactionType?.Name.ToString() ?? "Unknown"
+            Type = category.Type.ToString(),
+            TranslationKey = category.TranslationKey,
+            Icon = category.Icon,
+            Color = category.Color,
+            IsSystem = category.IsSystem
         };
     }
 

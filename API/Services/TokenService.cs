@@ -22,7 +22,7 @@ public class TokenService(IConfiguration config, UserManager<AppUser> userManage
         var claims = new List<Claim>
         {
             new (ClaimTypes.Email, user.Email!),
-            new (ClaimTypes.NameIdentifier, user.Id),
+            new (ClaimTypes.NameIdentifier, user.Id.ToString()),
         };
 
         var roles = await userManager.GetRolesAsync(user);

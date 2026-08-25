@@ -24,14 +24,14 @@ builder.Services.AddOpenApi();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 dataSourceBuilder.MapEnum<Frequency>();
-dataSourceBuilder.MapEnum<TransactionTypeName>();
+dataSourceBuilder.MapEnum<TransactionType>();
 
 var dataSource = dataSourceBuilder.Build();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(dataSource, o =>
     {
-        o.MapEnum<TransactionTypeName>();
+        o.MapEnum<TransactionType>();
         o.MapEnum<Frequency>();
     })
 );
@@ -46,7 +46,7 @@ builder.Services.AddIdentityCore<AppUser>(opt =>
     opt.Password.RequireNonAlphanumeric = false;
     opt.User.RequireUniqueEmail = true;
 })
-.AddRoles<IdentityRole>()
+.AddRoles<IdentityRole<Guid>>()
 .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

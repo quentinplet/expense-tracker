@@ -1,23 +1,32 @@
+export type TransactionType = 'Expense' | 'Income';
+
 export type Transaction = {
   id: string;
   amount: number;
-  date: Date;
-  description: string;
+  type: TransactionType;
+  date: string;
+  label: string;
+  note?: string | null;
   categoryName: string;
-  categoryId: number;
-  type?: 'income' | 'expense';
+  categoryId: string;
 };
 
-export type CreateTransactionDto = Omit<Transaction, 'id' | 'type' | 'categoryName'> & {
-  categoryId: number;
+export type CreateTransactionDto = {
+  amount: number;
+  type: TransactionType;
+  date: string;
+  label: string;
+  note?: string | null;
+  categoryId: string;
 };
-export type UpdateTransactionDto = Partial<CreateTransactionDto>;
+
+export type UpdateTransactionDto = CreateTransactionDto;
 
 export class TransactionParams {
   pageNumber = 1;
   pageSize = 10;
 
-  categoryId?: number;
+  categoryId?: string;
   transactionType?: string;
   search?: string;
   sortBy?: string;

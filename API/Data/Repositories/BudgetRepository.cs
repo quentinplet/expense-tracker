@@ -7,30 +7,27 @@ namespace API.Data.Repositories;
 
 public class BudgetRepository(AppDbContext context) : IBudgetRepository
 {
-    public async Task<IReadOnlyList<Budget>> GetAllByUserIdAsync(string userId)
+    public async Task<IReadOnlyList<Budget>> GetAllByUserIdAsync(Guid userId)
     {
         return await context.Budgets
             .Include(b => b.Category)
-            .Include(b => b.Category.TransactionType)
             .Where(b => b.UserId == userId)
             .OrderByDescending(b => b.Year)
             .ThenByDescending(b => b.Month)
             .ToListAsync();
     }
-    public async Task<List<Budget>> GetAllByUserIdAndMonthAsync(string userId, int month, int year)
+    public async Task<List<Budget>> GetAllByUserIdAndMonthAsync(Guid userId, int month, int year)
     {
         return await context.Budgets
             .Include(b => b.Category)
-            .Include(b => b.Category.TransactionType)
             .Where(b => b.UserId == userId && b.Month == month && b.Year == year)
             .ToListAsync();
     }
 
-    public async Task<Budget?> GetByIdAsync(int id)
+    public async Task<Budget?> GetByIdAsync(Guid id)
     {
         return await context.Budgets
             .Include(b => b.Category)
-            .Include(b => b.Category.TransactionType)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
     public void Add(Budget budget)

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities;
 
-public class AppUser : IdentityUser
+public class AppUser : IdentityUser<Guid>
 {
     public string? ImageUrl { get; set; }
     public string? RefreshToken { get; set; }
