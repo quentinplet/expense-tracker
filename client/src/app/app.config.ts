@@ -5,6 +5,9 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter, withViewTransitions } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import localeEn from '@angular/common/locales/en';
 
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -21,6 +24,11 @@ import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { LanguageService } from '@/core/services/language-service';
 import { DARK_CLASS, ThemeService } from '@/core/services/theme-service';
+
+// Angular n'embarque que en-US : sans ces enregistrements, DatePipe et CurrencyPipe
+// resteraient en anglais quelle que soit la langue choisie.
+registerLocaleData(localeFr);
+registerLocaleData(localeEn);
 
 export const appConfig: ApplicationConfig = {
   providers: [

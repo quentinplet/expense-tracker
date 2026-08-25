@@ -1,79 +1,104 @@
-import { AccountService } from '@/core/services/account-service';
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { StatsWidget } from './stats-widget/stats-widget';
+import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 import { DashboardService } from '@/core/services/dashboard-service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
-import { Select } from 'primeng/select';
-import { FormsModule } from '@angular/forms';
-import { DataWidget, WidgetSeverity } from '@/types/dashboard';
+import { DashboardResponse } from '@/types/dashboard';
+import { MonthNavigator } from './components/month-navigator/month-navigator';
+import { KpiCards } from './components/kpi-cards/kpi-cards';
+import { CategoryDonut } from './components/category-donut/category-donut';
+import { TrendChart } from './components/trend-chart/trend-chart';
+import { RecentTransactions } from './components/recent-transactions/recent-transactions';
+import { currentMonthKey, isValidMonthKey, MonthKey, shiftMonth } from './month';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsWidget, Select, FormsModule],
+  imports: [
+    TranslatePipe,
+    MonthNavigator,
+    KpiCards,
+    CategoryDonut,
+    TrendChart,
+    RecentTransactions,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
   private dashboardService = inject(DashboardService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  protected monthOptions = Array.from({ length: 12 }, (_, i) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() + -i);
-    return {
-      label: date.toLocaleString('default', { month: 'long', year: 'numeric' }),
-      month: date.getMonth() + 1,
-      year: date.getFullYear(),
-    };
-  });
+  protected loading = signal(false);
+  protected failed = signal(false);
 
-  protected selectedPeriod = signal(this.monthOptions[0]);
-
-  protected dashboardData = toSignal(
-    toObservable(this.selectedPeriod).pipe(
-      switchMap(({ month, year }) => this.dashboardService.getDashboardData({ month, year })),
+  /**
+   * Le mois affiché vit dans l'URL : rafraîchir, partager un lien ou revenir en
+   * arrière se comportent alors comme l'utilisateur s'y attend.
+   */
+  private month = toSignal(
+    this.route.queryParamMap.pipe(
+      map((params) => params.get('month')),
+      map((month) => (isValidMonthKey(month) ? month : currentMonthKey())),
     ),
+    { initialValue: currentMonthKey() },
   );
 
-  protected dataWidgets: () => DataWidget[] = computed(() => {
-    const data = this.dashboardData();
+  protected currentMonth = computed<MonthKey>(() => this.month());
 
-    if (!data) return [];
+  protected data = toSignal(
+    this.route.queryParamMap.pipe(
+      map((params) => params.get('month')),
+      map((month) => (isValidMonthKey(month) ? month : currentMonthKey())),
+      tap(() => {
+        this.loading.set(true);
+        this.failed.set(false);
+      }),
+      switchMap((month) =>
+        this.dashboardService.getDashboardData(month).pipe(
+          catchError(() => {
+            this.failed.set(true);
+            return of(null);
+          }),
+        ),
+      ),
+      tap(() => this.loading.set(false)),
+    ),
+    { initialValue: null as DashboardResponse | null },
+  );
 
-    return [
-      {
-        title: 'Total Expenses',
-        value: data.totalExpenses,
-        icon: 'pi pi-arrow-down',
-        severity: 'danger',
-        currency: true,
-      },
-      {
-        title: 'Total Income',
-        value: data.totalIncome,
-        icon: 'pi pi-arrow-up',
-        severity: 'success',
-        currency: true,
-      },
-      {
-        title: 'Balance',
-        value: data.balance,
-        icon: 'pi pi-wallet',
-        severity: 'contrast',
-        currency: true,
-      },
-      {
-        title: 'Transactions',
-        value: data.numberOfTransactions,
-        icon: 'pi pi-list',
-        severity: 'primary',
-      },
-    ];
+  /**
+   * Deux vides différents : aucune donnée nulle part appelle un message
+   * d'accueil, un mois vide alors qu'il y a de l'historique ailleurs appelle
+   * seulement « rien enregistré en août ». Montrer l'accueil à quelqu'un qui a
+   * simplement changé de mois se lit comme une perte de données.
+   */
+  protected monthIsEmpty = computed(() => {
+    const data = this.data();
+    if (!data) return false;
+    return data.totals.income === 0 && data.totals.expenses === 0;
   });
 
-  constructor() {
-    effect(() => {
-      console.log('Dashboard data updated:', this.dashboardData());
+  protected hasNoHistory = computed(() => {
+    const data = this.data();
+    if (!data) return false;
+    return this.monthIsEmpty() && data.trend.every((p) => p.income === 0 && p.expenses === 0);
+  });
+
+  goToPreviousMonth() {
+    this.navigateTo(shiftMonth(this.currentMonth(), -1));
+  }
+
+  goToNextMonth() {
+    this.navigateTo(shiftMonth(this.currentMonth(), 1));
+  }
+
+  private navigateTo(month: MonthKey) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { month },
+      queryParamsHandling: 'merge',
     });
   }
 }
