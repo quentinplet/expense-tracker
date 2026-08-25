@@ -38,7 +38,7 @@
     {
       "id": 1,
       "amount": 2800.0,
-      "date": "2025-01-01",
+      "date": "2026-01-01",
       "description": "Monthly salary",
       "categoryId": 9,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -46,7 +46,7 @@
     {
       "id": 2,
       "amount": 850.0,
-      "date": "2025-01-02",
+      "date": "2026-01-02",
       "description": "Monthly rent",
       "categoryId": 3,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -54,7 +54,7 @@
     {
       "id": 3,
       "amount": 65.4,
-      "date": "2025-01-03",
+      "date": "2026-01-03",
       "description": "Weekly groceries - Carrefour",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -62,7 +62,7 @@
     {
       "id": 4,
       "amount": 38.5,
-      "date": "2025-01-05",
+      "date": "2026-01-05",
       "description": "Monthly metro pass",
       "categoryId": 2,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -70,7 +70,7 @@
     {
       "id": 5,
       "amount": 120.0,
-      "date": "2025-01-06",
+      "date": "2026-01-06",
       "description": "Electricity bill",
       "categoryId": 7,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -78,7 +78,7 @@
     {
       "id": 6,
       "amount": 45.0,
-      "date": "2025-01-07",
+      "date": "2026-01-07",
       "description": "Restaurant dinner with friends",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -86,7 +86,7 @@
     {
       "id": 7,
       "amount": 500.0,
-      "date": "2025-01-08",
+      "date": "2026-01-08",
       "description": "Freelance web project",
       "categoryId": 10,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -94,7 +94,7 @@
     {
       "id": 8,
       "amount": 15.99,
-      "date": "2025-01-09",
+      "date": "2026-01-09",
       "description": "Netflix subscription",
       "categoryId": 5,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -102,7 +102,7 @@
     {
       "id": 9,
       "amount": 55.0,
-      "date": "2025-01-10",
+      "date": "2026-01-10",
       "description": "Doctor consultation",
       "categoryId": 4,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -110,7 +110,7 @@
     {
       "id": 10,
       "amount": 89.99,
-      "date": "2025-01-12",
+      "date": "2026-01-12",
       "description": "New running shoes",
       "categoryId": 6,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -118,7 +118,7 @@
     {
       "id": 11,
       "amount": 35.0,
-      "date": "2025-01-14",
+      "date": "2026-01-14",
       "description": "Weekly groceries - Lidl",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -126,7 +126,7 @@
     {
       "id": 12,
       "amount": 40.0,
-      "date": "2025-01-15",
+      "date": "2026-01-15",
       "description": "Gym membership",
       "categoryId": 8,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -134,7 +134,7 @@
     {
       "id": 13,
       "amount": 200.0,
-      "date": "2025-01-16",
+      "date": "2026-01-16",
       "description": "Dividend from stocks",
       "categoryId": 11,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -142,7 +142,7 @@
     {
       "id": 14,
       "amount": 12.5,
-      "date": "2025-01-17",
+      "date": "2026-01-17",
       "description": "Uber ride",
       "categoryId": 2,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -150,7 +150,7 @@
     {
       "id": 15,
       "amount": 75.0,
-      "date": "2025-01-18",
+      "date": "2026-01-18",
       "description": "Internet bill",
       "categoryId": 7,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -158,7 +158,7 @@
     {
       "id": 16,
       "amount": 29.99,
-      "date": "2025-01-19",
+      "date": "2026-01-19",
       "description": "Spotify + Apple Music",
       "categoryId": 5,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -166,7 +166,7 @@
     {
       "id": 17,
       "amount": 150.0,
-      "date": "2025-01-20",
+      "date": "2026-01-20",
       "description": "Birthday gift from parents",
       "categoryId": 12,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -174,7 +174,7 @@
     {
       "id": 18,
       "amount": 55.3,
-      "date": "2025-01-21",
+      "date": "2026-01-21",
       "description": "Weekly groceries - Monoprix",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -182,7 +182,7 @@
     {
       "id": 19,
       "amount": 25.0,
-      "date": "2025-01-23",
+      "date": "2026-01-23",
       "description": "Cinema tickets x2",
       "categoryId": 5,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -190,7 +190,7 @@
     {
       "id": 20,
       "amount": 320.0,
-      "date": "2025-01-25",
+      "date": "2026-01-25",
       "description": "Winter jacket - Zara",
       "categoryId": 6,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -198,7 +198,7 @@
     {
       "id": 21,
       "amount": 2800.0,
-      "date": "2025-02-01",
+      "date": "2026-02-01",
       "description": "Monthly salary",
       "categoryId": 9,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -206,7 +206,7 @@
     {
       "id": 22,
       "amount": 850.0,
-      "date": "2025-02-02",
+      "date": "2026-02-02",
       "description": "Monthly rent",
       "categoryId": 3,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -214,7 +214,7 @@
     {
       "id": 23,
       "amount": 70.2,
-      "date": "2025-02-03",
+      "date": "2026-02-03",
       "description": "Weekly groceries - Carrefour",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -222,7 +222,7 @@
     {
       "id": 24,
       "amount": 38.5,
-      "date": "2025-02-04",
+      "date": "2026-02-04",
       "description": "Monthly metro pass",
       "categoryId": 2,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -230,7 +230,7 @@
     {
       "id": 25,
       "amount": 750.0,
-      "date": "2025-02-05",
+      "date": "2026-02-05",
       "description": "Freelance mobile app project",
       "categoryId": 10,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -238,7 +238,7 @@
     {
       "id": 26,
       "amount": 95.0,
-      "date": "2025-02-06",
+      "date": "2026-02-06",
       "description": "Electricity bill",
       "categoryId": 7,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -246,7 +246,7 @@
     {
       "id": 27,
       "amount": 40.0,
-      "date": "2025-02-07",
+      "date": "2026-02-07",
       "description": "Gym membership",
       "categoryId": 8,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -254,7 +254,7 @@
     {
       "id": 28,
       "amount": 15.99,
-      "date": "2025-02-09",
+      "date": "2026-02-09",
       "description": "Netflix subscription",
       "categoryId": 5,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -262,7 +262,7 @@
     {
       "id": 29,
       "amount": 48.5,
-      "date": "2025-02-11",
+      "date": "2026-02-11",
       "description": "Valentine's day dinner",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -270,7 +270,7 @@
     {
       "id": 30,
       "amount": 200.0,
-      "date": "2025-02-14",
+      "date": "2026-02-14",
       "description": "Dividend from stocks",
       "categoryId": 11,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -278,7 +278,7 @@
     {
       "id": 31,
       "amount": 65.0,
-      "date": "2025-02-15",
+      "date": "2026-02-15",
       "description": "Pharmacy",
       "categoryId": 4,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -286,7 +286,7 @@
     {
       "id": 32,
       "amount": 199.99,
-      "date": "2025-02-17",
+      "date": "2026-02-17",
       "description": "New headphones - Sony",
       "categoryId": 6,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -294,7 +294,7 @@
     {
       "id": 33,
       "amount": 75.0,
-      "date": "2025-02-18",
+      "date": "2026-02-18",
       "description": "Internet bill",
       "categoryId": 7,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -302,7 +302,7 @@
     {
       "id": 34,
       "amount": 42.8,
-      "date": "2025-02-20",
+      "date": "2026-02-20",
       "description": "Weekly groceries - Lidl",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -310,7 +310,7 @@
     {
       "id": 35,
       "amount": 2800.0,
-      "date": "2025-03-01",
+      "date": "2026-03-01",
       "description": "Monthly salary",
       "categoryId": 9,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -318,7 +318,7 @@
     {
       "id": 36,
       "amount": 850.0,
-      "date": "2025-03-02",
+      "date": "2026-03-02",
       "description": "Monthly rent",
       "categoryId": 3,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -326,7 +326,7 @@
     {
       "id": 37,
       "amount": 600.0,
-      "date": "2025-03-03",
+      "date": "2026-03-03",
       "description": "Freelance design project",
       "categoryId": 10,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -334,7 +334,7 @@
     {
       "id": 38,
       "amount": 68.9,
-      "date": "2025-03-04",
+      "date": "2026-03-04",
       "description": "Weekly groceries - Carrefour",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -342,7 +342,7 @@
     {
       "id": 39,
       "amount": 38.5,
-      "date": "2025-03-05",
+      "date": "2026-03-05",
       "description": "Monthly metro pass",
       "categoryId": 2,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -350,7 +350,7 @@
     {
       "id": 40,
       "amount": 110.0,
-      "date": "2025-03-06",
+      "date": "2026-03-06",
       "description": "Electricity bill",
       "categoryId": 7,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -358,7 +358,7 @@
     {
       "id": 41,
       "amount": 40.0,
-      "date": "2025-03-07",
+      "date": "2026-03-07",
       "description": "Gym membership",
       "categoryId": 8,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -366,7 +366,7 @@
     {
       "id": 42,
       "amount": 15.99,
-      "date": "2025-03-09",
+      "date": "2026-03-09",
       "description": "Netflix subscription",
       "categoryId": 5,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -374,7 +374,7 @@
     {
       "id": 43,
       "amount": 200.0,
-      "date": "2025-03-15",
+      "date": "2026-03-15",
       "description": "Dividend from stocks",
       "categoryId": 11,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -382,7 +382,7 @@
     {
       "id": 44,
       "amount": 450.0,
-      "date": "2025-03-16",
+      "date": "2026-03-16",
       "description": "Flight tickets - Spring break",
       "categoryId": 2,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -390,7 +390,7 @@
     {
       "id": 45,
       "amount": 75.0,
-      "date": "2025-03-18",
+      "date": "2026-03-18",
       "description": "Internet bill",
       "categoryId": 7,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -398,7 +398,7 @@
     {
       "id": 46,
       "amount": 280.0,
-      "date": "2025-03-20",
+      "date": "2026-03-20",
       "description": "New sneakers - Nike",
       "categoryId": 6,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -406,7 +406,7 @@
     {
       "id": 47,
       "amount": 55.6,
-      "date": "2025-03-22",
+      "date": "2026-03-22",
       "description": "Weekly groceries - Monoprix",
       "categoryId": 1,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
@@ -414,7 +414,7 @@
     {
       "id": 48,
       "amount": 30.0,
-      "date": "2025-03-25",
+      "date": "2026-03-25",
       "description": "Concert tickets",
       "categoryId": 5,
       "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"

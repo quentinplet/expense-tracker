@@ -12,21 +12,17 @@ public class DashboardService(IUnitOfWork uow) : IDashboardService
 {
     public async Task<DashboardResponseDto> GetDashboardDataAsync(string userId, int month, int year)
     {
-        var transactions = await uow.TransactionRepository.GetMonthlyTransactionsAsync(userId, month, year);
-        var budgets = await uow.BudgetRepository.GetAllByUserIdAndMonthAsync(userId, month, year);
+        var transactionsSummary = await uow.TransactionRepository.GetTransactionsSummaryAsync(userId, month, year);
 
-        var totalIncome = CalculateTotalIncome(transactions);
-        var totalExpenses = CalculateTotalExpenses(transactions);
-        var expensesByCategory = CalculateExpensesByCategory(transactions);
-        var budgetSummaries = CalculateBudgetSummaries(budgets, transactions);
+        // var budgets = await uow.BudgetRepository.GetBudgetsByUserIdAsync(userId);
 
         return new DashboardResponseDto
         {
-            TotalIncome = totalIncome,
-            TotalExpenses = totalExpenses,
-            Balance = totalIncome - totalExpenses,
-            ExpensesByCategory = expensesByCategory,
-            BudgetSummaries = budgetSummaries
+            TotalIncome = transactionsSummary.TotalIncome,
+            TotalExpenses = transactionsSummary.TotalExpenses,
+            Balance = transactionsSummary.TotalIncome - transactionsSummary.TotalExpenses,
+            ExpensesByCategory = transactionsSummary.ExpensesByCategory,
+            NumberOfTransactions = transactionsSummary.NumberOfTransactions
         };
     }
     private static decimal CalculateTotalIncome(List<Transaction> transactions)

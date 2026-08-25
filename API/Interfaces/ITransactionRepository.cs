@@ -1,5 +1,6 @@
 using System;
 using System.Transactions;
+using API.DTOs.Responses;
 using API.Entities;
 using API.Helpers;
 
@@ -12,6 +13,7 @@ public interface ITransactionRepository
     Task<List<Entities.Transaction>> GetMonthlyTransactionsAsync(string userId, int month, int year);
     Task<List<Entities.Transaction>> GetTransactionsByIdsAsync(List<int> ids, string userId);
     Task<Entities.Transaction?> GetTransactionByIdAsync(int id);
+    Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(string userId, int month, int year);
 
     void AddTransaction(Entities.Transaction transaction);
     void UpdateTransaction(Entities.Transaction transaction);

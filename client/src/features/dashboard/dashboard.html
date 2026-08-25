@@ -1,2 +1,27 @@
-<p>dashboard works!</p>
-<p>Hello {{ currentUser?.userName }}</p>
+<div class="w-full">
+  <div class="mb-6 flex flex-col">
+    <h1 class="text-3xl font-bold m-0">Dashboard</h1>
+    <div>
+      <p-select
+        [options]="monthOptions"
+        optionLabel="label"
+        [(ngModel)]="selectedPeriod"
+        size="large"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+  @if (dashboardData(); as data) {
+    @for (widget of dataWidgets(); track $index) {
+      <app-stats-widget
+        [title]="widget.title"
+        [value]="widget.value"
+        [icon]="widget.icon"
+        [severity]="widget.severity"
+        [currency]="widget.currency"
+      ></app-stats-widget>
+    }
+  }
+</div>

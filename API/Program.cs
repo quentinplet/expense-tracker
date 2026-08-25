@@ -29,7 +29,11 @@ dataSourceBuilder.MapEnum<TransactionTypeName>();
 var dataSource = dataSourceBuilder.Build();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(dataSource, o => o.MapEnum<TransactionTypeName>())
+    options.UseNpgsql(dataSource, o =>
+    {
+        o.MapEnum<TransactionTypeName>();
+        o.MapEnum<Frequency>();
+    })
 );
 
 builder.Services.AddCors();

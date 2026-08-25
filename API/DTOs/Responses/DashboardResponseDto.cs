@@ -2,13 +2,17 @@ using System;
 
 namespace API.DTOs.Responses;
 
-public class DashboardResponseDto
+public class DashboardResponseDto : TransactionsSummaryResponseDto
+{
+}
+
+public class TransactionsSummaryResponseDto
 {
     public decimal TotalIncome { get; set; }
     public decimal TotalExpenses { get; set; }
     public decimal Balance { get; set; }
+    public int NumberOfTransactions { get; set; }
     public IReadOnlyList<CategorySummaryDto> ExpensesByCategory { get; set; } = [];
-    public IReadOnlyList<BudgetSummaryDto> BudgetSummaries { get; set; } = [];
 }
 
 public class CategorySummaryDto
