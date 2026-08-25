@@ -1,31 +1,46 @@
 <nav
-  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16 bg-white border-b border-gray-200 shadow-sm"
+  class="sticky top-0 z-40 flex h-16 items-center gap-2 border-b border-surface-200 bg-surface-0 px-4 dark:border-surface-800 dark:bg-surface-950"
 >
-  <div class="flex gap-2 items-center">
-    <a
-      routerLink="/dashboard"
-      class="flex items-center gap-2 text-primary font-bold text-xl no-underline"
-    >
-      <i class="pi pi-wallet text-2xl"></i>
-      <span>ExpenseTracker</span>
-    </a>
-    @if (busyService.busyRequestCount() > 0) {
-      <p-progressspinner
-        [style]="{ width: '2rem', height: '2rem' }"
-        strokeWidth="3"
-        fill="var(--surface-ground)"
-      />
-    }
-  </div>
-
-  <div class="flex items-center gap-3">
-    <span class="text-gray-600 font-medium">{{ accountService.currentUser()?.userName }}</span>
-    <p-menu #menu [model]="menuItems" [popup]="true" />
-    <p-avatar
-      [label]="accountService.currentUser()?.userName?.charAt(0)?.toUpperCase()"
-      shape="circle"
-      (click)="menu.toggle($event)"
-      styleClass="cursor-pointer bg-primary text-white"
+  @if (busyService.busyRequestCount() > 0) {
+    <p-progressspinner
+      [style]="{ width: '1.5rem', height: '1.5rem' }"
+      strokeWidth="4"
+      [attr.aria-label]="'common.loading' | translate"
     />
+  }
+
+  <div class="ml-auto flex items-center gap-2">
+    <app-language-switch />
+
+    <button
+      type="button"
+      (click)="themeService.toggle()"
+      [attr.aria-label]="'topbar.toggleTheme' | translate"
+      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-surface-200 text-surface-500 transition-colors hover:text-surface-800 dark:border-surface-800 dark:hover:text-surface-100"
+    >
+      <i
+        class="pi"
+        [class.pi-moon]="themeService.current() === 'light'"
+        [class.pi-sun]="themeService.current() === 'dark'"
+      ></i>
+    </button>
+
+    <button
+      type="button"
+      [attr.aria-label]="'topbar.notifications' | translate"
+      class="relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg border border-surface-200 text-surface-500 transition-colors hover:text-surface-800 dark:border-surface-800 dark:hover:text-surface-100"
+    >
+      <i class="pi pi-bell"></i>
+    </button>
+
+    <button
+      type="button"
+      (click)="menu.toggle($event)"
+      [attr.aria-label]="'topbar.profile' | translate"
+      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-contrast"
+    >
+      {{ initials() }}
+    </button>
+    <p-menu #menu [model]="menuItems()" [popup]="true" />
   </div>
 </nav>

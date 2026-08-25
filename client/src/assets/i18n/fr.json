@@ -12,8 +12,6 @@
     "categories": "Catégories"
   },
   "topbar": {
-    "search": "Rechercher une transaction…",
-    "add": "Ajouter",
     "notifications": "Notifications",
     "toggleTheme": "Changer de thème",
     "toggleSidebar": "Replier le menu",

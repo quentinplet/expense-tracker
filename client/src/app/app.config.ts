@@ -9,7 +9,7 @@ import { provideRouter, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeuix/themes/aura';
+import { ExpenseTrackerPreset } from '@/core/theme/preset';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { InitService } from '@/core/services/init-service';
 import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
@@ -20,6 +20,7 @@ import { languageInterceptor } from '@/core/interceptors/language-interceptor';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { LanguageService } from '@/core/services/language-service';
+import { DARK_CLASS, ThemeService } from '@/core/services/theme-service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -45,6 +46,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       const languageService = inject(LanguageService);
       languageService.use(languageService.resolveInitial());
+      inject(ThemeService).init();
     }),
     provideAppInitializer(async () => {
       const initService = inject(InitService);
@@ -64,7 +66,12 @@ export const appConfig: ApplicationConfig = {
     }),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: ExpenseTrackerPreset,
+        options: {
+          // Sans ça PrimeNG suivrait la préférence système pendant que Tailwind
+          // suivrait la classe `app-dark` : les deux se contrediraient.
+          darkModeSelector: `.${DARK_CLASS}`,
+        },
       },
     }),
     MessageService,

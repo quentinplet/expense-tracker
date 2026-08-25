@@ -1,8 +1,10 @@
-<div class="flex flex-col h-screen">
-  <app-navbar class="h-16 w-full fixed top-0 z-50" />
-  <div class="flex flex-1 pt-16 overflow-hidden">
-    <app-sidebar class="w-64 left-2 fixed top-20 h-full" />
-    <main class="flex-1 ml-68 p-6 overflow-y-auto">
+<div class="flex h-screen bg-surface-50 dark:bg-surface-900">
+  <!-- Sous md la sidebar disparaît ; le drawer coulissant de §17 reste à faire. -->
+  <app-sidebar class="hidden shrink-0 md:block" />
+
+  <div class="flex min-w-0 flex-1 flex-col overflow-y-auto">
+    <app-navbar />
+    <main class="flex-1 px-4 py-6 md:px-6">
       <router-outlet />
     </main>
   </div>
