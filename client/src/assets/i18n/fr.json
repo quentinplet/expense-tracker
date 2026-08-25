@@ -1,0 +1,157 @@
+{
+  "app": {
+    "name": "Expense Tracker"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "recurring": "Récurrent",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "categories": "Catégories"
+  },
+  "topbar": {
+    "search": "Rechercher une transaction…",
+    "add": "Ajouter",
+    "notifications": "Notifications",
+    "toggleTheme": "Changer de thème",
+    "toggleSidebar": "Replier le menu",
+    "language": "Langue",
+    "profile": "Profil",
+    "logout": "Se déconnecter"
+  },
+  "common": {
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "create": "Ajouter",
+    "update": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "loading": "Chargement…",
+    "all": "Tout",
+    "none": "Aucun",
+    "optional": "optionnel",
+    "seeAll": "Voir tout",
+    "retry": "Réessayer",
+    "stable": "Stable",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant"
+  },
+  "transaction": {
+    "list": {
+      "title": "Transactions",
+      "count": "{{count}} transactions au total",
+      "empty": "Aucune transaction",
+      "emptyHint": "Ajoutez votre première transaction pour commencer.",
+      "emptyFiltered": "Aucune transaction ne correspond à ces filtres.",
+      "importCsv": "Importer CSV",
+      "showing": "Affichage {{first}}–{{last}} sur {{total}}",
+      "deleteOne": "Voulez-vous vraiment supprimer « {{label}} » ?",
+      "deleteMany": "Voulez-vous vraiment supprimer les transactions sélectionnées ?",
+      "deleted": "Transaction supprimée",
+      "deletedMany": "Transactions supprimées",
+      "deleteFailed": "La suppression a échoué."
+    },
+    "columns": {
+      "label": "Libellé",
+      "category": "Catégorie",
+      "date": "Date",
+      "amount": "Montant",
+      "type": "Sens",
+      "actions": "Actions"
+    },
+    "filters": {
+      "allCategories": "Toutes les catégories",
+      "search": "Filtrer…",
+      "reset": "Réinitialiser",
+      "period": "Période"
+    },
+    "form": {
+      "createTitle": "Nouvelle transaction",
+      "editTitle": "Modifier la transaction",
+      "amount": "Montant",
+      "category": "Catégorie",
+      "date": "Date",
+      "label": "Libellé",
+      "labelPlaceholder": "Ex. Plein A20",
+      "note": "Note",
+      "notePlaceholder": "Ajouter un détail…",
+      "submitHint": "pour valider",
+      "created": "Transaction ajoutée",
+      "updated": "Transaction modifiée",
+      "createFailed": "La création a échoué.",
+      "updateFailed": "La modification a échoué.",
+      "labelRequired": "Le libellé est obligatoire.",
+      "categoryRequired": "La catégorie est obligatoire.",
+      "amountRequired": "Le montant doit être supérieur à 0."
+    },
+    "type": {
+      "expense": "Dépense",
+      "income": "Revenu"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Vue d'ensemble de vos finances",
+    "totals": {
+      "income": "Revenus du mois",
+      "expenses": "Dépenses du mois",
+      "net": "Net du mois",
+      "vsPrevious": "vs {{month}}",
+      "noPrevious": "Pas de comparaison"
+    },
+    "breakdown": {
+      "title": "Répartition par catégorie",
+      "empty": "Aucune dépense ce mois-ci",
+      "other": "Autres",
+      "thisMonth": "ce mois"
+    },
+    "trend": {
+      "title": "Évolution sur 12 mois",
+      "income": "Revenus",
+      "expenses": "Dépenses",
+      "empty": "Pas encore assez d'historique"
+    },
+    "recent": {
+      "title": "Transactions récentes",
+      "empty": "Aucune transaction ce mois-ci"
+    },
+    "empty": {
+      "title": "Rien à afficher pour l'instant",
+      "hint": "Ajoutez votre première transaction pour voir votre tableau de bord se remplir.",
+      "cta": "Ajouter une transaction",
+      "month": "Rien d'enregistré en {{month}}"
+    }
+  },
+  "category": {
+    "system": {
+      "food-groceries": "Alimentation",
+      "transport": "Transport",
+      "housing": "Logement",
+      "health": "Santé",
+      "entertainment": "Loisirs",
+      "shopping": "Shopping",
+      "utilities": "Électricité & eau",
+      "sport-fitness": "Sport & forme",
+      "salary": "Salaire",
+      "freelance": "Freelance",
+      "investment": "Investissement",
+      "gift": "Cadeau"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Continuez vers votre tableau de bord",
+      "email": "Email",
+      "emailPlaceholder": "Adresse email",
+      "password": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "submit": "Se connecter",
+      "back": "Retour"
+    }
+  }
+}

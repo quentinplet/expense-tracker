@@ -16,12 +16,36 @@ import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
 import { jwtInterceptor } from '@/core/interceptors/jwt-interceptor';
 import { loadingInterceptor } from '@/core/interceptors/loading-interceptor';
 import { errorInterceptor } from '@/core/interceptors/error-interceptor';
+import { languageInterceptor } from '@/core/interceptors/language-interceptor';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { LanguageService } from '@/core/services/language-service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withViewTransitions()),
-    provideHttpClient(withInterceptors([jwtInterceptor, loadingInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        jwtInterceptor,
+        languageInterceptor,
+        loadingInterceptor,
+        errorInterceptor,
+      ]),
+    ),
+    provideTranslateService({
+      // Une clé absente doit rester visible en développement (§10, règle 3) : ngx-translate
+      // affiche la clé brute par défaut, on ne pose donc pas de MissingTranslationHandler.
+      fallbackLang: 'en',
+      loader: provideTranslateHttpLoader({
+        prefix: '/assets/i18n/',
+        suffix: '.json',
+      }),
+    }),
+    provideAppInitializer(() => {
+      const languageService = inject(LanguageService);
+      languageService.use(languageService.resolveInitial());
+    }),
     provideAppInitializer(async () => {
       const initService = inject(InitService);
       return new Promise<void>((resolve) => {
