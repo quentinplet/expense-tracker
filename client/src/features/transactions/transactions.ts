@@ -185,6 +185,11 @@ export class Transactions implements OnInit {
       this.transactionParams.sortDirection = event.sortOrder === 1 ? 'asc' : 'desc';
     }
 
+    // La table est paginée côté serveur : une sélection conservée d'une page à l'autre
+    // ne serait plus visible à l'écran, et la suppression groupée porterait sur des
+    // lignes que l'utilisateur ne voit pas.
+    this.selectedTransactions.set([]);
+
     this.transactionService.getTransactions(this.transactionParams).subscribe({
       next: (result) => {
         this.transactions.set(result.items);
@@ -254,6 +259,13 @@ export class Transactions implements OnInit {
               life: 3000,
             });
           },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Deletion Failed',
+              detail: 'An error occurred while deleting the selected transactions.',
+            });
+          },
         });
       },
     });
@@ -283,7 +295,7 @@ export class Transactions implements OnInit {
               this.reloadCurrentPage();
             }
           },
-          error: (error) => {
+          error: () => {
             this.messageService.add({
               severity: 'error',
               summary: 'Deletion Failed',
