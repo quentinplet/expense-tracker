@@ -5,12 +5,21 @@ namespace API.DTOs.Requests;
 
 public class DashboardRequestDto
 {
-    [Required]
-    [Range(1, 12, ErrorMessage = "Month must be between 1 and 12.")]
-    public int Month { get; set; }
+    /// <summary>Mois affiché, au format YYYY-MM.</summary>
+    /// <remarks>
+    /// Le serveur ne devine jamais « le mois courant » : le client l'envoie toujours.
+    /// L'API tourne en UTC alors que l'utilisateur est à Paris — le 1er à 00h30 heure
+    /// de Paris, UTC est encore sur le mois précédent.
+    /// </remarks>
+    [Required(ErrorMessage = "The month is required")]
+    [RegularExpression(
+        @"^\d{4}-(0[1-9]|1[0-2])$",
+        ErrorMessage = "The month must use the YYYY-MM format")]
+    public string Month { get; set; } = null!;
 
-    [Required]
-    [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100.")]
-    public int Year { get; set; }
+    /// L'expression régulière garantit le format : ces deux lectures ne peuvent pas échouer
+    /// une fois le modèle validé.
+    public int Year => int.Parse(Month[..4]);
 
+    public int MonthNumber => int.Parse(Month[5..]);
 }

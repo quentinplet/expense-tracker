@@ -2,29 +2,32 @@ using System;
 
 namespace API.DTOs.Responses;
 
-public class DashboardResponseDto : TransactionsSummaryResponseDto
-{
-}
+public record DashboardResponseDto(
+    string Month,
+    MonthTotalsDto Totals,
+    IReadOnlyList<CategoryBreakdownDto> Breakdown,
+    IReadOnlyList<MonthlyPointDto> Trend,
+    IReadOnlyList<TransactionResponseDto> RecentTransactions);
 
-public class TransactionsSummaryResponseDto
-{
-    public decimal TotalIncome { get; set; }
-    public decimal TotalExpenses { get; set; }
-    public decimal Balance { get; set; }
-    public int NumberOfTransactions { get; set; }
-    public IReadOnlyList<CategorySummaryDto> ExpensesByCategory { get; set; } = [];
-}
+/// L'API renvoie les valeurs brutes du mois précédent, pas un écart calculé :
+/// c'est au client de décider comment présenter la variation, notamment quand
+/// la valeur précédente vaut zéro et qu'un pourcentage n'a aucun sens.
+public record MonthTotalsDto(
+    decimal Expenses,
+    decimal Income,
+    decimal Net,
+    decimal PreviousExpenses,
+    decimal PreviousIncome,
+    decimal PreviousNet);
 
-public class CategorySummaryDto
-{
-    public string CategoryName { get; set; } = null!;
-    public decimal TotalAmount { get; set; }
-}
+public record CategoryBreakdownDto(
+    Guid CategoryId,
+    string Name,
+    string? TranslationKey,
+    string? Color,
+    string? Icon,
+    decimal Total,
+    /// Part du total des dépenses du mois, entre 0 et 1.
+    decimal Share);
 
-public class BudgetSummaryDto
-{
-    public decimal TotalBudget { get; set; }
-    public decimal TotalSpent { get; set; }
-    public decimal RemainingBudget { get; set; }
-    public bool IsExceeded { get; set; }
-}
+public record MonthlyPointDto(string Month, decimal Expenses, decimal Income);

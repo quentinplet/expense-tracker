@@ -39,6 +39,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddIdentityCore<AppUser>(opt =>
