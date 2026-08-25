@@ -485,3 +485,8 @@ API/dating.db*
 API/API.http
 
 ssl/
+
+.claude/
+context/
+CLAUDE.md
+.playwright-mcp/
