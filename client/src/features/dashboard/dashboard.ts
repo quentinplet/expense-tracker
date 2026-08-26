@@ -1,79 +1,110 @@
+import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AccountService } from '@/core/services/account-service';
-import { Component, computed, effect, inject, signal } from '@angular/core';
-import { StatsWidget } from './stats-widget/stats-widget';
 import { DashboardService } from '@/core/services/dashboard-service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
-import { Select } from 'primeng/select';
-import { FormsModule } from '@angular/forms';
-import { DataWidget, WidgetSeverity } from '@/types/dashboard';
+import { LanguageService } from '@/core/services/language-service';
+import { DashboardResponse } from '@/types/dashboard';
+import { PeriodSelector } from './components/period-selector/period-selector';
+import { KpiCards } from './components/kpi-cards/kpi-cards';
+import { CategoryDonut } from './components/category-donut/category-donut';
+import { TrendChart } from './components/trend-chart/trend-chart';
+import { RecentTransactions } from './components/recent-transactions/recent-transactions';
+import { currentMonthKey, isValidMonthKey, MonthKey } from './month';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatsWidget, Select, FormsModule],
+  imports: [
+    DatePipe,
+    TranslatePipe,
+    PeriodSelector,
+    KpiCards,
+    CategoryDonut,
+    TrendChart,
+    RecentTransactions,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
+  private accountService = inject(AccountService);
   private dashboardService = inject(DashboardService);
+  private languageService = inject(LanguageService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
-  protected monthOptions = Array.from({ length: 12 }, (_, i) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() + -i);
+  protected loading = signal(false);
+  protected failed = signal(false);
+
+  protected locale = computed(() => this.languageService.current());
+  protected today = new Date();
+
+  /** Salutation selon l'heure d'ouverture. Le nom reste vide tant que le profil
+   *  n'est pas chargé : « Bonjour,  👋 » vaut mieux qu'un placeholder qui clignote. */
+  protected greeting = computed(() => {
+    const hour = this.today.getHours();
+    const moment = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
     return {
-      label: date.toLocaleString('default', { month: 'long', year: 'numeric' }),
-      month: date.getMonth() + 1,
-      year: date.getFullYear(),
+      key: `dashboard.greeting.${moment}`,
+      name: this.accountService.currentUser()?.userName ?? '',
     };
   });
 
-  protected selectedPeriod = signal(this.monthOptions[0]);
-
-  protected dashboardData = toSignal(
-    toObservable(this.selectedPeriod).pipe(
-      switchMap(({ month, year }) => this.dashboardService.getDashboardData({ month, year })),
-    ),
+  /**
+   * Le mois vit dans l'URL : rafraîchir, partager un lien ou revenir en arrière
+   * se comportent alors comme l'utilisateur s'y attend. Une valeur invalide retombe
+   * sur le mois courant plutôt que de provoquer une erreur.
+   *
+   * La portée « tout l'historique » n'est délibérément pas ici : elle est propre à
+   * chaque widget, et l'encoder dans l'URL reviendrait à traiter un confort de
+   * lecture comme un état partageable.
+   */
+  private month$ = this.route.queryParamMap.pipe(
+    map((params) => params.get('month')),
+    map((month) => (isValidMonthKey(month) ? month : currentMonthKey())),
   );
 
-  protected dataWidgets: () => DataWidget[] = computed(() => {
-    const data = this.dashboardData();
+  protected currentMonth = toSignal(this.month$, { initialValue: currentMonthKey() });
 
-    if (!data) return [];
+  protected data = toSignal(
+    this.month$.pipe(
+      tap(() => {
+        this.loading.set(true);
+        this.failed.set(false);
+      }),
+      switchMap((month) =>
+        this.dashboardService.getDashboardData(month).pipe(
+          catchError(() => {
+            this.failed.set(true);
+            return of(null);
+          }),
+        ),
+      ),
+      tap(() => this.loading.set(false)),
+    ),
+    { initialValue: null as DashboardResponse | null },
+  );
 
-    return [
-      {
-        title: 'Total Expenses',
-        value: data.totalExpenses,
-        icon: 'pi pi-arrow-down',
-        severity: 'danger',
-        currency: true,
-      },
-      {
-        title: 'Total Income',
-        value: data.totalIncome,
-        icon: 'pi pi-arrow-up',
-        severity: 'success',
-        currency: true,
-      },
-      {
-        title: 'Balance',
-        value: data.balance,
-        icon: 'pi pi-wallet',
-        severity: 'contrast',
-        currency: true,
-      },
-      {
-        title: 'Transactions',
-        value: data.numberOfTransactions,
-        icon: 'pi pi-list',
-        severity: 'primary',
-      },
-    ];
+  /**
+   * Deux vides différents : aucune donnée nulle part appelle un message d'accueil,
+   * un mois vide alors qu'il existe de l'historique ailleurs n'appelle qu'un
+   * état vide par widget. Montrer l'accueil à quelqu'un qui a simplement changé de
+   * mois se lirait comme une perte de données.
+   */
+  protected hasNoHistory = computed(() => {
+    const data = this.data();
+    if (!data) return false;
+    return data.cumulativeNet === 0 && data.trend.every((p) => !p.income && !p.expenses);
   });
 
-  constructor() {
-    effect(() => {
-      console.log('Dashboard data updated:', this.dashboardData());
+  setMonth(month: MonthKey) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { month },
+      queryParamsHandling: 'merge',
     });
   }
 }

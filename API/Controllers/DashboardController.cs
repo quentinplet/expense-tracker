@@ -3,7 +3,6 @@ using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Extensions;
 using API.Interfaces;
-using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +11,17 @@ namespace API.Controllers;
 [Authorize]
 public class DashboardController(IDashboardService dashboardService) : BaseApiController
 {
+    /// GET /api/dashboard?month=2026-08
+    /// Un seul appel pour tout l'écran : quatre endpoints, ce serait quatre allers-retours,
+    /// quatre états de chargement, et une fenêtre pendant laquelle une transaction créée
+    /// en cours de séquence ferait diverger les widgets entre eux.
+
     [HttpGet]
-    public async Task<ActionResult<DashboardResponseDto>> GetDashboardData([FromQuery] DashboardRequestDto requestDto)
+    public async Task<ActionResult<DashboardResponseDto>> GetDashboardData(
+        [FromQuery] DashboardRequestDto request)
     {
         var userId = User.GetMemberId();
-        var dashboardData = await dashboardService.GetDashboardDataAsync(userId, requestDto.Month, requestDto.Year);
-        return Ok(dashboardData);
-    }
 
+        return Ok(await dashboardService.GetDashboardDataAsync(userId, request));
+    }
 }

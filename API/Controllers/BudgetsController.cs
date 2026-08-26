@@ -26,7 +26,6 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     {
         var userId = User.GetMemberId();
 
-        if (userId == null) return Unauthorized();
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();
@@ -37,7 +36,6 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     public async Task<ActionResult<BudgetResponseDto>> CreateBudget([FromBody] BudgetRequestDto dto)
     {
         var userId = User.GetMemberId();
-        if (userId == null) return Unauthorized();
         var budget = new Budget
         {
             Amount = dto.Amount,
@@ -55,7 +53,6 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     public async Task<ActionResult> UpdateBudget(Guid id, [FromBody] BudgetRequestDto dto)
     {
         var userId = User.GetMemberId();
-        if (userId == null) return Unauthorized();
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();
@@ -73,7 +70,6 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     public async Task<ActionResult> DeleteBudget(Guid id)
     {
         var userId = User.GetMemberId();
-        if (userId == null) return Unauthorized();
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();

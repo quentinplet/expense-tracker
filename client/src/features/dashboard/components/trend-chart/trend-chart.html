@@ -1,0 +1,70 @@
+<div
+  class="flex h-full flex-col rounded-2xl border border-surface-200 bg-surface-0 p-5 dark:border-surface-800 dark:bg-surface-950"
+>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h2 class="m-0 text-base font-semibold text-surface-900 dark:text-surface-0">
+      {{ 'dashboard.trend.title' | translate }}
+    </h2>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <!-- Légende en HTML plutôt que dans le canvas, pour qu'elle suive thème et langue. -->
+      <div class="flex items-center gap-4 text-xs text-surface-500 dark:text-surface-400">
+        <span class="flex items-center gap-1.5">
+          <span class="h-0.5 w-3 rounded" [style.background-color]="incomeColor"></span>
+          {{ 'dashboard.trend.income' | translate }}
+        </span>
+        <span class="flex items-center gap-1.5">
+          <span class="h-0.5 w-3 rounded" [style.background-color]="expenseColor"></span>
+          {{ 'dashboard.trend.expenses' | translate }}
+        </span>
+      </div>
+
+      <div
+        class="flex items-center gap-0.5 rounded-lg bg-surface-100 p-0.5 dark:bg-surface-900"
+        role="group"
+      >
+        <button
+          type="button"
+          (click)="scope.set('month')"
+          [attr.aria-pressed]="scope() === 'month'"
+          class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+          [class]="
+            scope() === 'month'
+              ? 'bg-surface-0 text-surface-900 dark:bg-surface-950 dark:text-surface-0'
+              : 'text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-0'
+          "
+        >
+          {{ 'dashboard.scope.month' | translate }}
+        </button>
+        <button
+          type="button"
+          (click)="scope.set('all')"
+          [attr.aria-pressed]="scope() === 'all'"
+          class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+          [class]="
+            scope() === 'all'
+              ? 'bg-surface-0 text-surface-900 dark:bg-surface-950 dark:text-surface-0'
+              : 'text-surface-500 hover:text-surface-900 dark:text-surface-400 dark:hover:text-surface-0'
+          "
+        >
+          {{ 'dashboard.scope.all' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boîte à hauteur constante : l'état vide occupe exactement la place du graphique,
+       donc la carte ne change pas de taille en basculant de portée — et la carte
+       voisine, qui partage la même ligne de grille, ne bouge pas non plus. -->
+  <div class="mt-4 h-56">
+    @if (hasData()) {
+      <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="224px" />
+    } @else {
+      <p
+        class="m-0 flex h-full items-center justify-center text-sm text-surface-500 dark:text-surface-400"
+      >
+        {{ 'dashboard.trend.empty' | translate }}
+      </p>
+    }
+  </div>
+</div>

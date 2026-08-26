@@ -1,36 +1,53 @@
-export interface CategorySummary {
-  categoryName: string;
-  totalAmount: number;
-}
+import { Transaction } from './transaction';
 
-export interface BudgetSummary {
-  categoryName: string;
-  totalBudget: number;
-  totalSpent: number;
-  remainingBudget: number;
-  isExceeded: boolean;
-}
+export type MonthTotals = {
+  expenses: number;
+  income: number;
+  net: number;
+  previousExpenses: number;
+  previousIncome: number;
+  previousNet: number;
+};
 
-export interface DashboardResponse {
-  totalIncome: number;
-  totalExpenses: number;
-  balance: number;
-  numberOfTransactions: number;
-  expensesByCategory: CategorySummary[];
-  budgetSummaries: BudgetSummary[];
-}
+export type CategoryBreakdown = {
+  categoryId: string;
+  name: string;
+  translationKey?: string | null;
+  color?: string | null;
+  icon?: string | null;
+  total: number;
+  /** Part du total des dépenses du mois, entre 0 et 1. */
+  share: number;
+};
 
-export interface DashboardParams {
-  month: number;
-  year: number;
-}
+export type MonthlyPoint = {
+  /** "2026-08" */
+  month: string;
+  expenses: number;
+  income: number;
+};
 
-export type WidgetSeverity = 'success' | 'danger' | 'primary' | 'warning' | 'contrast';
+export type DailyPoint = {
+  /** "2026-08-14" */
+  date: string;
+  expenses: number;
+  income: number;
+};
 
-export type DataWidget = {
-  title: string;
-  value: number;
-  icon: string;
-  severity: WidgetSeverity;
-  currency?: boolean;
+export type DashboardResponse = {
+  /** `YYYY-MM` du mois affiché. */
+  month: string;
+  totals: MonthTotals;
+  /** Σ revenus − Σ dépenses sur tout l'historique. Ce n'est pas un solde. */
+  cumulativeNet: number;
+  /** Répartition du mois affiché ; `breakdownAllTime` couvre tout l'historique.
+   *  Les deux voyagent ensemble pour que la bascule du donut soit instantanée. */
+  breakdown: CategoryBreakdown[];
+  breakdownAllTime: CategoryBreakdown[];
+  allTimeExpenses: number;
+  /** Un point par jour du mois affiché ; `trend` porte la vue mensuelle sur tout
+   *  l'historique. La courbe choisit l'une ou l'autre selon sa portée. */
+  dailyTrend: DailyPoint[];
+  trend: MonthlyPoint[];
+  recentTransactions: Transaction[];
 };

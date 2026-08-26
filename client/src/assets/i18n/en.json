@@ -1,0 +1,167 @@
+{
+  "app": {
+    "name": "Expense Tracker"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "budgets": "Budgets",
+    "recurring": "Recurring",
+    "reports": "Reports",
+    "settings": "Settings",
+    "categories": "Categories"
+  },
+  "topbar": {
+    "notifications": "Notifications",
+    "toggleTheme": "Toggle theme",
+    "toggleSidebar": "Collapse menu",
+    "language": "Language",
+    "profile": "Profile",
+    "logout": "Sign out"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Add",
+    "update": "Update",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading…",
+    "all": "All",
+    "none": "None",
+    "optional": "optional",
+    "seeAll": "See all",
+    "retry": "Retry",
+    "stable": "Stable",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month"
+  },
+  "transaction": {
+    "list": {
+      "title": "Transactions",
+      "count": "{{count}} transactions in total",
+      "empty": "No transaction",
+      "emptyHint": "Add your first transaction to get started.",
+      "emptyFiltered": "No transaction matches these filters.",
+      "importCsv": "Import CSV",
+      "showing": "Showing {{first}}–{{last}} of {{total}}",
+      "deleteOne": "Are you sure you want to delete “{{label}}”?",
+      "deleteMany": "Are you sure you want to delete the selected transactions?",
+      "deleted": "Transaction deleted",
+      "deletedMany": "Transactions deleted",
+      "deleteFailed": "Deletion failed."
+    },
+    "columns": {
+      "label": "Label",
+      "category": "Category",
+      "date": "Date",
+      "amount": "Amount",
+      "type": "Type",
+      "actions": "Actions"
+    },
+    "filters": {
+      "allCategories": "All categories",
+      "search": "Filter…",
+      "reset": "Reset",
+      "period": "Period"
+    },
+    "form": {
+      "createTitle": "New transaction",
+      "editTitle": "Edit transaction",
+      "amount": "Amount",
+      "category": "Category",
+      "date": "Date",
+      "label": "Label",
+      "labelPlaceholder": "e.g. Petrol A20",
+      "note": "Note",
+      "notePlaceholder": "Add a detail…",
+      "submitHint": "to submit",
+      "created": "Transaction added",
+      "updated": "Transaction updated",
+      "createFailed": "Creation failed.",
+      "updateFailed": "Update failed.",
+      "labelRequired": "Label is required.",
+      "categoryRequired": "Category is required.",
+      "amountRequired": "Amount must be greater than 0."
+    },
+    "type": {
+      "expense": "Expense",
+      "income": "Income"
+    }
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning, {{name}} 👋",
+      "afternoon": "Good afternoon, {{name}} 👋",
+      "evening": "Good evening, {{name}} 👋"
+    },
+    "overviewFor": "Here's your financial overview for {{date}}.",
+    "totals": {
+      "income": "Income this month",
+      "expenses": "Expenses this month",
+      "net": "Net this month",
+      "vsPrevious": "vs {{month}}",
+      "noPrevious": "No comparison"
+    },
+    "breakdown": {
+      "title": "Breakdown by category",
+      "empty": "No expense this month",
+      "other": "Other",
+      "thisMonth": "this month",
+      "allTime": "all time",
+      "emptyAll": "No expense recorded yet"
+    },
+    "trend": {
+      "title": "Trend",
+      "income": "Income",
+      "expenses": "Expenses",
+      "empty": "Not enough history yet"
+    },
+    "recent": {
+      "title": "Recent transactions",
+      "empty": "No transaction this month"
+    },
+    "empty": {
+      "title": "Nothing to show yet",
+      "hint": "Add your first transaction to see your dashboard fill up."
+    },
+    "cumulative": {
+      "label": "Cumulative net",
+      "hint": "Since the first transaction"
+    },
+    "scope": {
+      "month": "Month",
+      "all": "All time"
+    }
+  },
+  "category": {
+    "system": {
+      "food-groceries": "Food & Groceries",
+      "transport": "Transport",
+      "housing": "Housing",
+      "health": "Health",
+      "entertainment": "Entertainment",
+      "shopping": "Shopping",
+      "utilities": "Utilities",
+      "sport-fitness": "Sport & Fitness",
+      "salary": "Salary",
+      "freelance": "Freelance",
+      "investment": "Investment",
+      "gift": "Gift"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Continue to your dashboard",
+      "email": "Email",
+      "emailPlaceholder": "Email address",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "submit": "Sign in",
+      "back": "Back"
+    }
+  }
+}

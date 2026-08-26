@@ -8,6 +8,9 @@ export type Transaction = {
   label: string;
   note?: string | null;
   categoryName: string;
+  categoryTranslationKey?: string | null;
+  categoryColor?: string | null;
+  categoryIcon?: string | null;
   categoryId: string;
 };
 

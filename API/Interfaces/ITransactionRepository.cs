@@ -13,7 +13,6 @@ public interface ITransactionRepository
     Task<List<Entities.Transaction>> GetMonthlyTransactionsAsync(Guid userId, int month, int year);
     Task<List<Entities.Transaction>> GetTransactionsByIdsAsync(List<Guid> ids, Guid userId);
     Task<Entities.Transaction?> GetTransactionByIdAsync(Guid id);
-    Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(Guid userId, int month, int year);
 
     void AddTransaction(Entities.Transaction transaction);
     void UpdateTransaction(Entities.Transaction transaction);

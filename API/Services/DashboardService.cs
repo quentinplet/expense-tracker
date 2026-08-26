@@ -1,72 +1,172 @@
 using System;
-using API.Data;
-using API.Data.Repositories;
+using API.DTOs.Requests;
 using API.DTOs.Responses;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
-public class DashboardService(IUnitOfWork uow) : IDashboardService
+public class DashboardService(IDashboardRepository repository) : IDashboardService
 {
-    public async Task<DashboardResponseDto> GetDashboardDataAsync(Guid userId, int month, int year)
+    /// <summary>Longueur minimale de la série mensuelle.</summary>
+    private const int TrendMonths = 12;
+
+    /// <summary>Longueur maximale de la série, soit dix ans.</summary>
+    /// <remarks>
+    /// La courbe est bornée par les données, que rien ne valide : une transaction
+    /// saisie en 1900 produirait sinon quinze cents points, et une réponse de
+    /// plusieurs mégaoctets pour une requête d'une ligne.
+    /// </remarks>
+    private const int MaxTrendMonths = 120;
+
+    private const int RecentCount = 5;
+
+    public async Task<DashboardResponseDto> GetDashboardDataAsync(Guid userId, DashboardRequestDto request)
     {
-        var transactionsSummary = await uow.TransactionRepository.GetTransactionsSummaryAsync(userId, month, year);
+        // Le mois affiché borne la répartition et la courbe journalière ; la courbe
+        // mensuelle, elle, court jusqu'au mois courant quel que soit ce choix.
+        var anchor = request.ResolveMonth();
 
-        // var budgets = await uow.BudgetRepository.GetBudgetsByUserIdAsync(userId);
+        var next = anchor.AddMonths(1);
+        var previous = anchor.AddMonths(-1);
 
-        return new DashboardResponseDto
+        var monthlyTotals = await repository.GetMonthlyTotalsAsync(userId);
+        var dailyTotals = await repository.GetDailyTotalsAsync(userId, anchor, next);
+        var overall = await repository.GetOverallTotalsAsync(userId);
+
+        var breakdown = await repository.GetExpenseBreakdownAsync(userId, anchor, next);
+        var breakdownAllTime = await repository.GetExpenseBreakdownAsync(userId, null, null);
+
+        // Décorrélé de la période : « récentes » veut dire récentes.
+        var recent = await repository.GetRecentAsync(userId, RecentCount);
+
+        var totals = BuildMonthTotals(monthlyTotals, anchor, previous);
+
+        return new DashboardResponseDto(
+            Month: request.Month,
+            Totals: totals,
+            CumulativeNet: overall.Income - overall.Expenses,
+            Breakdown: BuildBreakdown(breakdown, totals.Expenses),
+            BreakdownAllTime: BuildBreakdown(breakdownAllTime, overall.Expenses),
+            AllTimeExpenses: overall.Expenses,
+            DailyTrend: BuildDailyTrend(dailyTotals, anchor, next),
+            Trend: BuildTrend(monthlyTotals),
+            RecentTransactions: [.. recent.Select(t => t.ToTransactionResponseDto())]);
+    }
+
+    private static MonthTotalsDto BuildMonthTotals(
+        IReadOnlyList<MonthlyTotalProjection> totals, DateOnly current, DateOnly previous)
+    {
+        var expenses = Sum(totals, current, TransactionType.Expense);
+        var income = Sum(totals, current, TransactionType.Income);
+        var previousExpenses = Sum(totals, previous, TransactionType.Expense);
+        var previousIncome = Sum(totals, previous, TransactionType.Income);
+
+        return new MonthTotalsDto(
+            Expenses: expenses,
+            Income: income,
+            Net: income - expenses,
+            PreviousExpenses: previousExpenses,
+            PreviousIncome: previousIncome,
+            PreviousNet: previousIncome - previousExpenses);
+    }
+
+    private static decimal Sum(
+        IReadOnlyList<MonthlyTotalProjection> totals, DateOnly month, TransactionType type)
+    {
+        return totals
+            .Where(t => t.Year == month.Year && t.Month == month.Month && t.Type == type)
+            .Sum(t => t.Total);
+    }
+
+    private static List<CategoryBreakdownDto> BuildBreakdown(
+        IReadOnlyList<CategoryTotalProjection> breakdown, decimal periodExpenses)
+    {
+        return
+        [
+            .. breakdown.Select(c => new CategoryBreakdownDto(
+                c.CategoryId,
+                c.Name,
+                c.TranslationKey,
+                c.Color,
+                c.Icon,
+                c.Total,
+                // Une période sans dépense doit donner 0, jamais une division par zéro.
+                periodExpenses == 0 ? 0 : c.Total / periodExpenses)),
+        ];
+    }
+
+    /// <summary>
+    /// Un point par jour du mois affiché, du 1er au dernier, y compris les jours sans
+    /// transaction : une courbe qui saute les jours vides écrase l'axe du temps et
+    /// laisse croire à une dépense continue là où il n'y a eu que deux achats.
+    /// </summary>
+    private static List<DailyPointDto> BuildDailyTrend(
+        IReadOnlyList<DailyTotalProjection> totals, DateOnly from, DateOnly toExclusive)
+    {
+        var points = new List<DailyPointDto>();
+
+        for (var day = from; day < toExclusive; day = day.AddDays(1))
         {
-            TotalIncome = transactionsSummary.TotalIncome,
-            TotalExpenses = transactionsSummary.TotalExpenses,
-            Balance = transactionsSummary.TotalIncome - transactionsSummary.TotalExpenses,
-            ExpensesByCategory = transactionsSummary.ExpensesByCategory,
-            NumberOfTransactions = transactionsSummary.NumberOfTransactions
-        };
-    }
-    private static decimal CalculateTotalIncome(List<Transaction> transactions)
-    {
-        return transactions
-            .Where(t => t.Type == TransactionType.Income)
-            .Sum(t => t.Amount);
+            points.Add(new DailyPointDto(
+                day.ToString("yyyy-MM-dd"),
+                SumDay(totals, day, TransactionType.Expense),
+                SumDay(totals, day, TransactionType.Income)));
+        }
+
+        return points;
     }
 
-    private static decimal CalculateTotalExpenses(List<Transaction> transactions)
+    private static decimal SumDay(
+        IReadOnlyList<DailyTotalProjection> totals, DateOnly day, TransactionType type)
     {
-        return transactions
-            .Where(t => t.Type == TransactionType.Expense)
-            .Sum(t => t.Amount);
+        return totals.Where(t => t.Date == day && t.Type == type).Sum(t => t.Total);
     }
 
-    private static List<CategorySummaryDto> CalculateExpensesByCategory(List<Transaction> transactions)
+    /// <summary>
+    /// Série mensuelle sur tout l'historique, volontairement indépendante du mois
+    /// affiché : elle se lit jusqu'au mois courant même quand le picker est sur un
+    /// mois passé, sinon reculer d'un mois amputerait la courbe de tout ce qui suit.
+    /// </summary>
+    /// <remarks>
+    /// Le mois courant est ici lu en UTC, alors que le mois affiché vient toujours du
+    /// client. La nuance de fuseau ne coûte ici qu'un point à zéro de plus ou de moins
+    /// au bord droit pendant quelques heures, là où elle changerait les chiffres
+    /// affichés s'il s'agissait de choisir un mois.
+    ///
+    /// Les mois sans transaction sont absents du GroupBy. Sans remplissage explicite,
+    /// la courbe décalerait silencieusement ses points sur les mauvaises étiquettes.
+    /// </remarks>
+    private static List<MonthlyPointDto> BuildTrend(IReadOnlyList<MonthlyTotalProjection> totals)
     {
-        return transactions
-            .Where(t => t.Type == TransactionType.Expense)
-            .GroupBy(t => t.Category.Name)
-            .Select(g => new CategorySummaryDto
-            {
-                CategoryName = g.Key,
-                TotalAmount = g.Sum(t => t.Amount)
-            })
-            .OrderByDescending(c => c.TotalAmount)
-            .ToList();
-    }
+        var currentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
-    private static List<BudgetSummaryDto> CalculateBudgetSummaries(List<Budget> budgets, List<Transaction> transactions)
-    {
-        return budgets.Select(b =>
+        // Douze mois au minimum, étendus de part et d'autre par les données réelles :
+        // l'axe reste stable chez quelqu'un qui vient de commencer, et un mois sans
+        // rien enregistré apparaît comme un creux plutôt que d'être escamoté.
+        var start = currentMonth.AddMonths(-(TrendMonths - 1));
+        var end = currentMonth;
+
+        foreach (var row in totals)
         {
-            var spent = transactions
-                .Where(t => t.CategoryId == b.CategoryId && t.Type == TransactionType.Expense)
-                .Sum(t => t.Amount);
-            return new BudgetSummaryDto
-            {
-                TotalBudget = b.Amount,
-                TotalSpent = spent,
-                RemainingBudget = b.Amount - spent,
-                IsExceeded = spent > b.Amount
-            };
-        }).ToList();
+            var month = new DateOnly(row.Year, row.Month, 1);
+            if (month < start) start = month;
+            if (month > end) end = month;
+        }
+
+        var floor = end.AddMonths(-(MaxTrendMonths - 1));
+        if (start < floor) start = floor;
+
+        var points = new List<MonthlyPointDto>();
+        for (var month = start; month <= end; month = month.AddMonths(1))
+        {
+            points.Add(new MonthlyPointDto(
+                month.ToString("yyyy-MM"),
+                Sum(totals, month, TransactionType.Expense),
+                Sum(totals, month, TransactionType.Income)));
+        }
+
+        return points;
     }
 }

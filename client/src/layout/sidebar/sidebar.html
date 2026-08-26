@@ -1,18 +1,82 @@
 <aside
-  class="h-[calc(100vh-4rem)] w-64 bg-white border-r rounded-sm border-gray-200 overflow-y-auto"
+  class="flex h-full w-64 flex-col border-r border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-950"
 >
-  <ul class="list-none p-4 m-0 flex flex-col gap-1">
-    @for (item of menuItems; track item.route) {
-      <li>
-        <a
-          [routerLink]="item.route"
-          routerLinkActive="!bg-primary !text-white"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors no-underline cursor-pointer"
-        >
-          <i [class]="item.icon + ' text-lg'"></i>
-          <span class="font-medium">{{ item.label }}</span>
-        </a>
-      </li>
+  <a routerLink="/dashboard" class="flex h-16 shrink-0 items-center gap-3 px-5 no-underline">
+    <span
+      class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-contrast"
+    >
+      <i class="pi pi-wallet"></i>
+    </span>
+    <span class="text-base font-bold text-surface-900 dark:text-surface-0">
+      {{ 'app.name' | translate }}
+    </span>
+  </a>
+
+  <nav class="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+    <ul class="m-0 flex list-none flex-col gap-1 p-0">
+      @for (item of menuItems; track item.route) {
+        <li>
+          @if (item.available) {
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="!bg-primary/10 !text-primary"
+              class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-surface-600 no-underline transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-900"
+            >
+              <i [class]="item.icon"></i>
+              <span>{{ item.labelKey | translate }}</span>
+            </a>
+          } @else {
+            <span
+              aria-disabled="true"
+              class="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-surface-400 opacity-60 dark:text-surface-500"
+            >
+              <i [class]="item.icon"></i>
+              <span>{{ item.labelKey | translate }}</span>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+
+    @if (visibleCategories().length) {
+      <p
+        class="mt-6 mb-2 px-3 text-xs font-semibold tracking-wider text-surface-400 uppercase dark:text-surface-500"
+      >
+        {{ 'nav.categories' | translate }}
+      </p>
+      <ul class="m-0 flex list-none flex-col p-0">
+        @for (category of visibleCategories(); track category.id) {
+          <li
+            class="flex items-center gap-3 px-3 py-1.5 text-sm text-surface-600 dark:text-surface-300"
+          >
+            <!-- Couleur en variable inline : Category.color est une donnée éditable,
+                 jamais une classe générée (§18). -->
+            <span
+              class="h-2 w-2 shrink-0 rounded-full"
+              [style.background-color]="category.color || 'var(--p-surface-400)'"
+            ></span>
+            <span class="truncate">{{ category | categoryName }}</span>
+          </li>
+        }
+      </ul>
     }
-  </ul>
+  </nav>
+
+  <div class="shrink-0 border-t border-surface-200 p-3 dark:border-surface-800">
+    <div class="flex items-center gap-3 rounded-xl bg-surface-100 px-3 py-2.5 dark:bg-surface-900">
+      <span
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-contrast"
+      >
+        {{ initials() }}
+      </span>
+      <span class="min-w-0">
+        <span class="block truncate text-sm font-semibold text-surface-900 dark:text-surface-0">
+          {{ accountService.currentUser()?.userName }}
+        </span>
+        <span class="block truncate text-xs text-surface-500 dark:text-surface-400">
+          {{ accountService.currentUser()?.email }}
+        </span>
+      </span>
+    </div>
+  </div>
 </aside>

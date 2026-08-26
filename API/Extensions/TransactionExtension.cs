@@ -17,6 +17,9 @@ public static class TransactionExtension
             Label = transaction.Label,
             Note = transaction.Note,
             CategoryName = transaction.Category?.Name ?? string.Empty,
+            CategoryTranslationKey = transaction.Category?.TranslationKey,
+            CategoryColor = transaction.Category?.Color,
+            CategoryIcon = transaction.Category?.Icon,
             CategoryId = transaction.CategoryId,
             Type = transaction.Type.ToString()
         };

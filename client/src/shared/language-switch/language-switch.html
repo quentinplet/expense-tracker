@@ -1,0 +1,21 @@
+<div
+  class="flex items-center gap-0.5 rounded-full border border-surface-200 bg-surface-50 p-0.5 dark:border-surface-800 dark:bg-surface-900"
+  role="group"
+  [attr.aria-label]="'topbar.language' | translate"
+>
+  @for (lang of languages; track lang) {
+    <button
+      type="button"
+      class="cursor-pointer rounded-full px-2.5 py-1 text-xs font-semibold uppercase transition-colors"
+      [class]="
+        languageService.current() === lang
+          ? 'bg-primary/15 text-primary'
+          : 'text-surface-400 hover:text-surface-700 dark:hover:text-surface-200'
+      "
+      [attr.aria-pressed]="languageService.current() === lang"
+      (click)="select(lang)"
+    >
+      {{ lang }}
+    </button>
+  }
+</div>

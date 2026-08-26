@@ -113,42 +113,4 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
     {
         context.Transactions.RemoveRange(transactions);
     }
-
-    public async Task<TransactionsSummaryResponseDto> GetTransactionsSummaryAsync(Guid userId, int month, int year)
-    {
-        var baseQuery = context.Transactions
-            .Where(t => t.UserId == userId && t.Date.Month == month && t.Date.Year == year);
-
-        var numberOfTransactions = await baseQuery.CountAsync();
-
-        var totals = await baseQuery
-            .GroupBy(_ => 1)
-            .Select(g => new
-            {
-                TotalIncome = g.Where(t => t.Type == TransactionType.Income)
-                                .Sum(t => (decimal?)t.Amount) ?? 0,
-                TotalExpenses = g.Where(t => t.Type == TransactionType.Expense)
-                                .Sum(t => (decimal?)t.Amount) ?? 0,
-            })
-            .FirstOrDefaultAsync();
-
-        var expensesByCategory = await baseQuery
-            .Where(t => t.Type == TransactionType.Expense)
-            .GroupBy(t => t.Category.Name)
-            .Select(g => new CategorySummaryDto
-            {
-                CategoryName = g.Key,
-                TotalAmount = g.Sum(t => t.Amount)
-            })
-            .OrderByDescending(c => c.TotalAmount)
-            .ToListAsync();
-
-        return new TransactionsSummaryResponseDto
-        {
-            TotalIncome = totals?.TotalIncome ?? 0,
-            TotalExpenses = totals?.TotalExpenses ?? 0,
-            NumberOfTransactions = numberOfTransactions,
-            ExpensesByCategory = expensesByCategory
-        };
-    }
 }
