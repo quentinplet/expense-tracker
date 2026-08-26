@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -25,6 +25,9 @@ import { TransactionModalForm } from './transaction-modal-form/transaction-modal
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { LanguageService } from '@/core/services/language-service';
+import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 
 @Component({
   selector: 'app-transactions',
@@ -41,20 +44,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     Paginator,
     ReactiveFormsModule,
     TransactionModalForm,
+    TranslatePipe,
+    CategoryNamePipe,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
+  // Injecté pour construire les options du filtre : optionLabel prend un nom de
+  // champ, pas un pipe, donc les libellés se calculent en TypeScript.
+  providers: [CategoryNamePipe],
 })
 export class Transactions implements OnInit {
   @ViewChild('dt') dt!: Table;
 
   protected transactionParams = new TransactionParams();
   totalRecords = signal(0);
-
-  protected readonly transactionTypes = [
-    { label: 'Income', value: 'income' },
-    { label: 'Expense', value: 'expense' },
-  ];
 
   protected readonly Math = Math;
 
@@ -77,6 +80,44 @@ export class Transactions implements OnInit {
   private confirmationService = inject(ConfirmationService);
   protected busyService = inject(BusyService);
   protected categorieService = inject(CategorieService);
+  private translate = inject(TranslateService);
+  private languageService = inject(LanguageService);
+  private categoryNamePipe = inject(CategoryNamePipe);
+
+  /**
+   * Reconstruit à chaque changement de langue : les options d'un p-select sont des
+   * objets figés, elles ne se retraduisent pas seules.
+   */
+  protected readonly transactionTypes = computed(() => {
+    this.translate.currentLang();
+    return [
+      { label: this.translate.instant('transaction.type.income'), value: 'income' },
+      { label: this.translate.instant('transaction.type.expense'), value: 'expense' },
+    ];
+  });
+
+  /** Aucun LOCALE_ID n'est fourni : sans cet argument, les pipes rendent en en-US. */
+  protected locale = computed(() => this.languageService.current());
+
+  /**
+   * Options du filtre catégorie, libellés résolus par le pipe pour que la règle
+   * « clé de traduction si catégorie système, nom sinon » ne vive qu'à un endroit (§10).
+   */
+  protected categoryOptions = computed(() => {
+    this.translate.currentLang();
+    return this.categories().map((categorie) => ({
+      id: categorie.id,
+      label: this.categoryNamePipe.transform(categorie),
+    }));
+  });
+
+  /** Adapte la transaction à la forme attendue par le pipe. */
+  protected categoryOf(transaction: Transaction) {
+    return {
+      name: transaction.categoryName,
+      translationKey: transaction.categoryTranslationKey,
+    };
+  }
 
   transactionForm = this.fb.nonNullable.group({
     label: ['', Validators.required],
@@ -245,8 +286,8 @@ export class Transactions implements OnInit {
     if (!selectedTransactions.length) return;
 
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete the selected transactions?',
-      header: 'Confirm',
+      message: this.translate.instant('transaction.list.deleteMany'),
+      header: this.translate.instant('common.confirm'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.transactionService.deleteTransactions(selectedTransactions).subscribe({
@@ -259,16 +300,16 @@ export class Transactions implements OnInit {
             this.selectedTransactions.set([]);
             this.messageService.add({
               severity: 'success',
-              summary: 'Successful',
-              detail: 'Transactions Deleted',
+              summary: this.translate.instant('common.success'),
+              detail: this.translate.instant('transaction.list.deletedMany'),
               life: 3000,
             });
           },
           error: () => {
             this.messageService.add({
               severity: 'error',
-              summary: 'Deletion Failed',
-              detail: 'An error occurred while deleting the selected transactions.',
+              summary: this.translate.instant('common.error'),
+              detail: this.translate.instant('transaction.list.deleteFailed'),
             });
           },
         });
@@ -278,16 +319,16 @@ export class Transactions implements OnInit {
 
   deleteTransaction(transaction: Transaction) {
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + transaction.label + '?',
-      header: 'Confirm',
+      message: this.translate.instant('transaction.list.deleteOne', { label: transaction.label }),
+      header: this.translate.instant('common.confirm'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.transactionService.deleteTransaction(transaction.id).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Successful',
-              detail: 'Transaction Deleted',
+              summary: this.translate.instant('common.success'),
+              detail: this.translate.instant('transaction.list.deleted'),
               life: 3000,
             });
             this.transactions.update((transactions) =>
@@ -303,8 +344,8 @@ export class Transactions implements OnInit {
           error: () => {
             this.messageService.add({
               severity: 'error',
-              summary: 'Deletion Failed',
-              detail: 'An error occurred while deleting the transaction.',
+              summary: this.translate.instant('common.error'),
+              detail: this.translate.instant('transaction.list.deleteFailed'),
             });
           },
         });
@@ -349,8 +390,8 @@ export class Transactions implements OnInit {
         this.hideDialog();
         this.messageService.add({
           severity: 'success',
-          summary: 'Successful',
-          detail: 'Transaction Created',
+          summary: this.translate.instant('common.success'),
+          detail: this.translate.instant('transaction.form.created'),
           life: 3000,
         });
       },
@@ -358,8 +399,8 @@ export class Transactions implements OnInit {
         this.errors.set(error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Creation Failed',
-          detail: 'An error occurred while creating the transaction.',
+          summary: this.translate.instant('common.error'),
+          detail: this.translate.instant('transaction.form.createFailed'),
         });
       },
     });
@@ -381,8 +422,8 @@ export class Transactions implements OnInit {
           this.hideDialog();
           this.messageService.add({
             severity: 'success',
-            summary: 'Successful',
-            detail: 'Transaction Updated',
+            summary: this.translate.instant('common.success'),
+            detail: this.translate.instant('transaction.form.updated'),
             life: 3000,
           });
         },
@@ -390,8 +431,8 @@ export class Transactions implements OnInit {
           this.errors.set(error);
           this.messageService.add({
             severity: 'error',
-            summary: 'Update Failed',
-            detail: 'An error occurred while updating the transaction.',
+            summary: this.translate.instant('common.error'),
+            detail: this.translate.instant('transaction.form.updateFailed'),
           });
         },
       });

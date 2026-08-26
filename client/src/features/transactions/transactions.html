@@ -1,12 +1,12 @@
 <div class="w-full">
   <div class="mb-6">
-    <h1 class="text-3xl font-bold m-0">Transactions</h1>
+    <h1 class="text-3xl font-bold m-0">{{ 'transaction.list.title' | translate }}</h1>
   </div>
   <p-toolbar class="mb-6">
     <ng-template #start>
       <p-button
         (click)="openNew()"
-        label="New"
+        [label]="'common.create' | translate"
         icon="pi pi-plus"
         severity="secondary"
         class="mr-2"
@@ -14,7 +14,7 @@
       <p-button
         (click)="deleteSelectedTransactions()"
         severity="secondary"
-        label="Delete"
+        [label]="'common.delete' | translate"
         icon="pi pi-trash"
         outlined
       />
@@ -33,7 +33,10 @@
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} transactions"
+    [currentPageReportTemplate]="
+      'transaction.list.showing'
+        | translate: { first: '{first}', last: '{last}', total: '{totalRecords}' }
+    "
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[5, 10, 20, 30]"
   >
@@ -41,19 +44,19 @@
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-5">
           <p-select
-            [options]="categories()"
-            optionLabel="name"
+            [options]="categoryOptions()"
+            optionLabel="label"
             optionValue="id"
-            placeholder="All Category"
+            [placeholder]="'transaction.filters.allCategories' | translate"
             [showClear]="true"
             [(ngModel)]="selectedCategoryId"
             (onChange)="onCategoryChange($event.value)"
           />
           <p-select
-            [options]="transactionTypes"
+            [options]="transactionTypes()"
             optionLabel="label"
             optionValue="value"
-            placeholder="Type"
+            [placeholder]="'transaction.filters.allTypes' | translate"
             [showClear]="true"
             [(ngModel)]="selectedTransactionType"
             (onChange)="onTypeChange($event.value)"
@@ -65,7 +68,7 @@
                 (input)="onSearch($event)"
                 pInputText
                 type="text"
-                placeholder="Search..."
+                [placeholder]="'transaction.filters.search' | translate"
                 [value]="searchValue"
               />
             </p-iconfield>
@@ -81,7 +84,7 @@
           </div>
           <p-button
             icon="pi pi-filter-slash"
-            label="Reset"
+            [label]="'transaction.filters.reset' | translate"
             severity="secondary"
             outlined
             (onClick)="resetFilters()"
@@ -89,13 +92,18 @@
         </div>
         <div class="flex items-center gap-4">
           <span class="text-gray-500 text-sm whitespace-nowrap">
-            {{ (transactionParams.pageNumber - 1) * transactionParams.pageSize + 1 }}
-            to
             {{
-              Math.min(transactionParams.pageNumber * transactionParams.pageSize, totalRecords())
+              'transaction.list.showing'
+                | translate
+                  : {
+                      first: (transactionParams.pageNumber - 1) * transactionParams.pageSize + 1,
+                      last: Math.min(
+                        transactionParams.pageNumber * transactionParams.pageSize,
+                        totalRecords()
+                      ),
+                      total: totalRecords(),
+                    }
             }}
-            of
-            {{ totalRecords() }} transactions
           </span>
           <p-paginator
             [first]="(transactionParams.pageNumber - 1) * transactionParams.pageSize"
@@ -115,23 +123,23 @@
           <p-tableHeaderCheckbox />
         </th>
         <th pSortableColumn="date" style="min-width: 16rem">
-          Date
+          {{ 'transaction.columns.date' | translate }}
           <p-sortIcon field="date" />
         </th>
-        <th style="min-width: 16rem">Description</th>
+        <th style="min-width: 16rem">{{ 'transaction.columns.label' | translate }}</th>
         <th pSortableColumn="amount" style="min-width: 8rem">
-          Amount
+          {{ 'transaction.columns.amount' | translate }}
           <p-sortIcon field="amount" />
         </th>
         <th pSortableColumn="category" style="min-width: 10rem">
-          Category
+          {{ 'transaction.columns.category' | translate }}
           <p-sortIcon field="category" />
         </th>
         <th pSortableColumn="type" style="min-width: 10rem">
-          Type
+          {{ 'transaction.columns.type' | translate }}
           <p-sortIcon field="type" />
         </th>
-        <th>Actions</th>
+        <th>{{ 'transaction.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
     <ng-template #body let-transaction>
@@ -139,11 +147,13 @@
         <td style="width: 3rem">
           <p-tableCheckbox [value]="transaction" />
         </td>
-        <td style="min-width: 12rem">{{ transaction.date | date }}</td>
+        <td style="min-width: 12rem">
+          {{ transaction.date | date: 'mediumDate' : undefined : locale() }}
+        </td>
         <td style="min-width: 16rem">{{ transaction.label }}</td>
-        <td>{{ transaction.amount | currency: 'EUR' }}</td>
-        <td>{{ transaction.categoryName }}</td>
-        <td>{{ transaction.type }}</td>
+        <td>{{ transaction.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}</td>
+        <td>{{ categoryOf(transaction) | categoryName }}</td>
+        <td>{{ 'transaction.type.' + transaction.type.toLowerCase() | translate }}</td>
         <td>
           <p-button
             (click)="editTransaction(transaction)"
