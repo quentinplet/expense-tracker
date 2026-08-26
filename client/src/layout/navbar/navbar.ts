@@ -35,13 +35,13 @@ export class Navbar {
     this.translate.currentLang();
     return [
       {
-        label: this.translate.instant('topbar.profile'),
+        label: this.translate.instant('profileMenu.profile'),
         icon: 'pi pi-user',
         command: () => this.router.navigateByUrl('/profile'),
       },
       { separator: true },
       {
-        label: this.translate.instant('topbar.logout'),
+        label: this.translate.instant('profileMenu.logout'),
         icon: 'pi pi-sign-out',
         command: () => this.accountService.logout(),
       },

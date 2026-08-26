@@ -1,6 +1,8 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 import { AccountService } from '@/core/services/account-service';
 import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
@@ -18,12 +20,14 @@ type NavItem = {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, TranslatePipe, CategoryNamePipe],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe, CategoryNamePipe, MenuModule],
   templateUrl: './sidebar.html',
 })
 export class SidebarComponent implements OnInit {
   private categorieService = inject(CategorieService);
   protected accountService = inject(AccountService);
+  private translate = inject(TranslateService);
+  private router = inject(Router);
 
   protected categories = signal<Categorie[]>([]);
 
@@ -42,6 +46,28 @@ export class SidebarComponent implements OnInit {
   protected initials = computed(() =>
     (this.accountService.currentUser()?.userName ?? '').slice(0, 2).toUpperCase(),
   );
+
+  /**
+   * Même menu que la navbar, et mêmes clés i18n : c'est la même action rendue à
+   * deux endroits. Reconstruit à chaque changement de langue, un MenuItem
+   * PrimeNG étant un objet figé qui ne se retraduit pas tout seul.
+   */
+  protected profileMenuItems = computed<MenuItem[]>(() => {
+    this.translate.currentLang();
+    return [
+      {
+        label: this.translate.instant('profileMenu.profile'),
+        icon: 'pi pi-user',
+        command: () => this.router.navigateByUrl('/profile'),
+      },
+      { separator: true },
+      {
+        label: this.translate.instant('profileMenu.logout'),
+        icon: 'pi pi-sign-out',
+        command: () => this.accountService.logout(),
+      },
+    ];
+  });
 
   ngOnInit() {
     this.categorieService.getCategories().subscribe({
