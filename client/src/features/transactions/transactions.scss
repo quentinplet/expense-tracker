@@ -1,0 +1,25 @@
+/**
+ * La p-table apporte ses propres surfaces (celles d'Aura, sur une échelle zinc)
+ * alors que les cartes de l'application suivent l'échelle `surface` du thème.
+ * Posées côte à côte, les deux gris se voyaient. On rend la table transparente
+ * et c'est la carte qui porte le fond.
+ */
+:host ::ng-deep {
+  .p-datatable-header,
+  .p-datatable-thead > tr > th,
+  .p-datatable-tbody > tr,
+  .p-datatable-paginator-bottom {
+    background: transparent;
+  }
+
+  // La carte porte déjà la bordure extérieure et les coins arrondis.
+  .p-datatable-header,
+  .p-datatable-paginator-bottom {
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .p-datatable-paginator-bottom {
+    border-bottom: 0;
+  }
+}

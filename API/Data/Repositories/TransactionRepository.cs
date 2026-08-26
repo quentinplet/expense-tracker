@@ -30,6 +30,17 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             query = query.Where(t => t.Type == transactionParams.TransactionType.Value);
         }
 
+        // Filter by period — bornes incluses, chacune indépendante de l'autre
+        if (transactionParams.DateFrom.HasValue)
+        {
+            query = query.Where(t => t.Date >= transactionParams.DateFrom.Value);
+        }
+
+        if (transactionParams.DateTo.HasValue)
+        {
+            query = query.Where(t => t.Date <= transactionParams.DateTo.Value);
+        }
+
         // Search by description, category name
         if (!string.IsNullOrEmpty(transactionParams.Search))
         {

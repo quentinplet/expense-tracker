@@ -28,6 +28,12 @@ export class TransactionService {
     if (params.transactionType) {
       httpParams = httpParams.set('transactionType', params.transactionType);
     }
+    if (params.dateFrom) {
+      httpParams = httpParams.set('dateFrom', params.dateFrom);
+    }
+    if (params.dateTo) {
+      httpParams = httpParams.set('dateTo', params.dateTo);
+    }
     if (params.search) {
       httpParams = httpParams.set('search', params.search);
     }

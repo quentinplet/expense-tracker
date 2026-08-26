@@ -1,149 +1,209 @@
 <p-dialog
   [(visible)]="visible"
-  [style]="{ width: '450px' }"
+  [style]="{ width: '32rem' }"
   [header]="
     (isEditing() ? 'transaction.form.editTitle' : 'transaction.form.createTitle') | translate
   "
   [modal]="true"
+  [draggable]="false"
+  (onHide)="onClose()"
 >
   <ng-template #content>
-    <form id="transactionForm" [formGroup]="form()" class="p-fluid" (ngSubmit)="onSubmit()">
-      <div class="flex flex-col gap-6">
-        <div>
-          <p-tabs [value]="activeTab()" (valueChange)="onTypeTabChange($event)">
-            <p-tablist>
-              <p-tab value="Expense">{{ 'transaction.type.expense' | translate }}</p-tab>
-              <p-tab value="Income">{{ 'transaction.type.income' | translate }}</p-tab>
-            </p-tablist>
-            <p-tabpanels class="mt-5 p-0!">
-              <span class="block font-bold mb-4">
-                {{ 'transaction.form.category' | translate }}
-              </span>
-              <!-- Onglet Expense -->
-              <p-tabpanel value="Expense">
-                <div class="grid grid-cols-3 gap-5 mt-4">
-                  @for (categorie of categories(); track categorie.id) {
-                    @if (categorie.type === 'Expense') {
-                      <div class="flex items-center gap-2">
-                        <p-radiobutton
-                          formControlName="categoryId"
-                          [inputId]="'cat-' + categorie.id"
-                          name="categoryId"
-                          [value]="categorie.id"
-                        />
-                        <label [for]="'cat-' + categorie.id">{{ categorie | categoryName }}</label>
-                      </div>
-                    }
-                  }
-                </div>
-              </p-tabpanel>
+    <form id="transactionForm" [formGroup]="form()" (ngSubmit)="onSubmit()">
+      <!-- Segmenté Dépense | Revenu, teinté par le sens : rouge sortant, vert entrant. -->
+      <div
+        class="mb-6 flex items-center gap-1 rounded-xl bg-surface-100 p-1 dark:bg-surface-900"
+        role="group"
+        [attr.aria-label]="'transaction.columns.type' | translate"
+      >
+        <button
+          type="button"
+          (click)="selectType('Expense')"
+          [attr.aria-pressed]="activeType() === 'Expense'"
+          class="flex-1 cursor-pointer rounded-lg border-0 px-4 py-2.5 text-sm font-semibold transition-colors"
+          [class]="
+            activeType() === 'Expense'
+              ? 'bg-red-500/15 text-red-500'
+              : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
+          "
+        >
+          {{ 'transaction.type.expense' | translate }}
+        </button>
+        <button
+          type="button"
+          (click)="selectType('Income')"
+          [attr.aria-pressed]="activeType() === 'Income'"
+          class="flex-1 cursor-pointer rounded-lg border-0 px-4 py-2.5 text-sm font-semibold transition-colors"
+          [class]="
+            activeType() === 'Income'
+              ? 'bg-green-500/15 text-green-500'
+              : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
+          "
+        >
+          {{ 'transaction.type.income' | translate }}
+        </button>
+      </div>
 
-              <!-- Onglet Income -->
-              <p-tabpanel value="Income">
-                <div class="grid grid-cols-3 gap-5 mt-4">
-                  @for (categorie of categories(); track categorie.id) {
-                    @if (categorie.type === 'Income') {
-                      <div class="flex items-center gap-2">
-                        <p-radiobutton
-                          formControlName="categoryId"
-                          [inputId]="'cat-' + categorie.id"
-                          name="categoryId"
-                          [value]="categorie.id"
-                        />
-                        <label [for]="'cat-' + categorie.id">{{ categorie | categoryName }}</label>
-                      </div>
-                    }
-                  }
-                </div>
-              </p-tabpanel>
-              @if (form().get('categoryId')?.invalid && form().get('categoryId')?.touched) {
-                <small class="p-error text-red-500">
-                  {{ 'transaction.form.categoryRequired' | translate }}
-                </small>
-              }
-            </p-tabpanels>
-          </p-tabs>
-        </div>
+      <!-- Montant en premier et en grand : c'est le champ que l'on vient saisir (§2). -->
+      <div class="mb-5">
+        <label for="amount" class="mb-2 block text-sm font-semibold">
+          {{ 'transaction.form.amount' | translate }}
+        </label>
+        <p-inputnumber
+          formControlName="amount"
+          inputId="amount"
+          mode="currency"
+          currency="EUR"
+          [locale]="locale()"
+          [inputStyleClass]="
+            'text-3xl font-bold py-3 ' + (errors()['Amount'] ? 'ng-invalid ng-dirty' : '')
+          "
+          [autofocus]="true"
+          fluid
+        />
+        @if (errors()['Amount']) {
+          <small class="mt-1 block text-red-500">{{ errors()['Amount'][0] }}</small>
+        } @else if (form().get('amount')?.invalid && form().get('amount')?.touched) {
+          <small class="mt-1 block text-red-500">
+            {{ 'transaction.form.amountRequired' | translate }}
+          </small>
+        }
+      </div>
+
+      <div class="mb-5 grid grid-cols-2 gap-4">
         <div>
-          <label for="label" class="block font-bold mb-3">
-            {{ 'transaction.form.label' | translate }}
+          <label for="categoryId" class="mb-2 block text-sm font-semibold">
+            {{ 'transaction.form.category' | translate }}
           </label>
-          <input
-            formControlName="label"
-            type="text"
-            pInputText
-            id="label"
-            [placeholder]="'transaction.form.labelPlaceholder' | translate"
-            required
-            autofocus
+          <p-select
+            formControlName="categoryId"
+            inputId="categoryId"
+            [options]="categoryOptions()"
+            optionLabel="label"
+            optionValue="id"
+            [placeholder]="'transaction.form.category' | translate"
             fluid
-          />
-          @if (form().get('label')?.invalid && form().get('label')?.touched) {
-            <small class="p-error invalid-feedback">
-              {{ 'transaction.form.labelRequired' | translate }}
+          >
+            <!-- Couleur de catégorie en style inline, jamais en classe générée (§18). -->
+            <ng-template #selectedItem let-option>
+              @if (option) {
+                <span class="flex items-center gap-2">
+                  <span
+                    class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
+                    [style.color]="option.color || 'var(--p-surface-400)'"
+                    [style.background-color]="
+                      'color-mix(in oklch, ' +
+                      (option.color || 'var(--p-surface-400)') +
+                      ' 15%, transparent)'
+                    "
+                  >
+                    <i class="pi text-xs" [class]="option.icon || 'pi-tag'"></i>
+                  </span>
+                  {{ option.label }}
+                </span>
+              }
+            </ng-template>
+            <ng-template #item let-option>
+              <span class="flex items-center gap-2">
+                <span
+                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
+                  [style.color]="option.color || 'var(--p-surface-400)'"
+                  [style.background-color]="
+                    'color-mix(in oklch, ' +
+                    (option.color || 'var(--p-surface-400)') +
+                    ' 15%, transparent)'
+                  "
+                >
+                  <i class="pi text-xs" [class]="option.icon || 'pi-tag'"></i>
+                </span>
+                {{ option.label }}
+              </span>
+            </ng-template>
+          </p-select>
+          @if (form().get('categoryId')?.invalid && form().get('categoryId')?.touched) {
+            <small class="mt-1 block text-red-500">
+              {{ 'transaction.form.categoryRequired' | translate }}
             </small>
           }
         </div>
+
         <div>
-          <label for="note" class="block font-bold mb-3">
-            {{ 'transaction.form.note' | translate }}
-          </label>
-          <input
-            formControlName="note"
-            type="text"
-            pInputText
-            id="note"
-            [placeholder]="'transaction.form.notePlaceholder' | translate"
-            fluid
-          />
-        </div>
-        <div class="grid grid-cols-12 gap-4">
-          <div class="col-span-8">
-            <label for="amount" class="block font-bold mb-3">
-              {{ 'transaction.form.amount' | translate }}
-            </label>
-            <p-inputnumber
-              formControlName="amount"
-              [inputStyleClass]="errors()['Amount'] ? 'ng-invalid ng-dirty' : ''"
-              inputId="amount"
-              mode="currency"
-              currency="EUR"
-              [locale]="locale()"
-              fluid
-            />
-            @if (errors()['Amount']) {
-              <small class="p-error text-red-500">{{ errors()['Amount'][0] }}</small>
-            }
-          </div>
-        </div>
-        <div>
-          <label for="date" class="block font-bold mb-3">
+          <label for="date" class="mb-2 block text-sm font-semibold">
             {{ 'transaction.form.date' | translate }}
           </label>
           <p-date-picker
             formControlName="date"
-            [showButtonBar]="true"
             inputId="date"
+            [showButtonBar]="true"
             [dateFormat]="dateFormat()"
-            showIcon
+            [showIcon]="true"
+            iconDisplay="input"
             fluid
-          ></p-date-picker>
+          />
         </div>
       </div>
-      <div class="mt-5 mb-2 flex justify-end items-center gap-3">
+
+      <div class="mb-5">
+        <label for="label" class="mb-2 block text-sm font-semibold">
+          {{ 'transaction.form.label' | translate }}
+        </label>
+        <input
+          formControlName="label"
+          type="text"
+          pInputText
+          id="label"
+          [placeholder]="'transaction.form.labelPlaceholder' | translate"
+          fluid
+        />
+        @if (form().get('label')?.invalid && form().get('label')?.touched) {
+          <small class="mt-1 block text-red-500">
+            {{ 'transaction.form.labelRequired' | translate }}
+          </small>
+        }
+      </div>
+
+      <div>
+        <label for="note" class="mb-2 block text-sm font-semibold">
+          {{ 'transaction.form.note' | translate }}
+          <span class="font-normal text-surface-500 dark:text-surface-400">
+            {{ 'transaction.form.optional' | translate }}
+          </span>
+        </label>
+        <textarea
+          formControlName="note"
+          pTextarea
+          id="note"
+          rows="2"
+          [placeholder]="'transaction.form.notePlaceholder' | translate"
+          class="w-full"
+        ></textarea>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #footer>
+    <div class="flex w-full items-center justify-between gap-3">
+      <span class="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+        <kbd
+          class="rounded border border-surface-300 px-1.5 py-0.5 font-sans dark:border-surface-700"
+        >
+          ↵
+        </kbd>
+        {{ 'transaction.form.submitHint' | translate }}
+      </span>
+      <div class="flex items-center gap-3">
         <p-button
           [label]="'common.cancel' | translate"
-          icon="pi pi-times"
+          severity="secondary"
           text
           (click)="onClose()"
         />
         <p-button
           form="transactionForm"
           [label]="(isEditing() ? 'common.update' : 'common.create') | translate"
-          icon="pi pi-check"
           type="submit"
         />
       </div>
-    </form>
+    </div>
   </ng-template>
 </p-dialog>

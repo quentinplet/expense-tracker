@@ -31,6 +31,9 @@ export class TransactionParams {
 
   categoryId?: string;
   transactionType?: string;
+  /** Bornes incluses, au format yyyy-MM-dd attendu par la DateOnly de l'API. */
+  dateFrom?: string;
+  dateTo?: string;
   search?: string;
   sortBy?: string;
   sortDirection: 'asc' | 'desc' = 'desc';
