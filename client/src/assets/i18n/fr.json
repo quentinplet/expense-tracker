@@ -15,7 +15,9 @@
     "notifications": "Notifications",
     "toggleTheme": "Changer de thème",
     "toggleSidebar": "Replier le menu",
-    "language": "Langue",
+    "language": "Langue"
+  },
+  "profileMenu": {
     "profile": "Profil",
     "logout": "Se déconnecter"
   },

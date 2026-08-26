@@ -36,11 +36,17 @@
     <button
       type="button"
       (click)="menu.toggle($event)"
-      [attr.aria-label]="'topbar.profile' | translate"
+      [attr.aria-label]="'profileMenu.profile' | translate"
       class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-contrast"
     >
       {{ initials() }}
     </button>
-    <p-menu #menu [model]="menuItems()" [popup]="true" />
+    <!--
+      appendTo="body" : rendu dans la navbar, l'overlay vit dans le conteneur
+      overflow-y-auto du main-layout. Le focus que PrimeNG pose sur la liste à
+      l'ouverture y déclenche un scroll, et le scroll-handler de l'overlay
+      referme aussitôt le menu.
+    -->
+    <p-menu #menu [model]="menuItems()" [popup]="true" appendTo="body" />
   </div>
 </nav>

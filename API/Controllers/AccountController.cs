@@ -61,6 +61,32 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         return await user.ToDto(tokenService);
     }
 
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        var refreshToken = Request.Cookies["refreshToken"];
 
+        if (!string.IsNullOrEmpty(refreshToken))
+        {
+            var user = await userManager.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
 
+            if (user != null)
+            {
+                user.RefreshToken = null;
+                user.RefreshTokenExpiry = null;
+                await userManager.UpdateAsync(user);
+            }
+        }
+
+        // Mêmes attributs qu'à la pose, sinon le navigateur garde le cookie.
+        Response.Cookies.Delete("refreshToken", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        });
+
+        return NoContent();
+    }
 }
