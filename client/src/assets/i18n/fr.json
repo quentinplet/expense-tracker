@@ -92,8 +92,12 @@
     }
   },
   "dashboard": {
-    "title": "Tableau de bord",
-    "subtitle": "Vue d'ensemble de vos finances",
+    "greeting": {
+      "morning": "Bonjour, {{name}} 👋",
+      "afternoon": "Bon après-midi, {{name}} 👋",
+      "evening": "Bonsoir, {{name}} 👋"
+    },
+    "overviewFor": "Voici votre vue d'ensemble au {{date}}.",
     "totals": {
       "income": "Revenus du mois",
       "expenses": "Dépenses du mois",
@@ -105,10 +109,12 @@
       "title": "Répartition par catégorie",
       "empty": "Aucune dépense ce mois-ci",
       "other": "Autres",
-      "thisMonth": "ce mois"
+      "thisMonth": "sur le mois",
+      "allTime": "toutes périodes",
+      "emptyAll": "Aucune dépense enregistrée"
     },
     "trend": {
-      "title": "Évolution sur 12 mois",
+      "title": "Évolution",
       "income": "Revenus",
       "expenses": "Dépenses",
       "empty": "Pas encore assez d'historique"
@@ -119,9 +125,15 @@
     },
     "empty": {
       "title": "Rien à afficher pour l'instant",
-      "hint": "Ajoutez votre première transaction pour voir votre tableau de bord se remplir.",
-      "cta": "Ajouter une transaction",
-      "month": "Rien d'enregistré en {{month}}"
+      "hint": "Ajoutez votre première transaction pour voir votre tableau de bord se remplir."
+    },
+    "cumulative": {
+      "label": "Net cumulé",
+      "hint": "Depuis la première transaction"
+    },
+    "scope": {
+      "month": "Mois",
+      "all": "Toutes périodes"
     }
   },
   "category": {

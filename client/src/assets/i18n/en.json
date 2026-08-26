@@ -92,8 +92,12 @@
     }
   },
   "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "An overview of your finances",
+    "greeting": {
+      "morning": "Good morning, {{name}} 👋",
+      "afternoon": "Good afternoon, {{name}} 👋",
+      "evening": "Good evening, {{name}} 👋"
+    },
+    "overviewFor": "Here's your financial overview for {{date}}.",
     "totals": {
       "income": "Income this month",
       "expenses": "Expenses this month",
@@ -105,10 +109,12 @@
       "title": "Breakdown by category",
       "empty": "No expense this month",
       "other": "Other",
-      "thisMonth": "this month"
+      "thisMonth": "this month",
+      "allTime": "all time",
+      "emptyAll": "No expense recorded yet"
     },
     "trend": {
-      "title": "12-month trend",
+      "title": "Trend",
       "income": "Income",
       "expenses": "Expenses",
       "empty": "Not enough history yet"
@@ -119,9 +125,15 @@
     },
     "empty": {
       "title": "Nothing to show yet",
-      "hint": "Add your first transaction to see your dashboard fill up.",
-      "cta": "Add a transaction",
-      "month": "Nothing recorded in {{month}}"
+      "hint": "Add your first transaction to see your dashboard fill up."
+    },
+    "cumulative": {
+      "label": "Cumulative net",
+      "hint": "Since the first transaction"
+    },
+    "scope": {
+      "month": "Month",
+      "all": "All time"
     }
   },
   "category": {

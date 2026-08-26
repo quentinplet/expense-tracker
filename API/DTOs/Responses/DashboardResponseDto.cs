@@ -3,15 +3,24 @@ using System;
 namespace API.DTOs.Responses;
 
 public record DashboardResponseDto(
+    /// `YYYY-MM` du mois affiché.
     string Month,
     MonthTotalsDto Totals,
+    /// Σ revenus − Σ dépenses sur tout l'historique enregistré, indépendamment du mois
+    /// affiché. Ce n'est PAS un solde : l'application ignore ce que l'utilisateur
+    /// possède, elle ne connaît que les flux qu'il a saisis.
+    decimal CumulativeNet,
+    /// Répartition des dépenses du mois affiché.
     IReadOnlyList<CategoryBreakdownDto> Breakdown,
+    /// La même, sur tout l'historique. Ses parts sont calculées sur `AllTimeExpenses`.
+    IReadOnlyList<CategoryBreakdownDto> BreakdownAllTime,
+    decimal AllTimeExpenses,
+    /// Un point par jour du mois affiché, zéros compris.
+    IReadOnlyList<DailyPointDto> DailyTrend,
+    /// Un point par mois, du premier mois enregistré jusqu'au mois affiché.
     IReadOnlyList<MonthlyPointDto> Trend,
     IReadOnlyList<TransactionResponseDto> RecentTransactions);
 
-/// L'API renvoie les valeurs brutes du mois précédent, pas un écart calculé :
-/// c'est au client de décider comment présenter la variation, notamment quand
-/// la valeur précédente vaut zéro et qu'un pourcentage n'a aucun sens.
 public record MonthTotalsDto(
     decimal Expenses,
     decimal Income,
@@ -27,7 +36,10 @@ public record CategoryBreakdownDto(
     string? Color,
     string? Icon,
     decimal Total,
-    /// Part du total des dépenses du mois, entre 0 et 1.
+    /// Part du total des dépenses de la portée, entre 0 et 1.
     decimal Share);
 
 public record MonthlyPointDto(string Month, decimal Expenses, decimal Income);
+
+/// `Date` au format `YYYY-MM-DD`.
+public record DailyPointDto(string Date, decimal Expenses, decimal Income);

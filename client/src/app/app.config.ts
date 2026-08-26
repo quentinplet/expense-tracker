@@ -35,12 +35,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withViewTransitions()),
     provideHttpClient(
-      withInterceptors([
-        jwtInterceptor,
-        languageInterceptor,
-        loadingInterceptor,
-        errorInterceptor,
-      ]),
+      withInterceptors([jwtInterceptor, languageInterceptor, loadingInterceptor, errorInterceptor]),
     ),
     provideTranslateService({
       // Une clé absente doit rester visible en développement (§10, règle 3) : ngx-translate

@@ -11,7 +11,7 @@ export class DashboardService {
   private http = inject(HttpClient);
   private baseUrl = environment.apiUrl;
 
-  /** @param month au format `YYYY-MM`. Le serveur ne devine jamais le mois courant. */
+  /** @param month `YYYY-MM`. Le serveur ne devine jamais le mois courant. */
   getDashboardData(month: string): Observable<DashboardResponse> {
     return this.http.get<DashboardResponse>(`${this.baseUrl}dashboard`, {
       params: new HttpParams().set('month', month),

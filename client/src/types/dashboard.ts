@@ -27,10 +27,27 @@ export type MonthlyPoint = {
   income: number;
 };
 
+export type DailyPoint = {
+  /** "2026-08-14" */
+  date: string;
+  expenses: number;
+  income: number;
+};
+
 export type DashboardResponse = {
+  /** `YYYY-MM` du mois affiché. */
   month: string;
   totals: MonthTotals;
+  /** Σ revenus − Σ dépenses sur tout l'historique. Ce n'est pas un solde. */
+  cumulativeNet: number;
+  /** Répartition du mois affiché ; `breakdownAllTime` couvre tout l'historique.
+   *  Les deux voyagent ensemble pour que la bascule du donut soit instantanée. */
   breakdown: CategoryBreakdown[];
+  breakdownAllTime: CategoryBreakdown[];
+  allTimeExpenses: number;
+  /** Un point par jour du mois affiché ; `trend` porte la vue mensuelle sur tout
+   *  l'historique. La courbe choisit l'une ou l'autre selon sa portée. */
+  dailyTrend: DailyPoint[];
   trend: MonthlyPoint[];
   recentTransactions: Transaction[];
 };

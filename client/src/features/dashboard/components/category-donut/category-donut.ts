@@ -1,9 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { UIChart } from 'primeng/chart';
 import { LanguageService } from '@/core/services/language-service';
 import { CategoryBreakdown } from '@/types/dashboard';
+import { Scope } from '../../month';
 
 /** Au-delà, la légende devient plus haute que le graphique. */
 const MAX_SLICES = 6;
@@ -27,10 +28,22 @@ export class CategoryDonut {
   private translate = inject(TranslateService);
   private languageService = inject(LanguageService);
 
-  breakdown = input.required<CategoryBreakdown[]>();
+  monthBreakdown = input.required<CategoryBreakdown[]>();
+  allTimeBreakdown = input.required<CategoryBreakdown[]>();
   monthExpenses = input.required<number>();
+  allTimeExpenses = input.required<number>();
+
+  /**
+   * Réglage local au widget, et non porté par l'URL : c'est un confort de lecture,
+   * pas un état qu'on partage ou sur lequel on revient avec le bouton précédent.
+   */
+  protected scope = signal<Scope>('month');
 
   protected locale = computed(() => this.languageService.current());
+
+  protected total = computed(() =>
+    this.scope() === 'all' ? this.allTimeExpenses() : this.monthExpenses(),
+  );
 
   /**
    * Les catégories arrivent triées par montant décroissant. On garde les
@@ -41,7 +54,7 @@ export class CategoryDonut {
     // Lecture de la langue : les libellés doivent suivre un changement à chaud.
     this.translate.currentLang();
 
-    const items = this.breakdown();
+    const items = this.scope() === 'all' ? this.allTimeBreakdown() : this.monthBreakdown();
     const head = items.slice(0, MAX_SLICES);
     const tail = items.slice(MAX_SLICES);
 

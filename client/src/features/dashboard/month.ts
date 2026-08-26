@@ -6,6 +6,12 @@
  */
 export type MonthKey = string;
 
+/**
+ * Portée d'un widget : le mois affiché, ou tout l'historique. C'est un réglage local
+ * à chaque graphique — la période globale, elle, reste toujours un mois.
+ */
+export type Scope = 'month' | 'all';
+
 export function toMonthKey(date: Date): MonthKey {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
@@ -22,6 +28,15 @@ export function isValidMonthKey(value: string | null | undefined): value is Mont
 export function monthKeyToDate(month: MonthKey): Date {
   const [year, monthNumber] = month.split('-').map(Number);
   return new Date(year, monthNumber - 1, 1);
+}
+
+/**
+ * Même précaution pour un jour : `new Date('2026-08-01')` est interprété en UTC,
+ * donc affiché la veille dans tout fuseau négatif.
+ */
+export function dayKeyToDate(day: string): Date {
+  const [year, month, date] = day.split('-').map(Number);
+  return new Date(year, month - 1, date);
 }
 
 export function shiftMonth(month: MonthKey, offset: number): MonthKey {

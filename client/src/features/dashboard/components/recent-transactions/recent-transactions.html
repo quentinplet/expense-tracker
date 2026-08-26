@@ -34,18 +34,17 @@
             <span class="block truncate text-sm font-semibold text-surface-900 dark:text-surface-0">
               {{ transaction.label }}
             </span>
-            <span class="block truncate text-xs text-surface-500">
+            <!-- Date et catégorie sur une seule ligne secondaire : une colonne de
+                 date séparée écrasait le libellé sur les écrans étroits. -->
+            <span class="block truncate text-xs text-surface-500 dark:text-surface-400">
+              {{ transaction.date | date: 'longDate' : undefined : locale() }} ·
               {{ categoryOf(transaction) | categoryName }}
             </span>
           </span>
 
-          <span class="shrink-0 text-xs text-surface-500">
-            {{ transaction.date | date: 'd MMM' : undefined : locale() }}
-          </span>
-
           <!-- Le sens n'est jamais porté par la couleur seule : le signe est toujours là (§17). -->
           <span
-            class="w-28 shrink-0 text-right text-sm font-semibold"
+            class="shrink-0 text-right text-sm font-semibold tabular-nums"
             [class]="transaction.type === 'Income' ? 'text-green-500' : 'text-red-500'"
           >
             {{ transaction.type === 'Income' ? '+' : '−'
@@ -55,7 +54,7 @@
       }
     </ul>
   } @else {
-    <p class="py-10 text-center text-sm text-surface-500">
+    <p class="py-10 text-center text-sm text-surface-500 dark:text-surface-400">
       {{ 'dashboard.recent.empty' | translate }}
     </p>
   }
