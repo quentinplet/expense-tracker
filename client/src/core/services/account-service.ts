@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { LoginCreds, User } from '../../types/user';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -9,6 +10,7 @@ import { tap } from 'rxjs/internal/operators/tap';
 })
 export class AccountService {
   private http = inject(HttpClient);
+  private router = inject(Router);
   currentUser = signal<User | null>(null);
   private baseUrl = environment.apiUrl;
 
@@ -57,12 +59,18 @@ export class AccountService {
   }
 
   logout() {
+    // La session locale part dans tous les cas : si l'appel échoue, laisser
+    // l'utilisateur connecté côté client est pire que garder un cookie serveur.
     this.http.post(this.baseUrl + 'account/logout', {}, { withCredentials: true }).subscribe({
-      next: () => {
-        localStorage.removeItem('filters');
-        this.currentUser.set(null);
-      },
+      next: () => this.clearSession(),
+      error: () => this.clearSession(),
     });
+  }
+
+  private clearSession() {
+    localStorage.removeItem('filters');
+    this.currentUser.set(null);
+    this.router.navigateByUrl('/login');
   }
 
   setCurrentUser(user: User) {

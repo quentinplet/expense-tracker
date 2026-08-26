@@ -41,6 +41,12 @@
     >
       {{ initials() }}
     </button>
-    <p-menu #menu [model]="menuItems()" [popup]="true" />
+    <!--
+      appendTo="body" : rendu dans la navbar, l'overlay vit dans le conteneur
+      overflow-y-auto du main-layout. Le focus que PrimeNG pose sur la liste à
+      l'ouverture y déclenche un scroll, et le scroll-handler de l'overlay
+      referme aussitôt le menu.
+    -->
+    <p-menu #menu [model]="menuItems()" [popup]="true" appendTo="body" />
   </div>
 </nav>
