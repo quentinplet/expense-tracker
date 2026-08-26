@@ -1,7 +1,9 @@
 <p-dialog
   [(visible)]="visible"
   [style]="{ width: '450px' }"
-  [header]="isEditing() ? 'Edit Transaction' : 'New Transaction'"
+  [header]="
+    (isEditing() ? 'transaction.form.editTitle' : 'transaction.form.createTitle') | translate
+  "
   [modal]="true"
 >
   <ng-template #content>
@@ -10,11 +12,13 @@
         <div>
           <p-tabs [value]="activeTab()" (valueChange)="onTypeTabChange($event)">
             <p-tablist>
-              <p-tab value="Expense">Expense</p-tab>
-              <p-tab value="Income">Income</p-tab>
+              <p-tab value="Expense">{{ 'transaction.type.expense' | translate }}</p-tab>
+              <p-tab value="Income">{{ 'transaction.type.income' | translate }}</p-tab>
             </p-tablist>
             <p-tabpanels class="mt-5 p-0!">
-              <span class="block font-bold mb-4">Category</span>
+              <span class="block font-bold mb-4">
+                {{ 'transaction.form.category' | translate }}
+              </span>
               <!-- Onglet Expense -->
               <p-tabpanel value="Expense">
                 <div class="grid grid-cols-3 gap-5 mt-4">
@@ -27,7 +31,7 @@
                           name="categoryId"
                           [value]="categorie.id"
                         />
-                        <label [for]="'cat-' + categorie.id">{{ categorie.name }}</label>
+                        <label [for]="'cat-' + categorie.id">{{ categorie | categoryName }}</label>
                       </div>
                     }
                   }
@@ -46,47 +50,65 @@
                           name="categoryId"
                           [value]="categorie.id"
                         />
-                        <label [for]="'cat-' + categorie.id">{{ categorie.name }}</label>
+                        <label [for]="'cat-' + categorie.id">{{ categorie | categoryName }}</label>
                       </div>
                     }
                   }
                 </div>
               </p-tabpanel>
               @if (form().get('categoryId')?.invalid && form().get('categoryId')?.touched) {
-                <small class="p-error text-red-500">Category is required.</small>
+                <small class="p-error text-red-500">
+                  {{ 'transaction.form.categoryRequired' | translate }}
+                </small>
               }
             </p-tabpanels>
           </p-tabs>
         </div>
         <div>
-          <label for="label" class="block font-bold mb-3">Label</label>
+          <label for="label" class="block font-bold mb-3">
+            {{ 'transaction.form.label' | translate }}
+          </label>
           <input
             formControlName="label"
             type="text"
             pInputText
             id="label"
+            [placeholder]="'transaction.form.labelPlaceholder' | translate"
             required
             autofocus
             fluid
           />
           @if (form().get('label')?.invalid && form().get('label')?.touched) {
-            <small class="p-error invalid-feedback">Label is required.</small>
+            <small class="p-error invalid-feedback">
+              {{ 'transaction.form.labelRequired' | translate }}
+            </small>
           }
         </div>
         <div>
-          <label for="note" class="block font-bold mb-3">Note</label>
-          <input formControlName="note" type="text" pInputText id="note" fluid />
+          <label for="note" class="block font-bold mb-3">
+            {{ 'transaction.form.note' | translate }}
+          </label>
+          <input
+            formControlName="note"
+            type="text"
+            pInputText
+            id="note"
+            [placeholder]="'transaction.form.notePlaceholder' | translate"
+            fluid
+          />
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="col-span-8">
-            <label for="amount" class="block font-bold mb-3">Amount</label>
+            <label for="amount" class="block font-bold mb-3">
+              {{ 'transaction.form.amount' | translate }}
+            </label>
             <p-inputnumber
               formControlName="amount"
               [inputStyleClass]="errors()['Amount'] ? 'ng-invalid ng-dirty' : ''"
               inputId="amount"
               mode="currency"
               currency="EUR"
-              locale="en-US"
+              [locale]="locale()"
               fluid
             />
             @if (errors()['Amount']) {
@@ -95,22 +117,29 @@
           </div>
         </div>
         <div>
-          <label for="date" class="block font-bold mb-3">Date</label>
+          <label for="date" class="block font-bold mb-3">
+            {{ 'transaction.form.date' | translate }}
+          </label>
           <p-date-picker
             formControlName="date"
             [showButtonBar]="true"
             inputId="date"
-            dateFormat="mm/dd/yy"
+            [dateFormat]="dateFormat()"
             showIcon
             fluid
           ></p-date-picker>
         </div>
       </div>
       <div class="mt-5 mb-2 flex justify-end items-center gap-3">
-        <p-button label="Cancel" icon="pi pi-times" text (click)="onClose()" />
+        <p-button
+          [label]="'common.cancel' | translate"
+          icon="pi pi-times"
+          text
+          (click)="onClose()"
+        />
         <p-button
           form="transactionForm"
-          [label]="isEditing() ? 'Update' : 'Create'"
+          [label]="(isEditing() ? 'common.update' : 'common.create') | translate"
           icon="pi pi-check"
           type="submit"
         />

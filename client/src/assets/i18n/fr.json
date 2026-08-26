@@ -38,7 +38,9 @@
     "retry": "Réessayer",
     "stable": "Stable",
     "previousMonth": "Mois précédent",
-    "nextMonth": "Mois suivant"
+    "nextMonth": "Mois suivant",
+    "success": "Succès",
+    "error": "Erreur"
   },
   "transaction": {
     "list": {
@@ -65,6 +67,7 @@
     },
     "filters": {
       "allCategories": "Toutes les catégories",
+      "allTypes": "Tous les sens",
       "search": "Filtrer…",
       "reset": "Réinitialiser",
       "period": "Période"

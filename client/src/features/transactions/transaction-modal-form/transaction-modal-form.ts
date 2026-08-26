@@ -1,4 +1,4 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import { Dialog } from 'primeng/dialog';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from 'primeng/tabs';
 import { RadioButton } from 'primeng/radiobutton';
@@ -9,6 +9,9 @@ import { Categorie } from '@/types/categorie';
 import { TransactionType } from '@/types/transaction';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
+import { LanguageService } from '@/core/services/language-service';
 
 @Component({
   selector: 'app-transaction-modal-form',
@@ -25,6 +28,8 @@ import { InputTextModule } from 'primeng/inputtext';
     Button,
     InputTextModule,
     ReactiveFormsModule,
+    TranslatePipe,
+    CategoryNamePipe,
   ],
   templateUrl: './transaction-modal-form.html',
   styleUrl: './transaction-modal-form.scss',
@@ -38,6 +43,15 @@ export class TransactionModalForm {
 
   close = output<void>();
   save = output<void>();
+
+  private languageService = inject(LanguageService);
+
+  /** Le p-inputnumber et le p-datepicker prennent une locale explicite, sinon en-US. */
+  protected locale = computed(() => this.languageService.current());
+
+  /** `dd/mm/yy` en français, `mm/dd/yy` en anglais — le format du p-datepicker
+   *  n'est pas déductible de la locale, il faut le lui donner. */
+  protected dateFormat = computed(() => (this.locale() === 'fr' ? 'dd/mm/yy' : 'mm/dd/yy'));
 
   /// L'onglet actif reflète le sens de la transaction en cours d'édition,
   /// pour qu'un revenu ne s'ouvre pas sur l'onglet Expense.
