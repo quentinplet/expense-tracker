@@ -18,6 +18,8 @@ import {
   UpdateTransactionDto,
 } from '@/types/transaction';
 import { Paginator, PaginatorState } from 'primeng/paginator';
+import { DatePicker } from 'primeng/datepicker';
+import { TooltipModule } from 'primeng/tooltip';
 import { BusyService } from '@/core/services/busy-service';
 import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
@@ -46,6 +48,8 @@ import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
     TransactionModalForm,
     TranslatePipe,
     CategoryNamePipe,
+    DatePicker,
+    TooltipModule,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
@@ -99,6 +103,21 @@ export class Transactions implements OnInit {
   /** Aucun LOCALE_ID n'est fourni : sans cet argument, les pipes rendent en en-US. */
   protected locale = computed(() => this.languageService.current());
 
+  /** Le format du p-datepicker ne se déduit pas de la locale, il faut le lui donner. */
+  protected dateFormat = computed(() => (this.locale() === 'fr' ? 'dd/mm/yy' : 'mm/dd/yy'));
+
+  /**
+   * Source unique de la pagination. Les deux paginateurs — celui de la p-table et
+   * celui du bandeau — la **lisent** ; aucun ne la détient. Sans ça, changer de page
+   * sur l'un laissait l'autre affiché sur l'ancienne.
+   *
+   * Pas de boucle possible : le setter `first` de la p-table est une simple
+   * affectation, il n'émet pas `onLazyLoad`. Seul son propre paginateur le fait.
+   */
+  private paging = signal({ first: 0, rows: new TransactionParams().pageSize });
+  protected first = computed(() => this.paging().first);
+  protected rows = computed(() => this.paging().rows);
+
   /**
    * Options du filtre catégorie, libellés résolus par le pipe pour que la règle
    * « clé de traduction si catégorie système, nom sinon » ne vive qu'à un endroit (§10).
@@ -119,12 +138,56 @@ export class Transactions implements OnInit {
     };
   }
 
+  /** Segmenté `Tout | Dépenses | Revenus` : la valeur nulle est l'option « Tout ». */
+  protected readonly typeSegments = computed(() => {
+    this.translate.currentLang();
+    return [
+      { label: this.translate.instant('transaction.filters.typeAll'), value: null },
+      { label: this.translate.instant('transaction.filters.typeExpense'), value: 'expense' },
+      { label: this.translate.instant('transaction.filters.typeIncome'), value: 'income' },
+    ];
+  });
+
+  /** Un filtre est actif : l'état vide doit dire « aucun résultat », pas « aucune donnée ». */
+  protected hasActiveFilters = computed(
+    () =>
+      !!this.searchValue ||
+      !!this.selectedCategoryId ||
+      !!this.selectedTransactionType ||
+      !!this.selectedPeriod(),
+  );
+
+  /** Plage du p-datepicker : [début] ou [début, fin], fin nulle tant qu'on choisit. */
+  protected selectedPeriod = signal<Date[] | null>(null);
+
+  onPeriodChange(range: Date[] | null) {
+    this.selectedPeriod.set(range);
+
+    const [from, to] = range ?? [];
+    this.transactionParams.dateFrom = from ? this.toIsoDate(from) : undefined;
+    this.transactionParams.dateTo = to ? this.toIsoDate(to) : undefined;
+
+    // Tant que la fin n'est pas choisie, le p-datepicker n'a qu'une borne : on
+    // n'interroge pas le serveur sur une plage à moitié saisie.
+    if (range && range.length && !to) return;
+
+    this.transactionParams.pageNumber = 1;
+    this.loadTransactions({ first: 0, rows: this.transactionParams.pageSize });
+  }
+
+  /** L'API attend une DateOnly : date locale en yyyy-MM-dd, jamais un toISOString
+   *  qui basculerait d'un jour selon le fuseau. */
+  private toIsoDate(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
   transactionForm = this.fb.nonNullable.group({
     label: ['', Validators.required],
     note: [''],
     type: ['Expense' as TransactionType, Validators.required],
     categoryId: ['', Validators.required],
-    amount: [0, Validators.required],
+    // §3.C : le montant est toujours positif, le sens est porté par `type`.
+    amount: [0, [Validators.required, Validators.min(0.01)]],
     date: [new Date(), Validators.required],
   });
 
@@ -198,10 +261,13 @@ export class Transactions implements OnInit {
     this.searchValue = '';
     this.selectedCategoryId = null;
     this.selectedTransactionType = null;
+    this.selectedPeriod.set(null);
 
     this.transactionParams.search = undefined;
     this.transactionParams.categoryId = undefined;
     this.transactionParams.transactionType = undefined;
+    this.transactionParams.dateFrom = undefined;
+    this.transactionParams.dateTo = undefined;
     this.transactionParams.sortBy = undefined;
     this.transactionParams.sortDirection = 'desc';
     this.transactionParams.pageNumber = 1;
@@ -216,10 +282,15 @@ export class Transactions implements OnInit {
   }
 
   loadTransactions(event: TableLazyLoadEvent) {
-    this.transactionParams.pageNumber =
-      Math.floor((event.first ?? 0) / (event.rows ?? this.transactionParams.pageSize)) + 1;
+    const first = event.first ?? 0;
+    const rows = event.rows ?? this.transactionParams.pageSize;
 
-    this.transactionParams.pageSize = event.rows ?? this.transactionParams.pageSize;
+    this.transactionParams.pageNumber = Math.floor(first / rows) + 1;
+    this.transactionParams.pageSize = rows;
+
+    // Tous les chemins de chargement passent ici : c'est le seul endroit qui écrit
+    // la pagination, donc le seul qui puisse désynchroniser les deux paginateurs.
+    this.paging.set({ first, rows });
 
     // Sort
     if (typeof event.sortField === 'string') {
@@ -250,11 +321,9 @@ export class Transactions implements OnInit {
     });
   }
 
+  /** Paginateur du bandeau. Il délègue à loadTransactions, qui écrit `paging` et
+   *  repousse donc la nouvelle page dans le paginateur de la table. */
   onPageChange(event: PaginatorState) {
-    const page =
-      Math.floor((event.first ?? 0) / (event.rows ?? this.transactionParams.pageSize)) + 1;
-    this.transactionParams.pageNumber = page;
-    this.transactionParams.pageSize = event.rows ?? this.transactionParams.pageSize;
     this.loadTransactions({ first: event.first, rows: event.rows });
   }
 

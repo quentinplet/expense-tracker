@@ -55,7 +55,8 @@
       "deleteMany": "Are you sure you want to delete the selected transactions?",
       "deleted": "Transaction deleted",
       "deletedMany": "Transactions deleted",
-      "deleteFailed": "Deletion failed."
+      "deleteFailed": "Deletion failed.",
+      "importCsvSoon": "Coming soon"
     },
     "columns": {
       "label": "Label",
@@ -70,7 +71,11 @@
       "allTypes": "All types",
       "search": "Filter…",
       "reset": "Reset",
-      "period": "Period"
+      "period": "Period",
+      "periodAny": "All periods",
+      "typeAll": "All",
+      "typeExpense": "Expenses",
+      "typeIncome": "Income"
     },
     "form": {
       "createTitle": "New transaction",
@@ -89,7 +94,8 @@
       "updateFailed": "Update failed.",
       "labelRequired": "Label is required.",
       "categoryRequired": "Category is required.",
-      "amountRequired": "Amount must be greater than 0."
+      "amountRequired": "Amount must be greater than 0.",
+      "optional": "(optional)"
     },
     "type": {
       "expense": "Expense",
