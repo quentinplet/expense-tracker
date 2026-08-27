@@ -114,6 +114,22 @@
   <div
     class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
   >
+    <!-- Barre d'action groupée : n'existe que lorsqu'il y a une sélection, pour
+         laisser les en-têtes de colonnes coller au haut de la carte sinon. -->
+    @if (selectedTransactions().length) {
+      <div
+        class="flex items-center justify-end border-b border-surface-200 px-4 py-3 dark:border-surface-800"
+      >
+        <p-button
+          (click)="deleteSelectedTransactions()"
+          severity="danger"
+          [label]="'common.delete' | translate"
+          icon="pi pi-trash"
+          outlined
+          size="small"
+        />
+      </div>
+    }
     <p-table
       #dt
       [first]="first()"
@@ -134,35 +150,6 @@
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[5, 10, 20, 30]"
     >
-      <ng-template #caption>
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <span class="text-sm whitespace-nowrap text-surface-500 dark:text-surface-400">
-            {{
-              'transaction.list.showing'
-                | translate
-                  : {
-                      first: totalRecords() ? first() + 1 : 0,
-                      last: Math.min(first() + rows(), totalRecords()),
-                      total: totalRecords(),
-                    }
-            }}
-          </span>
-
-          <div class="flex items-center gap-3">
-            @if (selectedTransactions().length) {
-              <p-button
-                (click)="deleteSelectedTransactions()"
-                severity="danger"
-                [label]="'common.delete' | translate"
-                icon="pi pi-trash"
-                outlined
-                size="small"
-              />
-            }
-          </div>
-        </div>
-      </ng-template>
-
       <ng-template #header>
         <tr>
           <th style="width: 3rem">

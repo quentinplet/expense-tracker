@@ -62,8 +62,6 @@ export class Transactions implements OnInit {
   protected transactionParams = new TransactionParams();
   totalRecords = signal(0);
 
-  protected readonly Math = Math;
-
   transactionDialog = false;
   transactions = signal<Transaction[]>([]);
   categories = signal<Categorie[]>([]);
