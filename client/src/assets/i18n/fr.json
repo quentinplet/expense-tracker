@@ -81,6 +81,7 @@
       "createTitle": "Nouvelle transaction",
       "editTitle": "Modifier la transaction",
       "amount": "Montant",
+      "amountPlaceholder": "0,00 €",
       "category": "Catégorie",
       "date": "Date",
       "label": "Libellé",
@@ -95,6 +96,7 @@
       "labelRequired": "Le libellé est obligatoire.",
       "categoryRequired": "La catégorie est obligatoire.",
       "amountRequired": "Le montant doit être supérieur à 0.",
+      "dateRequired": "La date est obligatoire.",
       "optional": "(optionnel)"
     },
     "type": {

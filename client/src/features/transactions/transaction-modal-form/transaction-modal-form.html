@@ -1,18 +1,41 @@
 <p-dialog
   [(visible)]="visible"
-  [style]="{ width: '32rem' }"
+  [style]="{ width: '34rem' }"
   [header]="
     (isEditing() ? 'transaction.form.editTitle' : 'transaction.form.createTitle') | translate
   "
   [modal]="true"
   [draggable]="false"
+  [focusOnShow]="false"
+  appendTo="body"
+  styleClass="transaction-dialog"
+  (onShow)="onShow()"
   (onHide)="onClose()"
 >
   <ng-template #content>
-    <form id="transactionForm" [formGroup]="form()" (ngSubmit)="onSubmit()">
-      <!-- Segmenté Dépense | Revenu, teinté par le sens : rouge sortant, vert entrant. -->
+    <form id="transactionForm" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!--
+        Soumission implicite : sans un bouton submit DANS le formulaire, `Entrée`
+        ne déclenche rien — le bouton du pied de page vit hors du <form>, dans le
+        template #footer du p-dialog. C'est lui qui porte la promesse « ↵ pour valider ».
+      -->
+      <button type="submit" class="hidden" tabindex="-1" aria-hidden="true"></button>
+
+      <!--
+        Segmenté Dépense | Revenu, traité comme un segmented control standard : c'est
+        l'ÉLÉVATION qui marque la sélection — pilule blanche sur piste grise en clair,
+        surface-800 en sombre — et le TEXTE qui porte le sens, rouge sortant / vert
+        entrant.
+
+        Aucune teinte de fond, volontairement : un aplat rouge virait au maroon sur le
+        fond sombre, et se délavait en rose pâle sur le fond clair, où il ne restait
+        qu'un cerne. Une seule règle tient donc dans les deux modes.
+
+        Le libellé est toujours là, donc la couleur n'est jamais seule à porter
+        l'information (§17).
+      -->
       <div
-        class="mb-6 flex items-center gap-1 rounded-xl bg-surface-100 p-1 dark:bg-surface-950"
+        class="mb-6 flex items-center gap-1 rounded-full border border-surface-200 bg-surface-100 p-1 dark:border-surface-800 dark:bg-surface-950"
         role="group"
         [attr.aria-label]="'transaction.columns.type' | translate"
       >
@@ -20,10 +43,10 @@
           type="button"
           (click)="selectType('Expense')"
           [attr.aria-pressed]="activeType() === 'Expense'"
-          class="flex-1 cursor-pointer rounded-lg border-0 px-4 py-2.5 text-sm font-semibold transition-colors"
+          class="flex-1 cursor-pointer rounded-full border-0 px-4 py-3 text-sm font-semibold transition-colors"
           [class]="
             activeType() === 'Expense'
-              ? 'bg-red-500/15 text-red-500'
+              ? 'bg-surface-0 text-red-600 shadow-sm dark:bg-surface-800 dark:text-red-400'
               : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
           "
         >
@@ -33,10 +56,10 @@
           type="button"
           (click)="selectType('Income')"
           [attr.aria-pressed]="activeType() === 'Income'"
-          class="flex-1 cursor-pointer rounded-lg border-0 px-4 py-2.5 text-sm font-semibold transition-colors"
+          class="flex-1 cursor-pointer rounded-full border-0 px-4 py-3 text-sm font-semibold transition-colors"
           [class]="
             activeType() === 'Income'
-              ? 'bg-green-500/15 text-green-500'
+              ? 'bg-surface-0 text-emerald-600 shadow-sm dark:bg-surface-800 dark:text-emerald-400'
               : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
           "
         >
@@ -50,38 +73,50 @@
           {{ 'transaction.form.amount' | translate }}
         </label>
         <p-inputnumber
+          #amountInput
           formControlName="amount"
           inputId="amount"
           mode="currency"
           currency="EUR"
           [locale]="locale()"
-          [inputStyleClass]="
-            'text-3xl font-bold py-3 ' + (errors()['Amount'] ? 'ng-invalid ng-dirty' : '')
-          "
-          [autofocus]="true"
+          [placeholder]="'transaction.form.amountPlaceholder' | translate"
+          [invalid]="!!errors()['Amount'] || (showErrors() && form.controls.amount.invalid)"
+          inputStyleClass="text-3xl! font-bold! py-3!"
+          (keydown)="onAmountKeydown($event)"
           fluid
         />
         @if (errors()['Amount']) {
-          <small class="mt-1 block text-red-500">{{ errors()['Amount'][0] }}</small>
-        } @else if (form().get('amount')?.invalid && form().get('amount')?.touched) {
-          <small class="mt-1 block text-red-500">
+          <small class="mt-2 block text-sm text-red-500">{{ errors()['Amount'][0] }}</small>
+        } @else if (showErrors() && form.controls.amount.invalid) {
+          <small class="mt-2 block text-sm text-red-500">
             {{ 'transaction.form.amountRequired' | translate }}
           </small>
         }
       </div>
 
+      <!-- Catégorie et Date appariées ; le libellé, plus long, prend la ligne suivante. -->
       <div class="mb-5 grid grid-cols-2 gap-4">
         <div>
-          <label for="categoryId" class="mb-2 block text-sm font-semibold">
+          <!--
+            Pas de `for` ici : `inputId` pose l'id sur un `<span role="combobox">`, qui
+            n'est pas un élément « labelable » au sens HTML (input, select, textarea…).
+            Le navigateur voit l'id exister mais refuse l'association — d'où
+            l'avertissement « doesn't match any element id ». `aria-labelledby` est le
+            mécanisme prévu pour un rôle ARIA combobox.
+          -->
+          <label id="categoryLabel" class="mb-2 block text-sm font-semibold">
             {{ 'transaction.form.category' | translate }}
           </label>
           <p-select
             formControlName="categoryId"
-            inputId="categoryId"
+            ariaLabelledBy="categoryLabel"
             [options]="categoryOptions()"
             optionLabel="label"
             optionValue="id"
             [placeholder]="'transaction.form.category' | translate"
+            [invalid]="showErrors() && form.controls.categoryId.invalid"
+            appendTo="body"
+            [dt]="fieldTokens"
             fluid
           >
             <!-- Couleur de catégorie en style inline, jamais en classe générée (§18). -->
@@ -89,7 +124,7 @@
               @if (option) {
                 <span class="flex items-center gap-2">
                   <span
-                    class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
+                    class="flex h-[1.2rem] w-[1.2rem] shrink-0 items-center justify-center rounded-md"
                     [style.color]="option.color || 'var(--p-surface-400)'"
                     [style.background-color]="
                       'color-mix(in oklch, ' +
@@ -106,7 +141,7 @@
             <ng-template #item let-option>
               <span class="flex items-center gap-2">
                 <span
-                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
+                  class="flex h-[1.2rem] w-[1.2rem] shrink-0 items-center justify-center rounded-md"
                   [style.color]="option.color || 'var(--p-surface-400)'"
                   [style.background-color]="
                     'color-mix(in oklch, ' +
@@ -120,8 +155,8 @@
               </span>
             </ng-template>
           </p-select>
-          @if (form().get('categoryId')?.invalid && form().get('categoryId')?.touched) {
-            <small class="mt-1 block text-red-500">
+          @if (showErrors() && form.controls.categoryId.invalid) {
+            <small class="mt-2 block text-sm text-red-500">
               {{ 'transaction.form.categoryRequired' | translate }}
             </small>
           }
@@ -131,6 +166,16 @@
           <label for="date" class="mb-2 block text-sm font-semibold">
             {{ 'transaction.form.date' | translate }}
           </label>
+          <!--
+            `appendTo="body"` ici ET sur le p-dialog lui-même. Rendu en place, le dialogue
+            vivait dans le `div.overflow-y-auto` de main-layout ; PrimeNG accroche son
+            écouteur de scroll aux ancêtres scrollables de la CIBLE, donc scroller la page
+            derrière refermait select et calendrier. Même piège que le menu profil
+            (`f873797`), mais il se soigne à la racine, sur le dialogue.
+
+            Sur les overlays, l'attribut sert en plus à ne pas rogner le calendrier, plus
+            grand que son parent.
+          -->
           <p-date-picker
             formControlName="date"
             inputId="date"
@@ -138,8 +183,16 @@
             [dateFormat]="dateFormat()"
             [showIcon]="true"
             iconDisplay="input"
+            appendTo="body"
+            [style]="datePickerTokens"
+            [invalid]="showErrors() && form.controls.date.invalid"
             fluid
           />
+          @if (showErrors() && form.controls.date.invalid) {
+            <small class="mt-2 block text-sm text-red-500">
+              {{ 'transaction.form.dateRequired' | translate }}
+            </small>
+          }
         </div>
       </div>
 
@@ -153,10 +206,12 @@
           pInputText
           id="label"
           [placeholder]="'transaction.form.labelPlaceholder' | translate"
+          [invalid]="showErrors() && form.controls.label.invalid"
+          [dt]="fieldTokens"
           fluid
         />
-        @if (form().get('label')?.invalid && form().get('label')?.touched) {
-          <small class="mt-1 block text-red-500">
+        @if (showErrors() && form.controls.label.invalid) {
+          <small class="mt-2 block text-sm text-red-500">
             {{ 'transaction.form.labelRequired' | translate }}
           </small>
         }
@@ -175,6 +230,7 @@
           id="note"
           rows="2"
           [placeholder]="'transaction.form.notePlaceholder' | translate"
+          [dt]="fieldTokens"
           class="w-full"
         ></textarea>
       </div>
@@ -195,13 +251,19 @@
         <p-button
           [label]="'common.cancel' | translate"
           severity="secondary"
-          text
-          (click)="onClose()"
+          outlined
+          (onClick)="onClose()"
         />
+        <!--
+          Le pied de page du p-dialog est rendu HORS du <form> : ni `type="submit"`
+          ni un attribut `form=` sur <p-button> (qui n'a pas cette entrée, il finirait
+          sur l'hôte et pas sur le <button>) ne soumettent quoi que ce soit. On appelle
+          onSubmit() directement — même entonnoir que la soumission par `Entrée`.
+        -->
         <p-button
-          form="transactionForm"
           [label]="(isEditing() ? 'common.update' : 'common.create') | translate"
-          type="submit"
+          type="button"
+          (onClick)="onSubmit()"
         />
       </div>
     </div>

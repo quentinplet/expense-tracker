@@ -1,6 +1,8 @@
 <div class="w-full">
   <!-- En-tête : titre, total, actions -->
-  <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+  <!-- `items-end` : les actions s'alignent sur le bas du bloc titre, donc juste au-dessus
+       de la carte de filtres, comme la maquette — et non en haut du titre. -->
+  <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
     <div>
       <h1 class="m-0 text-3xl font-bold text-surface-900 dark:text-surface-0">
         {{ 'transaction.list.title' | translate }}
@@ -298,11 +300,10 @@
 
   <app-transaction-modal-form
     [(visible)]="transactionDialog"
-    [isEditing]="!!selectedTransaction()"
-    (close)="hideDialog()"
-    (save)="submit()"
-    [form]="transactionForm"
+    [transaction]="selectedTransaction()"
     [categories]="categories()"
     [errors]="errors()"
+    (close)="hideDialog()"
+    (save)="submit($event)"
   />
 </div>

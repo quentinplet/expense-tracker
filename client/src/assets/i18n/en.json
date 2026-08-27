@@ -81,6 +81,7 @@
       "createTitle": "New transaction",
       "editTitle": "Edit transaction",
       "amount": "Amount",
+      "amountPlaceholder": "€0.00",
       "category": "Category",
       "date": "Date",
       "label": "Label",
@@ -95,6 +96,7 @@
       "labelRequired": "Label is required.",
       "categoryRequired": "Category is required.",
       "amountRequired": "Amount must be greater than 0.",
+      "dateRequired": "Date is required.",
       "optional": "(optional)"
     },
     "type": {

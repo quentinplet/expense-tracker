@@ -1,0 +1,64 @@
+/**
+ * Ce fichier ne porte QUE ce que Tailwind ne peut pas atteindre : des éléments rendus
+ * à l'intérieur des templates de PrimeNG, sans entrée pour leur passer une classe.
+ * Les hauteurs de champ, elles, sont des utilitaires Tailwind posés dans le template.
+ *
+ * Portée par la CLASSE du dialogue, pas par `:host`. Le p-dialog est monté avec
+ * `appendTo="body"` (sinon le scroll de la page referme select et calendrier) : il
+ * n'est donc plus un descendant du host, et un `:host ::ng-deep` — compilé en
+ * `[_nghost-…] X` — ne l'atteignait plus du tout. `::ng-deep` seul émet une règle
+ * globale, que `.transaction-dialog` referme sur ce seul dialogue.
+ */
+::ng-deep .transaction-dialog {
+  /**
+   * Le gabarit `selectedItem` rend un badge d'icône ; on le centre sur la ligne.
+   *
+   * Ni `height` ni `padding` ici, volontairement : la hauteur du champ vient du token
+   * `paddingY` passé en `[dt]`, et forcer l'un ou l'autre écraserait ce que le token
+   * fournit — le select s'effondrait alors à 18px. Le badge est dimensionné sous la
+   * hauteur de ligne (cf. `h-5` dans le template), donc il ne pousse pas le champ.
+   */
+  .p-select-label {
+    display: flex;
+    align-items: center;
+  }
+
+  /**
+   * `assets/styles.scss` colore en rouge tout `.ng-invalid.ng-touched` : il suffisait
+   * de cliquer à côté d'un champ vide — ou sur le switch, qui lui prend le focus —
+   * pour voir la bordure virer sans avoir rien validé. On neutralise la règle ici et
+   * on laisse `[invalid]` porter l'état, piloté par `showErrors()` : la bordure rouge
+   * n'apparaît donc qu'après une tentative de soumission.
+   *
+   * `:not(:focus)` / `:not(.p-focus)` sont indispensables : cette règle est plus
+   * spécifique que le `:focus` de PrimeNG. Sans l'exclusion, un champ déjà visité
+   * — donc `ng-touched` — ne montrait plus sa bordure de focus au second clic.
+   */
+  .p-inputtext.ng-invalid.ng-touched:not(:focus),
+  .p-textarea.ng-invalid.ng-touched:not(:focus),
+  .p-select.ng-invalid.ng-touched:not(.p-focus) {
+    border-color: var(--p-inputtext-border-color);
+  }
+
+  .p-inputtext.p-invalid,
+  .p-textarea.p-invalid,
+  .p-select.p-invalid,
+  .p-inputtext.ng-invalid.ng-touched.p-invalid,
+  .p-select.ng-invalid.ng-touched.p-invalid {
+    border-color: var(--p-inputtext-invalid-border-color);
+  }
+
+  /**
+   * Aura colore aussi le PLACEHOLDER en rouge sur un champ invalide
+   * (`form.field.invalid.placeholder.color`). Un texte d'exemple n'est pas une erreur :
+   * il reste gris, seuls la bordure et le message portent l'état.
+   */
+  .p-inputtext::placeholder,
+  .p-textarea::placeholder {
+    color: var(--p-inputtext-placeholder-color);
+  }
+
+  .p-select.p-invalid .p-select-label.p-placeholder {
+    color: var(--p-select-placeholder-color);
+  }
+}

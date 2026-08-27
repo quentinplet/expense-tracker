@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,7 +14,6 @@ import {
   CreateTransactionDto,
   Transaction,
   TransactionParams,
-  TransactionType,
   UpdateTransactionDto,
 } from '@/types/transaction';
 import { Paginator, PaginatorState } from 'primeng/paginator';
@@ -23,7 +22,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { BusyService } from '@/core/services/busy-service';
 import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
-import { TransactionModalForm } from './transaction-modal-form/transaction-modal-form';
+import {
+  TransactionFormValue,
+  TransactionModalForm,
+} from './transaction-modal-form/transaction-modal-form';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -44,7 +46,6 @@ import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
     InputIconModule,
     IconFieldModule,
     Paginator,
-    ReactiveFormsModule,
     TransactionModalForm,
     TranslatePipe,
     CategoryNamePipe,
@@ -65,12 +66,12 @@ export class Transactions implements OnInit {
 
   protected readonly Math = Math;
 
-  transactionDialog: boolean = false;
+  transactionDialog = false;
   transactions = signal<Transaction[]>([]);
   categories = signal<Categorie[]>([]);
   errors = signal<Record<string, string[]>>({});
   private searchSubject = new Subject<string>();
-  protected searchValue: string = '';
+  protected searchValue = '';
   protected selectedCategoryId: string | null = null;
   protected selectedTransactionType: string | null = null;
   private destroyRef = inject(DestroyRef);
@@ -78,7 +79,6 @@ export class Transactions implements OnInit {
   selectedTransaction = signal<Transaction | null>(null);
   selectedTransactions = signal<Transaction[]>([]);
 
-  private fb = inject(FormBuilder);
   private transactionService = inject(TransactionService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -181,16 +181,6 @@ export class Transactions implements OnInit {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   }
 
-  transactionForm = this.fb.nonNullable.group({
-    label: ['', Validators.required],
-    note: [''],
-    type: ['Expense' as TransactionType, Validators.required],
-    categoryId: ['', Validators.required],
-    // §3.C : le montant est toujours positif, le sens est porté par `type`.
-    amount: [0, [Validators.required, Validators.min(0.01)]],
-    date: [new Date(), Validators.required],
-  });
-
   ngOnInit() {
     this.loadTransactions({
       first: 0,
@@ -200,13 +190,12 @@ export class Transactions implements OnInit {
     this.configureDebounce();
   }
 
-  configureDebounce() {
+  private configureDebounce() {
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((searchTerm) => {
         this.transactionParams.search = searchTerm;
 
-        // reset to first page when search term changes
         this.transactionParams.pageNumber = 1;
 
         this.loadTransactions({
@@ -235,7 +224,6 @@ export class Transactions implements OnInit {
     this.selectedCategoryId = categoryId;
     this.transactionParams.categoryId = categoryId ?? undefined;
 
-    // reset to first page when category filter changes
     this.transactionParams.pageNumber = 1;
 
     this.loadTransactions({
@@ -248,7 +236,6 @@ export class Transactions implements OnInit {
     this.selectedTransactionType = type;
     this.transactionParams.transactionType = type ?? undefined;
 
-    // reset to first page when type filter changes
     this.transactionParams.pageNumber = 1;
 
     this.loadTransactions({
@@ -313,7 +300,7 @@ export class Transactions implements OnInit {
     });
   }
 
-  loadCategories() {
+  private loadCategories() {
     this.categorieService.getCategories().subscribe({
       next: (categories) => {
         this.categories.set(categories);
@@ -327,26 +314,17 @@ export class Transactions implements OnInit {
     this.loadTransactions({ first: event.first, rows: event.rows });
   }
 
+  // La transaction sélectionnée est le seul état transmis : le dialogue possède son
+  // formulaire et se remplit lui-même à l'ouverture.
   openNew() {
     this.selectedTransaction.set(null);
-    this.transactionForm.reset();
     this.errors.set({});
     this.transactionDialog = true;
   }
 
-  // ✅ Type correct — plus de `{ id: string; name: string }`
   editTransaction(transaction: Transaction) {
     this.selectedTransaction.set(transaction);
-
-    this.transactionForm.patchValue({
-      label: transaction.label,
-      note: transaction.note ?? '',
-      type: transaction.type,
-      amount: transaction.amount,
-      date: new Date(transaction.date),
-      categoryId: transaction.categoryId,
-    });
-
+    this.errors.set({});
     this.transactionDialog = true;
   }
 
@@ -422,21 +400,20 @@ export class Transactions implements OnInit {
     });
   }
 
-  private toPayload(): CreateTransactionDto {
-    const { label, note, type, categoryId, amount, date } = this.transactionForm.getRawValue();
-    return {
-      label,
-      note: note || null,
-      type,
-      categoryId,
-      amount,
-      // L'API attend une DateOnly : date locale au format yyyy-MM-dd, sans fuseau.
-      date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`,
+  /**
+   * Le dialogue remonte la saisie ; la traduction vers le contrat de l'API se fait ici,
+   * avec le même `toIsoDate()` que le filtre de période — la règle ne vit qu'à un endroit.
+   */
+  submit(value: TransactionFormValue) {
+    const transactionData: CreateTransactionDto = {
+      label: value.label,
+      note: value.note || null,
+      type: value.type,
+      categoryId: value.categoryId,
+      amount: value.amount,
+      date: this.toIsoDate(value.date),
     };
-  }
 
-  submit() {
-    const transactionData = this.toPayload();
     if (this.selectedTransaction()) {
       this.updateTransaction(transactionData);
       return;
@@ -444,12 +421,8 @@ export class Transactions implements OnInit {
     this.addNewTransaction(transactionData);
   }
 
-  addNewTransaction(transactionData: CreateTransactionDto) {
-    console.log('Adding new transaction with data:', transactionData);
-    const newTransaction: CreateTransactionDto = {
-      ...transactionData,
-    };
-    this.transactionService.addNewTransaction(newTransaction).subscribe({
+  private addNewTransaction(transactionData: CreateTransactionDto) {
+    this.transactionService.addNewTransaction(transactionData).subscribe({
       next: (createdTransaction) => {
         this.transactions.update((transactions) => [
           createdTransaction,
@@ -475,46 +448,41 @@ export class Transactions implements OnInit {
     });
   }
 
-  updateTransaction(transactionData: UpdateTransactionDto) {
-    if (!this.selectedTransaction()) return;
+  private updateTransaction(transactionData: UpdateTransactionDto) {
+    const selected = this.selectedTransaction();
+    if (!selected) return;
 
-    const updatedTransaction: UpdateTransactionDto = {
-      ...transactionData,
-    };
-    this.transactionService
-      .updateTransaction(this.selectedTransaction()!.id, updatedTransaction)
-      .subscribe({
-        next: (updatedTransaction) => {
-          this.transactions.update((transactions) =>
-            transactions.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)),
-          );
-          this.hideDialog();
-          this.messageService.add({
-            severity: 'success',
-            summary: this.translate.instant('common.success'),
-            detail: this.translate.instant('transaction.form.updated'),
-            life: 3000,
-          });
-        },
-        error: (error) => {
-          this.errors.set(error);
-          this.messageService.add({
-            severity: 'error',
-            summary: this.translate.instant('common.error'),
-            detail: this.translate.instant('transaction.form.updateFailed'),
-          });
-        },
-      });
+    this.transactionService.updateTransaction(selected.id, transactionData).subscribe({
+      next: (updatedTransaction) => {
+        this.transactions.update((transactions) =>
+          transactions.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)),
+        );
+        this.hideDialog();
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('common.success'),
+          detail: this.translate.instant('transaction.form.updated'),
+          life: 3000,
+        });
+      },
+      error: (error) => {
+        this.errors.set(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('common.error'),
+          detail: this.translate.instant('transaction.form.updateFailed'),
+        });
+      },
+    });
   }
 
   hideDialog() {
     this.transactionDialog = false;
     this.selectedTransaction.set(null);
-    this.transactionForm.reset();
     this.errors.set({});
   }
 
-  reloadCurrentPage() {
+  private reloadCurrentPage() {
     const page = this.transactionParams.pageNumber;
     const pageSize = this.transactionParams.pageSize;
     this.loadTransactions({ first: (page - 1) * pageSize, rows: pageSize });
