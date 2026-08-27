@@ -62,10 +62,12 @@ export class TransactionService {
     return this.http.delete<void>(`${this.baseUrl}transactions/${id}`);
   }
 
-  deleteTransactions(transactions: Transaction[]): Observable<void> {
+  /** Renvoie le nombre réellement supprimé : un id déjà supprimé ailleurs est
+   *  silencieusement ignoré côté serveur, et peut donc être inférieur à transactions.length. */
+  deleteTransactions(transactions: Transaction[]): Observable<number> {
     // L'API attend un tableau d'ids brut (`[FromBody] List<int>`), pas un objet enveloppe.
     const ids = transactions.map((t) => t.id);
-    return this.http.request<void>('delete', `${this.baseUrl}transactions`, {
+    return this.http.request<number>('delete', `${this.baseUrl}transactions`, {
       body: ids,
     });
   }

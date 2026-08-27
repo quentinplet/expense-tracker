@@ -100,7 +100,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteTransactions([FromBody] List<Guid> ids)
+    public async Task<ActionResult<int>> DeleteTransactions([FromBody] List<Guid> ids)
     {
         var userId = User.GetMemberId();
         var transactions = await uow.TransactionRepository.GetTransactionsByIdsAsync(ids, userId);
@@ -108,7 +108,10 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         if (transactions.Any(t => t.UserId != userId)) return Forbid();
 
         uow.TransactionRepository.DeleteTransactions(transactions);
-        if (await uow.Complete()) return NoContent();
+        // Le nombre réellement supprimé peut être inférieur à ids.Count (un id déjà
+        // supprimé ailleurs est silencieusement ignoré par GetTransactionsByIdsAsync) :
+        // le client en a besoin pour ne jamais deviner un compte.
+        if (await uow.Complete()) return Ok(transactions.Count);
         return BadRequest("Failed to delete transactions");
     }
 

@@ -329,16 +329,15 @@ export class Transactions implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.transactionService.deleteTransactions(selectedTransactions).subscribe({
-          next: () => {
+          next: (deletedCount) => {
             this.selectedTransactions.set([]);
 
             // Hors de la dernière page, une ligne de la page suivante doit remonter :
             // impossible à deviner côté client, un recomptage serveur est la seule
             // option correcte. Sur la dernière page, rien ne remonte derrière, donc une
-            // mise à jour locale suffit et évite un aller-retour réseau — au prix d'un
-            // risque résiduel et étroit : si le serveur a silencieusement ignoré un id
-            // déjà supprimé ailleurs, `totalRecords` dérive d'autant ici (contrairement
-            // à un recomptage systématique, qui ne suppose jamais ce compte).
+            // mise à jour locale suffit et évite un aller-retour réseau ; `deletedCount`
+            // (et non selectedTransactions.length) protège `totalRecords` d'une dérive
+            // si le serveur a silencieusement ignoré un id déjà supprimé ailleurs.
             if (!this.isOnLastPage()) {
               this.reloadCurrentPage();
             } else {
@@ -347,7 +346,7 @@ export class Transactions implements OnInit {
               this.transactions.update((transactions) =>
                 transactions.filter((t) => !selectedIds.has(t.id)),
               );
-              this.totalRecords.update((count) => count - selectedTransactions.length);
+              this.totalRecords.update((count) => count - deletedCount);
               if (pageWillEmpty && this.transactionParams.pageNumber > 1) {
                 this.transactionParams.pageNumber--;
                 this.reloadCurrentPage();
