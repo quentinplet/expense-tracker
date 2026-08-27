@@ -100,15 +100,13 @@
       }
     </div>
 
-    @if (hasActiveFilters()) {
-      <p-button
-        icon="pi pi-filter-slash"
-        [label]="'transaction.filters.reset' | translate"
-        severity="secondary"
-        text
-        (onClick)="resetFilters()"
-      />
-    }
+    <p-button
+      icon="pi pi-filter-slash"
+      [label]="'transaction.filters.reset' | translate"
+      severity="secondary"
+      text
+      (onClick)="resetFilters()"
+    />
   </div>
 
   <!-- La table vit dans une carte, comme la barre de filtres et comme les cartes du
