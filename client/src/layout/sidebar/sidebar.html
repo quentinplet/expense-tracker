@@ -1,5 +1,5 @@
 <aside
-  class="flex h-full w-64 flex-col border-r border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-950"
+  class="flex h-full w-64 flex-col border-r border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
 >
   <a routerLink="/dashboard" class="flex h-16 shrink-0 items-center gap-3 px-5 no-underline">
     <span
@@ -20,7 +20,7 @@
             <a
               [routerLink]="item.route"
               routerLinkActive="!bg-primary/10 !text-primary"
-              class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-surface-600 no-underline transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-900"
+              class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-surface-600 no-underline transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
             >
               <i [class]="item.icon"></i>
               <span>{{ item.labelKey | translate }}</span>
@@ -67,7 +67,7 @@
       type="button"
       (click)="profileMenu.toggle($event)"
       [attr.aria-label]="'profileMenu.profile' | translate"
-      class="flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 bg-surface-100 px-3 py-2.5 text-left transition-colors hover:bg-surface-200 dark:bg-surface-900 dark:hover:bg-surface-800"
+      class="flex w-full cursor-pointer items-center gap-3 rounded-xl border-0 bg-surface-100 px-3 py-2.5 text-left transition-colors hover:bg-surface-200 dark:bg-surface-950 dark:hover:bg-surface-800"
     >
       <span
         class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-contrast"
