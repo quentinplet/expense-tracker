@@ -21,10 +21,6 @@
   .p-select-label {
     display: flex;
     align-items: center;
-
-    /* Aucune hauteur ni padding ici : c'est le token `paddingY` qui les fournit. Le
-       badge est dimensionné dans le template pile sur la hauteur de ligne (1.2rem),
-       donc il ne pousse pas le champ — sans quoi il sautait de 0,7px à la sélection. */
   }
 
   /**

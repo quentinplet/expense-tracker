@@ -159,7 +159,18 @@ export class TransactionModalForm implements OnChanges {
     this.submitted.set(false);
 
     if (!transaction) {
-      this.form.reset({ type: 'Expense', date: new Date() });
+      // Chaque champ explicité, plutôt que de compter sur le rappel implicite d'Angular
+      // à la valeur de construction pour les contrôles omis : ce rappel est correct ici
+      // (chaque contrôle a été construit vide), mais silencieux pour qui ne le sait pas —
+      // un futur contrôle construit avec une valeur non vide s'y ferait piéger.
+      this.form.reset({
+        label: '',
+        note: '',
+        type: 'Expense',
+        categoryId: '',
+        amount: null,
+        date: new Date(),
+      });
       return;
     }
 
