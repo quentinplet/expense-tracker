@@ -367,15 +367,16 @@ export class Transactions implements OnInit {
               detail: this.translate.instant('transaction.list.deleted'),
               life: 3000,
             });
-            this.transactions.update((transactions) =>
-              transactions.filter((t) => t.id !== transaction.id),
-            );
-            this.totalRecords.update((count) => count - 1);
             this.selectedTransaction.set(null);
+            // Testé avant toute mutation : est-ce la dernière ligne de cette page ?
+            // Un splice local + `totalRecords - 1` laissait la page affichée avec une
+            // rangée de moins qu'une page pleine jusqu'au prochain changement de page,
+            // sans jamais faire remonter la ligne suivante depuis le serveur — d'où le
+            // recomptage systématique ci-dessous plutôt qu'une mise à jour optimiste.
             if (this.transactions().length === 1 && this.transactionParams.pageNumber > 1) {
               this.transactionParams.pageNumber--;
-              this.reloadCurrentPage();
             }
+            this.reloadCurrentPage();
           },
           error: () => {
             this.messageService.add({
