@@ -330,16 +330,30 @@ export class Transactions implements OnInit {
       accept: () => {
         this.transactionService.deleteTransactions(selectedTransactions).subscribe({
           next: () => {
-            // Le serveur ne renvoie pas le nombre réellement supprimé (un id périmé,
-            // déjà supprimé ailleurs, est ignoré silencieusement) : `totalRecords -
-            // selectedTransactions.length` dérivait dans ce cas. Un recomptage
-            // serveur, comme pour la suppression simple, ne suppose jamais un compte.
-            const pageWillEmpty = this.transactions().length === selectedTransactions.length;
             this.selectedTransactions.set([]);
-            if (pageWillEmpty && this.transactionParams.pageNumber > 1) {
-              this.transactionParams.pageNumber--;
+
+            // Hors de la dernière page, une ligne de la page suivante doit remonter :
+            // impossible à deviner côté client, un recomptage serveur est la seule
+            // option correcte. Sur la dernière page, rien ne remonte derrière, donc une
+            // mise à jour locale suffit et évite un aller-retour réseau — au prix d'un
+            // risque résiduel et étroit : si le serveur a silencieusement ignoré un id
+            // déjà supprimé ailleurs, `totalRecords` dérive d'autant ici (contrairement
+            // à un recomptage systématique, qui ne suppose jamais ce compte).
+            if (!this.isOnLastPage()) {
+              this.reloadCurrentPage();
+            } else {
+              const selectedIds = new Set(selectedTransactions.map((t) => t.id));
+              const pageWillEmpty = this.transactions().length === selectedTransactions.length;
+              this.transactions.update((transactions) =>
+                transactions.filter((t) => !selectedIds.has(t.id)),
+              );
+              this.totalRecords.update((count) => count - selectedTransactions.length);
+              if (pageWillEmpty && this.transactionParams.pageNumber > 1) {
+                this.transactionParams.pageNumber--;
+                this.reloadCurrentPage();
+              }
             }
-            this.reloadCurrentPage();
+
             this.messageService.add({
               severity: 'success',
               summary: this.translate.instant('common.success'),
@@ -374,15 +388,25 @@ export class Transactions implements OnInit {
               life: 3000,
             });
             this.selectedTransaction.set(null);
-            // Testé avant toute mutation : est-ce la dernière ligne de cette page ?
-            // Un splice local + `totalRecords - 1` laissait la page affichée avec une
-            // rangée de moins qu'une page pleine jusqu'au prochain changement de page,
-            // sans jamais faire remonter la ligne suivante depuis le serveur — d'où le
-            // recomptage systématique ci-dessous plutôt qu'une mise à jour optimiste.
-            if (this.transactions().length === 1 && this.transactionParams.pageNumber > 1) {
-              this.transactionParams.pageNumber--;
+
+            // Hors de la dernière page, la ligne suivante doit remonter depuis le
+            // serveur : un splice local laisserait la page affichée avec une rangée de
+            // moins qu'une page pleine. Sur la dernière page, rien ne remonte derrière,
+            // une mise à jour locale suffit et évite l'aller-retour réseau.
+            if (!this.isOnLastPage()) {
+              this.reloadCurrentPage();
+            } else {
+              // Testé avant la mutation : est-ce la dernière ligne de cette page ?
+              const emptiesPage = this.transactions().length === 1;
+              this.transactions.update((transactions) =>
+                transactions.filter((t) => t.id !== transaction.id),
+              );
+              this.totalRecords.update((count) => count - 1);
+              if (emptiesPage && this.transactionParams.pageNumber > 1) {
+                this.transactionParams.pageNumber--;
+                this.reloadCurrentPage();
+              }
             }
-            this.reloadCurrentPage();
           },
           error: () => {
             this.messageService.add({
@@ -482,5 +506,12 @@ export class Transactions implements OnInit {
     const page = this.transactionParams.pageNumber;
     const pageSize = this.transactionParams.pageSize;
     this.loadTransactions({ first: (page - 1) * pageSize, rows: pageSize });
+  }
+
+  /** Dernière page : aucune ligne suivante à faire remonter, une suppression peut donc
+   *  se contenter d'une mise à jour locale plutôt que d'un recomptage serveur. */
+  private isOnLastPage(): boolean {
+    const { pageNumber, pageSize } = this.transactionParams;
+    return pageNumber === Math.ceil(this.totalRecords() / pageSize);
   }
 }
