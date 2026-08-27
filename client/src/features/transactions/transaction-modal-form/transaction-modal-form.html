@@ -185,8 +185,14 @@
             iconDisplay="input"
             appendTo="body"
             [style]="datePickerTokens"
+            [invalid]="showErrors() && form.controls.date.invalid"
             fluid
           />
+          @if (showErrors() && form.controls.date.invalid) {
+            <small class="mt-2 block text-sm text-red-500">
+              {{ 'transaction.form.dateRequired' | translate }}
+            </small>
+          }
         </div>
       </div>
 

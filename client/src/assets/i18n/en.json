@@ -96,6 +96,7 @@
       "labelRequired": "Label is required.",
       "categoryRequired": "Category is required.",
       "amountRequired": "Amount must be greater than 0.",
+      "dateRequired": "Date is required.",
       "optional": "(optional)"
     },
     "type": {

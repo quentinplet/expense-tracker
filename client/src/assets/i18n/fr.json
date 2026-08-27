@@ -96,6 +96,7 @@
       "labelRequired": "Le libellé est obligatoire.",
       "categoryRequired": "La catégorie est obligatoire.",
       "amountRequired": "Le montant doit être supérieur à 0.",
+      "dateRequired": "La date est obligatoire.",
       "optional": "(optionnel)"
     },
     "type": {
