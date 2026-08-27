@@ -28,7 +28,7 @@
 
   <!-- Barre de filtres, dans sa propre carte -->
   <div
-    class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-3 dark:border-surface-800 dark:bg-surface-950"
+    class="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 px-3 py-4 dark:border-surface-800 dark:bg-surface-900"
   >
     <p-select
       [options]="categoryOptions()"
@@ -54,7 +54,7 @@
 
     <!-- Segmenté Tout | Dépenses | Revenus : remplace le select de sens. -->
     <div
-      class="flex items-center gap-1 rounded-lg bg-surface-100 p-1 dark:bg-surface-900"
+      class="flex items-center gap-1 rounded-lg bg-surface-100 p-1 dark:bg-surface-950"
       role="group"
       [attr.aria-label]="'transaction.columns.type' | translate"
     >
@@ -112,100 +112,125 @@
   <!-- La table vit dans une carte, comme la barre de filtres et comme les cartes du
        dashboard : sans ça elle flottait à même le fond de page. -->
   <div
-    class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-950"
+    class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
   >
     <p-table
       #dt
       [first]="first()"
-    [rows]="rows()"
-    [loading]="busyService.busyRequestCount() > 0"
-    [paginator]="true"
-    [lazy]="true"
-    [totalRecords]="totalRecords()"
-    (onLazyLoad)="loadTransactions($event)"
-    [value]="transactions()"
-    [(selection)]="selectedTransactions"
-    [rowHover]="true"
-    dataKey="id"
-    [currentPageReportTemplate]="
-      'transaction.list.showing'
-        | translate: { first: '{first}', last: '{last}', total: '{totalRecords}' }
-    "
-    [showCurrentPageReport]="true"
-    [rowsPerPageOptions]="[5, 10, 20, 30]"
-  >
-    <ng-template #caption>
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <span class="text-sm whitespace-nowrap text-surface-500 dark:text-surface-400">
-          {{
-            'transaction.list.showing'
-              | translate
-                : {
-                    first: totalRecords() ? first() + 1 : 0,
-                    last: Math.min(first() + rows(), totalRecords()),
-                    total: totalRecords(),
-                  }
-          }}
-        </span>
+      [rows]="rows()"
+      [loading]="busyService.busyRequestCount() > 0"
+      [paginator]="true"
+      [lazy]="true"
+      [totalRecords]="totalRecords()"
+      (onLazyLoad)="loadTransactions($event)"
+      [value]="transactions()"
+      [(selection)]="selectedTransactions"
+      [rowHover]="true"
+      dataKey="id"
+      [currentPageReportTemplate]="
+        'transaction.list.showing'
+          | translate: { first: '{first}', last: '{last}', total: '{totalRecords}' }
+      "
+      [showCurrentPageReport]="true"
+      [rowsPerPageOptions]="[5, 10, 20, 30]"
+    >
+      <ng-template #caption>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <span class="text-sm whitespace-nowrap text-surface-500 dark:text-surface-400">
+            {{
+              'transaction.list.showing'
+                | translate
+                  : {
+                      first: totalRecords() ? first() + 1 : 0,
+                      last: Math.min(first() + rows(), totalRecords()),
+                      total: totalRecords(),
+                    }
+            }}
+          </span>
 
-        <div class="flex items-center gap-3">
-          @if (selectedTransactions().length) {
-            <p-button
-              (click)="deleteSelectedTransactions()"
-              severity="danger"
-              [label]="'common.delete' | translate"
-              icon="pi pi-trash"
-              outlined
-              size="small"
-            />
-          }
-          <!-- Second paginateur, synchronisé avec celui de la table par `first()`/`rows()`. -->
-          <p-paginator
-            [first]="first()"
-            [rows]="rows()"
-            [totalRecords]="totalRecords()"
-            [rowsPerPageOptions]="[5, 10, 20, 30]"
-            (onPageChange)="onPageChange($event)"
-          />
-        </div>
-      </div>
-    </ng-template>
-
-    <ng-template #header>
-      <tr>
-        <th style="width: 3rem">
-          <p-tableHeaderCheckbox />
-        </th>
-        <th class="text-xs tracking-wider uppercase" style="min-width: 18rem">
-          {{ 'transaction.columns.label' | translate }}
-        </th>
-        <th pSortableColumn="category" class="text-xs tracking-wider uppercase">
-          {{ 'transaction.columns.category' | translate }}
-          <p-sortIcon field="category" />
-        </th>
-        <th pSortableColumn="date" class="text-xs tracking-wider uppercase">
-          {{ 'transaction.columns.date' | translate }}
-          <p-sortIcon field="date" />
-        </th>
-        <th pSortableColumn="amount" class="text-right text-xs tracking-wider uppercase">
-          {{ 'transaction.columns.amount' | translate }}
-          <p-sortIcon field="amount" />
-        </th>
-        <th style="width: 8rem">{{ 'transaction.columns.actions' | translate }}</th>
-      </tr>
-    </ng-template>
-
-    <ng-template #body let-transaction>
-      <tr>
-        <td>
-          <p-tableCheckbox [value]="transaction" />
-        </td>
-
-        <td>
           <div class="flex items-center gap-3">
-            <!-- Couleur de catégorie en style inline, jamais en classe générée (§18). -->
+            @if (selectedTransactions().length) {
+              <p-button
+                (click)="deleteSelectedTransactions()"
+                severity="danger"
+                [label]="'common.delete' | translate"
+                icon="pi pi-trash"
+                outlined
+                size="small"
+              />
+            }
+            <!-- Second paginateur, synchronisé avec celui de la table par `first()`/`rows()`. -->
+            <p-paginator
+              [first]="first()"
+              [rows]="rows()"
+              [totalRecords]="totalRecords()"
+              [rowsPerPageOptions]="[5, 10, 20, 30]"
+              (onPageChange)="onPageChange($event)"
+            />
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #header>
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox />
+          </th>
+          <th class="text-xs tracking-wider uppercase" style="min-width: 18rem">
+            {{ 'transaction.columns.label' | translate }}
+          </th>
+          <th pSortableColumn="category" class="text-xs tracking-wider uppercase">
+            {{ 'transaction.columns.category' | translate }}
+            <p-sortIcon field="category" />
+          </th>
+          <th pSortableColumn="date" class="text-xs tracking-wider uppercase">
+            {{ 'transaction.columns.date' | translate }}
+            <p-sortIcon field="date" />
+          </th>
+          <th pSortableColumn="amount" class="text-right text-xs tracking-wider uppercase">
+            {{ 'transaction.columns.amount' | translate }}
+            <p-sortIcon field="amount" />
+          </th>
+          <th style="width: 8rem">{{ 'transaction.columns.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-transaction>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="transaction" />
+          </td>
+
+          <td>
+            <div class="flex items-center gap-3">
+              <!-- Couleur de catégorie en style inline, jamais en classe générée (§18). -->
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                [style.color]="transaction.categoryColor || 'var(--p-surface-400)'"
+                [style.background-color]="
+                  'color-mix(in oklch, ' +
+                  (transaction.categoryColor || 'var(--p-surface-400)') +
+                  ' 15%, transparent)'
+                "
+              >
+                <i class="pi text-sm" [class]="transaction.categoryIcon || 'pi-tag'"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block truncate font-medium text-surface-900 dark:text-surface-0">
+                  {{ transaction.label }}
+                </span>
+                @if (transaction.note) {
+                  <span class="block truncate text-xs text-surface-500 dark:text-surface-400">
+                    {{ transaction.note }}
+                  </span>
+                }
+              </span>
+            </div>
+          </td>
+
+          <td>
             <span
-              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+              class="inline-block rounded-md px-2 py-1 text-xs font-semibold"
               [style.color]="transaction.categoryColor || 'var(--p-surface-400)'"
               [style.background-color]="
                 'color-mix(in oklch, ' +
@@ -213,85 +238,60 @@
                 ' 15%, transparent)'
               "
             >
-              <i class="pi text-sm" [class]="transaction.categoryIcon || 'pi-tag'"></i>
+              {{ categoryOf(transaction) | categoryName }}
             </span>
-            <span class="min-w-0">
-              <span class="block truncate font-medium text-surface-900 dark:text-surface-0">
-                {{ transaction.label }}
-              </span>
-              @if (transaction.note) {
-                <span class="block truncate text-xs text-surface-500 dark:text-surface-400">
-                  {{ transaction.note }}
-                </span>
-              }
-            </span>
-          </div>
-        </td>
+          </td>
 
-        <td>
-          <span
-            class="inline-block rounded-md px-2 py-1 text-xs font-semibold"
-            [style.color]="transaction.categoryColor || 'var(--p-surface-400)'"
-            [style.background-color]="
-              'color-mix(in oklch, ' +
-              (transaction.categoryColor || 'var(--p-surface-400)') +
-              ' 15%, transparent)'
-            "
+          <td class="text-sm text-surface-500 dark:text-surface-400">
+            {{ transaction.date | date: 'mediumDate' : undefined : locale() }}
+          </td>
+
+          <!-- Le sens n'est jamais porté par la couleur seule : le signe est toujours là (§17). -->
+          <td
+            class="text-right font-semibold tabular-nums"
+            [class]="transaction.type === 'Income' ? 'text-green-500' : 'text-red-500'"
           >
-            {{ categoryOf(transaction) | categoryName }}
-          </span>
-        </td>
+            {{ transaction.type === 'Income' ? '+' : '−'
+            }}{{ transaction.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
+          </td>
 
-        <td class="text-sm text-surface-500 dark:text-surface-400">
-          {{ transaction.date | date: 'mediumDate' : undefined : locale() }}
-        </td>
+          <td>
+            <p-button
+              (click)="editTransaction(transaction)"
+              icon="pi pi-pencil"
+              class="mr-2"
+              [rounded]="true"
+              [outlined]="true"
+              [attr.aria-label]="'common.update' | translate"
+            />
+            <p-button
+              (click)="deleteTransaction(transaction)"
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              [outlined]="true"
+              [attr.aria-label]="'common.delete' | translate"
+            />
+          </td>
+        </tr>
+      </ng-template>
 
-        <!-- Le sens n'est jamais porté par la couleur seule : le signe est toujours là (§17). -->
-        <td
-          class="text-right font-semibold tabular-nums"
-          [class]="transaction.type === 'Income' ? 'text-green-500' : 'text-red-500'"
-        >
-          {{ transaction.type === 'Income' ? '+' : '−'
-          }}{{ transaction.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
-        </td>
-
-        <td>
-          <p-button
-            (click)="editTransaction(transaction)"
-            icon="pi pi-pencil"
-            class="mr-2"
-            [rounded]="true"
-            [outlined]="true"
-            [attr.aria-label]="'common.update' | translate"
-          />
-          <p-button
-            (click)="deleteTransaction(transaction)"
-            icon="pi pi-trash"
-            severity="danger"
-            [rounded]="true"
-            [outlined]="true"
-            [attr.aria-label]="'common.delete' | translate"
-          />
-        </td>
-      </tr>
-    </ng-template>
-
-    <ng-template #emptymessage>
-      <tr>
-        <td colspan="6" class="py-12 text-center">
-          <p class="m-0 font-medium text-surface-600 dark:text-surface-300">
-            {{
-              (hasActiveFilters() ? 'transaction.list.emptyFiltered' : 'transaction.list.empty')
-                | translate
-            }}
-          </p>
-          @if (!hasActiveFilters()) {
-            <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
-              {{ 'transaction.list.emptyHint' | translate }}
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6" class="py-12 text-center">
+            <p class="m-0 font-medium text-surface-600 dark:text-surface-300">
+              {{
+                (hasActiveFilters() ? 'transaction.list.emptyFiltered' : 'transaction.list.empty')
+                  | translate
+              }}
             </p>
-          }
-        </td>
-      </tr>
+            @if (!hasActiveFilters()) {
+              <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
+                {{ 'transaction.list.emptyHint' | translate }}
+              </p>
+            }
+          </td>
+        </tr>
       </ng-template>
     </p-table>
   </div>
