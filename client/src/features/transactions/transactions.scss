@@ -5,7 +5,6 @@
  * et c'est la carte qui porte le fond.
  */
 :host ::ng-deep {
-  .p-datatable-header,
   .p-datatable-thead > tr > th,
   .p-datatable-tbody > tr,
   .p-datatable-paginator-bottom {
@@ -13,13 +12,9 @@
   }
 
   // La carte porte déjà la bordure extérieure et les coins arrondis.
-  .p-datatable-header,
   .p-datatable-paginator-bottom {
     border-left: 0;
     border-right: 0;
-  }
-
-  .p-datatable-paginator-bottom {
     border-bottom: 0;
   }
 }
