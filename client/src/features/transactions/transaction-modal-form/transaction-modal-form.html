@@ -97,12 +97,19 @@
       <!-- Catégorie et Date appariées ; le libellé, plus long, prend la ligne suivante. -->
       <div class="mb-5 grid grid-cols-2 gap-4">
         <div>
-          <label for="categoryId" class="mb-2 block text-sm font-semibold">
+          <!--
+            Pas de `for` ici : `inputId` pose l'id sur un `<span role="combobox">`, qui
+            n'est pas un élément « labelable » au sens HTML (input, select, textarea…).
+            Le navigateur voit l'id exister mais refuse l'association — d'où
+            l'avertissement « doesn't match any element id ». `aria-labelledby` est le
+            mécanisme prévu pour un rôle ARIA combobox.
+          -->
+          <label id="categoryLabel" class="mb-2 block text-sm font-semibold">
             {{ 'transaction.form.category' | translate }}
           </label>
           <p-select
             formControlName="categoryId"
-            inputId="categoryId"
+            ariaLabelledBy="categoryLabel"
             [options]="categoryOptions()"
             optionLabel="label"
             optionValue="id"
