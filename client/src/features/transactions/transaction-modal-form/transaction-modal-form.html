@@ -13,7 +13,7 @@
   (onHide)="onClose()"
 >
   <ng-template #content>
-    <form id="transactionForm" [formGroup]="form()" (ngSubmit)="onSubmit()">
+    <form id="transactionForm" [formGroup]="form" (ngSubmit)="onSubmit()">
       <!--
         Soumission implicite : sans un bouton submit DANS le formulaire, `Entrée`
         ne déclenche rien — le bouton du pied de page vit hors du <form>, dans le
@@ -80,14 +80,14 @@
           currency="EUR"
           [locale]="locale()"
           [placeholder]="'transaction.form.amountPlaceholder' | translate"
-          [invalid]="!!errors()['Amount'] || (showErrors() && !!form().get('amount')?.invalid)"
+          [invalid]="!!errors()['Amount'] || (showErrors() && form.controls.amount.invalid)"
           inputStyleClass="text-3xl! font-bold! py-3!"
           (keydown)="onAmountKeydown($event)"
           fluid
         />
         @if (errors()['Amount']) {
           <small class="mt-2 block text-sm text-red-500">{{ errors()['Amount'][0] }}</small>
-        } @else if (showErrors() && form().get('amount')?.invalid) {
+        } @else if (showErrors() && form.controls.amount.invalid) {
           <small class="mt-2 block text-sm text-red-500">
             {{ 'transaction.form.amountRequired' | translate }}
           </small>
@@ -107,7 +107,7 @@
             optionLabel="label"
             optionValue="id"
             [placeholder]="'transaction.form.category' | translate"
-            [invalid]="showErrors() && !!form().get('categoryId')?.invalid"
+            [invalid]="showErrors() && form.controls.categoryId.invalid"
             appendTo="body"
             [dt]="fieldTokens"
             fluid
@@ -148,7 +148,7 @@
               </span>
             </ng-template>
           </p-select>
-          @if (showErrors() && form().get('categoryId')?.invalid) {
+          @if (showErrors() && form.controls.categoryId.invalid) {
             <small class="mt-2 block text-sm text-red-500">
               {{ 'transaction.form.categoryRequired' | translate }}
             </small>
@@ -193,11 +193,11 @@
           pInputText
           id="label"
           [placeholder]="'transaction.form.labelPlaceholder' | translate"
-          [invalid]="showErrors() && !!form().get('label')?.invalid"
+          [invalid]="showErrors() && form.controls.label.invalid"
           [dt]="fieldTokens"
           fluid
         />
-        @if (showErrors() && form().get('label')?.invalid) {
+        @if (showErrors() && form.controls.label.invalid) {
           <small class="mt-2 block text-sm text-red-500">
             {{ 'transaction.form.labelRequired' | translate }}
           </small>

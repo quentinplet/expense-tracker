@@ -1,29 +1,43 @@
 import {
   Component,
   computed,
-  DestroyRef,
   inject,
   input,
   model,
-  OnInit,
+  OnChanges,
   output,
   signal,
+  SimpleChanges,
   viewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Button } from 'primeng/button';
+import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
 import { InputNumber } from 'primeng/inputnumber';
-import { DatePicker } from 'primeng/datepicker';
-import { Button } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
-import { Categorie } from '@/types/categorie';
-import { TransactionType } from '@/types/transaction';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { Categorie } from '@/types/categorie';
+import { Transaction, TransactionType } from '@/types/transaction';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { LanguageService } from '@/core/services/language-service';
+
+/**
+ * Ce que le dialogue remonte : la saisie telle que le formulaire la porte, `date` en
+ * `Date`. La traduction vers le contrat de l'API appartient au parent, qui possède déjà
+ * `toIsoDate()` pour le filtre de période.
+ */
+export type TransactionFormValue = {
+  label: string;
+  note: string;
+  type: TransactionType;
+  categoryId: string;
+  amount: number;
+  date: Date;
+};
 
 @Component({
   selector: 'app-transaction-modal-form',
@@ -44,72 +58,76 @@ import { LanguageService } from '@/core/services/language-service';
   // champ, pas un pipe, donc les libellés se calculent en TypeScript.
   providers: [CategoryNamePipe],
 })
-export class TransactionModalForm implements OnInit {
+export class TransactionModalForm implements OnChanges {
   visible = model.required<boolean>();
-  form = input.required<FormGroup>();
   categories = input.required<Categorie[]>();
   errors = input.required<Record<string, string[]>>();
-  isEditing = input.required<boolean>();
+
+  /** La transaction à éditer, ou `null` pour une création. */
+  transaction = input<Transaction | null>(null);
 
   close = output<void>();
-  save = output<void>();
+  save = output<TransactionFormValue>();
 
-  private amountInput = viewChild<InputNumber>('amountInput');
-
-  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
   private languageService = inject(LanguageService);
   private translate = inject(TranslateService);
   private categoryNamePipe = inject(CategoryNamePipe);
 
+  private amountInput = viewChild<InputNumber>('amountInput');
+
+  /**
+   * Le montant est nullable pour que le champ s'ouvre vide : à 0 le p-inputnumber
+   * insérait les chiffres frappés dans le zéro affiché, et saisir « 68 » donnait
+   * 680,00 €. Il reste toujours positif, le sens étant porté par `type` (§3.C).
+   */
+  protected form = this.fb.group({
+    label: this.fb.nonNullable.control('', Validators.required),
+    note: this.fb.nonNullable.control(''),
+    type: this.fb.nonNullable.control<TransactionType>('Expense', Validators.required),
+    categoryId: this.fb.nonNullable.control('', Validators.required),
+    amount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    date: this.fb.nonNullable.control(new Date(), Validators.required),
+  });
+
+  protected isEditing = computed(() => this.transaction() !== null);
+
   /** Le p-inputnumber et le p-datepicker prennent une locale explicite, sinon en-US. */
   protected locale = computed(() => this.languageService.current());
 
-  /** `dd/mm/yy` en français, `mm/dd/yy` en anglais — le format du p-datepicker
-   *  n'est pas déductible de la locale, il faut le lui donner. */
+  /** Le format du p-datepicker ne se déduit pas de la locale, il faut le lui donner. */
   protected dateFormat = computed(() => (this.locale() === 'fr' ? 'dd/mm/yy' : 'mm/dd/yy'));
 
   /**
-   * Le sens de la transaction en cours, pour qu'un revenu ne s'ouvre pas sur « Dépense ».
-   *
-   * Miroir signal du contrôle `type`, et pas un `computed()` qui lirait
-   * `form().get('type')?.value` : la valeur d'un FormControl n'est pas un signal et
-   * `form()` ne change jamais d'instance, donc un tel computed n'était jamais
-   * invalidé — il restait figé sur « Expense » et le switch ne faisait rien à l'écran.
-   *
-   * Alimenté par `valueChanges` (cf. ngOnInit) et non à l'ouverture du dialogue :
-   * `onShow` n'arrive qu'une fois l'animation d'entrée terminée, on voyait donc le
-   * switch s'afficher sur « Dépense » puis basculer sur « Revenu » à l'édition.
+   * Miroir signal du contrôle `type`, pour teinter le switch et filtrer les catégories.
+   * Un `computed()` ne conviendrait pas : la valeur d'un FormControl n'est pas un signal,
+   * rien ne l'invaliderait.
    */
-  private currentType = signal<TransactionType>('Expense');
-  activeType = this.currentType.asReadonly();
+  protected activeType = toSignal(this.form.controls.type.valueChanges, {
+    initialValue: this.form.controls.type.value,
+  });
 
   /**
-   * Une erreur ne s'affiche qu'une fois la soumission tentée. `touched` seul ne suffit
-   * pas : cliquer sur le switch fait perdre le focus au montant, ce qui suffisait à
-   * déclencher « Le montant doit être supérieur à 0. » sans que l'utilisateur ait
-   * rien validé.
+   * Une erreur ne s'affiche qu'une fois la soumission tentée. `touched` ne suffit pas :
+   * cliquer sur le switch fait perdre le focus au montant, ce qui suffisait à déclencher
+   * « Le montant doit être supérieur à 0. » sans que rien n'ait été validé.
    */
   private submitted = signal(false);
-  protected showErrors = computed(() => this.submitted());
+  protected showErrors = this.submitted.asReadonly();
 
   /**
-   * Champs un peu plus hauts que la valeur par défaut de PrimeNG, via SES tokens
-   * plutôt qu'un utilitaire Tailwind.
-   *
-   * Tailwind 4 émet ses utilitaires dans `@layer utilities` et PrimeNG injecte son
-   * thème hors layer : une règle sans layer bat toujours une règle en layer, quelle
-   * que soit la spécificité. Un `h-12` n'avait donc aucun effet et il fallait
-   * `h-12!`. Ici on ne combat plus la règle de PrimeNG, on l'alimente — sa propre
-   * déclaration lit `var(--p-*-padding-y)`, donc plus besoin d'`!important`.
+   * Champs plus hauts via les tokens de PrimeNG plutôt qu'un utilitaire Tailwind :
+   * Tailwind 4 émet ses utilitaires dans `@layer utilities` et PrimeNG injecte son thème
+   * hors layer, or une règle sans layer bat toujours une règle en layer. `h-12` restait
+   * donc sans effet. En alimentant `var(--p-*-padding-y)`, plus besoin d'`!important`.
    *
    * Le montant est exclu : il porte sa propre taille.
    */
   protected readonly fieldTokens = { paddingY: '0.9rem' };
 
   /**
-   * Le p-date-picker n'expose pas de token de padding : son champ est un `.p-inputtext`
-   * ordinaire. On pose donc la variable de l'inputtext sur l'hôte, d'où elle descend
-   * par héritage CSS jusqu'à l'input interne.
+   * Le p-date-picker n'expose pas de token de padding — son champ est un `.p-inputtext`
+   * ordinaire. La variable posée sur l'hôte descend par héritage CSS jusqu'à l'input.
    */
   protected readonly datePickerTokens = { '--p-inputtext-padding-y': '0.9rem' };
 
@@ -121,29 +139,43 @@ export class TransactionModalForm implements OnInit {
   );
 
   /**
-   * PrimeNG traduit la touche décimale du PAVÉ numérique vers le séparateur de la
-   * locale (`event.code === 'NumpadDecimal'`), mais pas le point de la rangée
-   * principale : en français il était purement avalé — `4` `.` `5` donnait `45,00 €`.
-   * Impossible de saisir des centimes au clavier d'un portable.
+   * Réinitialise à chaque ouverture.
    *
-   * On rejoue donc la frappe avec la virgule. `onInputKeyPress` lit
-   * `event.which || event.keyCode`, d'où les deux propriétés redéfinies : le
-   * constructeur de KeyboardEvent ignore ces champs hérités.
+   * `ngOnChanges` et non un `effect()` : Angular déconseille les effects pour propager
+   * de l'état, et ce hook s'exécute avant que la vue ne soit rendue, là où un effect
+   * part de façon asynchrone dans le cycle.
+   *
+   * Clé sur `visible` et non sur `transaction` : deux créations consécutives passent
+   * toutes deux `null`, ce qui ne produit aucun changement. Et le composant n'est jamais
+   * recréé, le p-dialog possédant sa visibilité, donc `ngOnInit` ne suffirait pas.
    */
-  onAmountKeydown(event: KeyboardEvent) {
-    const decimal = this.decimalChar();
-    if (event.key !== '.' || decimal === '.') return;
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['visible'] && this.visible()) {
+      this.resetFrom(this.transaction());
+    }
+  }
 
-    event.preventDefault();
-    const replay = new KeyboardEvent('keypress', { bubbles: true, cancelable: true });
-    Object.defineProperty(replay, 'which', { get: () => decimal.charCodeAt(0) });
-    Object.defineProperty(replay, 'keyCode', { get: () => decimal.charCodeAt(0) });
-    (event.target as HTMLInputElement).dispatchEvent(replay);
+  private resetFrom(transaction: Transaction | null) {
+    this.submitted.set(false);
+
+    if (!transaction) {
+      this.form.reset({ type: 'Expense', date: new Date() });
+      return;
+    }
+
+    this.form.reset({
+      label: transaction.label,
+      note: transaction.note ?? '',
+      type: transaction.type,
+      categoryId: transaction.categoryId,
+      amount: transaction.amount,
+      date: new Date(transaction.date),
+    });
   }
 
   /**
-   * Options du select de catégorie, restreintes au sens courant et libellées par le
-   * pipe — la règle « clé de traduction si système, nom sinon » ne vit qu'à un endroit.
+   * Options du select, restreintes au sens courant et libellées par le pipe — la règle
+   * « clé de traduction si système, nom sinon » ne vit qu'à un endroit (§10).
    */
   protected categoryOptions = computed(() => {
     this.translate.currentLang();
@@ -157,57 +189,62 @@ export class TransactionModalForm implements OnInit {
       }));
   });
 
-  ngOnInit() {
-    const type = this.form().get('type');
-    this.currentType.set(type?.value ?? 'Expense');
-
-    // Le parent patche `type` avant d'ouvrir le dialogue : en suivant le contrôle,
-    // le switch est déjà au bon endroit à la première image, sans bascule visible.
-    type?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((value: TransactionType) => this.currentType.set(value));
-  }
-
   selectType(type: TransactionType) {
-    const form = this.form();
-    if (form.get('type')?.value === type) return;
+    if (this.form.controls.type.value === type) return;
 
-    form.patchValue({ type });
     // La catégorie retenue appartient à l'autre sens : on la réinitialise.
-    form.patchValue({ categoryId: '' });
+    this.form.patchValue({ type, categoryId: '' });
   }
 
   /**
-   * Le focus va au montant, le champ que l'on vient saisir (§2).
-   *
-   * `[autofocus]` sur le p-inputnumber ne tenait pas : le p-dialog pose le focus sur
-   * le premier élément focusable — le segment « Dépense » — depuis un `setTimeout`
-   * calé sur la durée de transition, donc APRÈS le nôtre. Il nous le reprenait, et
-   * ce blur marquait le montant `touched` : « Le montant doit être supérieur à 0. »
-   * s'affichait avant toute frappe. D'où `[focusOnShow]="false"` sur le dialogue.
+   * PrimeNG traduit la touche décimale du PAVÉ numérique vers le séparateur de la locale
+   * (`event.code === 'NumpadDecimal'`) mais pas le point de la rangée principale : en
+   * français il était avalé, `4` `.` `5` donnant `45,00 €`. On rejoue la frappe avec la
+   * virgule ; `onInputKeyPress` lit `event.which || event.keyCode`, d'où les propriétés
+   * redéfinies — le constructeur de KeyboardEvent ignore ces champs hérités.
    */
-  onShow() {
-    this.focusAmount();
+  onAmountKeydown(event: KeyboardEvent) {
+    const decimal = this.decimalChar();
+    if (event.key !== '.' || decimal === '.') return;
+
+    event.preventDefault();
+    const replay = new KeyboardEvent('keypress', { bubbles: true, cancelable: true });
+    Object.defineProperty(replay, 'which', { get: () => decimal.charCodeAt(0) });
+    Object.defineProperty(replay, 'keyCode', { get: () => decimal.charCodeAt(0) });
+    (event.target as HTMLInputElement).dispatchEvent(replay);
   }
 
-  private focusAmount() {
+  /**
+   * Le focus va au montant, le champ que l'on vient saisir (§2). Le p-dialog le poserait
+   * sinon sur le premier élément focusable depuis un `setTimeout` calé sur la durée de
+   * transition — donc après le nôtre — et ce blur marquait le montant `touched`. D'où
+   * `[focusOnShow]="false"` sur le dialogue.
+   */
+  onShow() {
     setTimeout(() => this.amountInput()?.input?.nativeElement.focus());
   }
 
   onClose() {
-    // Désarmé à la FERMETURE, pas dans onShow : celui-ci n'arrive qu'une fois
-    // l'animation d'entrée terminée, donc le dialogue se repeignait d'abord avec les
-    // erreurs de la session précédente avant de les effacer — d'où le flash.
-    this.submitted.set(false);
     this.close.emit();
   }
 
   onSubmit() {
-    if (this.form().invalid) {
+    if (this.form.invalid) {
       this.submitted.set(true);
-      this.form().markAllAsTouched();
+      this.form.markAllAsTouched();
       return;
     }
-    this.save.emit();
+
+    const { label, note, type, categoryId, amount, date } = this.form.getRawValue();
+
+    this.save.emit({
+      label,
+      note,
+      type,
+      categoryId,
+      date,
+      // `required` + `min(0.01)` : on n'arrive ici que par un formulaire valide.
+      amount: amount ?? 0,
+    });
   }
 }
