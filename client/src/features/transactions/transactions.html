@@ -114,6 +114,22 @@
   <div
     class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
   >
+    <!-- Barre d'action groupée : n'existe que lorsqu'il y a une sélection, pour
+         laisser les en-têtes de colonnes coller au haut de la carte sinon. -->
+    @if (selectedTransactions().length) {
+      <div
+        class="flex items-center justify-end border-b border-surface-200 px-4 py-3 dark:border-surface-800"
+      >
+        <p-button
+          (click)="deleteSelectedTransactions()"
+          severity="danger"
+          [label]="'common.delete' | translate"
+          icon="pi pi-trash"
+          outlined
+          size="small"
+        />
+      </div>
+    }
     <p-table
       #dt
       [first]="first()"
@@ -133,65 +149,31 @@
       "
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[5, 10, 20, 30]"
+      [dt]="headerTokens"
     >
-      <ng-template #caption>
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <span class="text-sm whitespace-nowrap text-surface-500 dark:text-surface-400">
-            {{
-              'transaction.list.showing'
-                | translate
-                  : {
-                      first: totalRecords() ? first() + 1 : 0,
-                      last: Math.min(first() + rows(), totalRecords()),
-                      total: totalRecords(),
-                    }
-            }}
-          </span>
-
-          <div class="flex items-center gap-3">
-            @if (selectedTransactions().length) {
-              <p-button
-                (click)="deleteSelectedTransactions()"
-                severity="danger"
-                [label]="'common.delete' | translate"
-                icon="pi pi-trash"
-                outlined
-                size="small"
-              />
-            }
-            <!-- Second paginateur, synchronisé avec celui de la table par `first()`/`rows()`. -->
-            <p-paginator
-              [first]="first()"
-              [rows]="rows()"
-              [totalRecords]="totalRecords()"
-              [rowsPerPageOptions]="[5, 10, 20, 30]"
-              (onPageChange)="onPageChange($event)"
-            />
-          </div>
-        </div>
-      </ng-template>
-
       <ng-template #header>
         <tr>
           <th style="width: 3rem">
             <p-tableHeaderCheckbox />
           </th>
-          <th class="text-xs tracking-wider uppercase" style="min-width: 18rem">
+          <th class="text-sm tracking-wider uppercase" style="min-width: 18rem">
             {{ 'transaction.columns.label' | translate }}
           </th>
-          <th pSortableColumn="category" class="text-xs tracking-wider uppercase">
+          <th pSortableColumn="category" class="text-sm tracking-wider uppercase">
             {{ 'transaction.columns.category' | translate }}
             <p-sortIcon field="category" />
           </th>
-          <th pSortableColumn="date" class="text-xs tracking-wider uppercase">
+          <th pSortableColumn="date" class="text-sm tracking-wider uppercase">
             {{ 'transaction.columns.date' | translate }}
             <p-sortIcon field="date" />
           </th>
-          <th pSortableColumn="amount" class="text-right text-xs tracking-wider uppercase">
+          <th pSortableColumn="amount" class="text-right text-sm tracking-wider uppercase">
             {{ 'transaction.columns.amount' | translate }}
             <p-sortIcon field="amount" />
           </th>
-          <th style="width: 8rem">{{ 'transaction.columns.actions' | translate }}</th>
+          <th class="text-sm tracking-wider uppercase" style="width: 8rem">
+            {{ 'transaction.columns.actions' | translate }}
+          </th>
         </tr>
       </ng-template>
 

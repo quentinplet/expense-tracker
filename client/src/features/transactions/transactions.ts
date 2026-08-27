@@ -16,7 +16,6 @@ import {
   TransactionParams,
   UpdateTransactionDto,
 } from '@/types/transaction';
-import { Paginator, PaginatorState } from 'primeng/paginator';
 import { DatePicker } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { BusyService } from '@/core/services/busy-service';
@@ -45,7 +44,6 @@ import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
     SelectModule,
     InputIconModule,
     IconFieldModule,
-    Paginator,
     TransactionModalForm,
     TranslatePipe,
     CategoryNamePipe,
@@ -64,7 +62,9 @@ export class Transactions implements OnInit {
   protected transactionParams = new TransactionParams();
   totalRecords = signal(0);
 
-  protected readonly Math = Math;
+  /** Aura fixe le padding des en-têtes en CSS non-layered : une classe Tailwind
+   *  py-* n'aurait aucun effet dessus, il faut passer par le token du composant. */
+  protected readonly headerTokens = { headerCell: { padding: '1rem 1rem' } };
 
   transactionDialog = false;
   transactions = signal<Transaction[]>([]);
@@ -107,12 +107,9 @@ export class Transactions implements OnInit {
   protected dateFormat = computed(() => (this.locale() === 'fr' ? 'dd/mm/yy' : 'mm/dd/yy'));
 
   /**
-   * Source unique de la pagination. Les deux paginateurs — celui de la p-table et
-   * celui du bandeau — la **lisent** ; aucun ne la détient. Sans ça, changer de page
-   * sur l'un laissait l'autre affiché sur l'ancienne.
-   *
-   * Pas de boucle possible : le setter `first` de la p-table est une simple
-   * affectation, il n'émet pas `onLazyLoad`. Seul son propre paginateur le fait.
+   * Source unique de la pagination, écrite uniquement par `loadTransactions`. La
+   * p-table la **lit** via `first()`/`rows()` ; son propre setter `first` est une
+   * simple affectation, il n'émet pas `onLazyLoad` et ne peut donc pas boucler.
    */
   private paging = signal({ first: 0, rows: new TransactionParams().pageSize });
   protected first = computed(() => this.paging().first);
@@ -255,17 +252,13 @@ export class Transactions implements OnInit {
     this.transactionParams.transactionType = undefined;
     this.transactionParams.dateFrom = undefined;
     this.transactionParams.dateTo = undefined;
-    this.transactionParams.sortBy = undefined;
     this.transactionParams.sortDirection = 'desc';
     this.transactionParams.pageNumber = 1;
 
-    // reset PrimeNG table state
+    // `dt.reset()` remet l'affichage à zéro (tri, icônes, première page) et émet lui-même
+    // un `onLazyLoad` puisque la table est en mode lazy — inutile de rappeler
+    // `loadTransactions` en plus, ça doublait la requête réseau à chaque réinitialisation.
     this.dt.reset();
-
-    this.loadTransactions({
-      first: 0,
-      rows: this.transactionParams.pageSize,
-    } as TableLazyLoadEvent);
   }
 
   loadTransactions(event: TableLazyLoadEvent) {
@@ -279,12 +272,16 @@ export class Transactions implements OnInit {
     // la pagination, donc le seul qui puisse désynchroniser les deux paginateurs.
     this.paging.set({ first, rows });
 
-    // Sort
+    // Sort. `sortOrder` n'a de sens que rattaché à une colonne triée : `dt.reset()`
+    // émet lui-même un `onLazyLoad` avec `sortField: null` mais `sortOrder: 1` (valeur
+    // par défaut de PrimeNG), qui écraserait sinon la direction voulue par l'appelant.
     if (typeof event.sortField === 'string') {
       this.transactionParams.sortBy = event.sortField;
-    }
-    if (event.sortOrder !== undefined && event.sortOrder !== null) {
-      this.transactionParams.sortDirection = event.sortOrder === 1 ? 'asc' : 'desc';
+      if (event.sortOrder !== undefined && event.sortOrder !== null) {
+        this.transactionParams.sortDirection = event.sortOrder === 1 ? 'asc' : 'desc';
+      }
+    } else {
+      this.transactionParams.sortBy = undefined;
     }
 
     // La table est paginée côté serveur : une sélection conservée d'une page à l'autre
@@ -306,12 +303,6 @@ export class Transactions implements OnInit {
         this.categories.set(categories);
       },
     });
-  }
-
-  /** Paginateur du bandeau. Il délègue à loadTransactions, qui écrit `paging` et
-   *  repousse donc la nouvelle page dans le paginateur de la table. */
-  onPageChange(event: PaginatorState) {
-    this.loadTransactions({ first: event.first, rows: event.rows });
   }
 
   // La transaction sélectionnée est le seul état transmis : le dialogue possède son
@@ -338,13 +329,30 @@ export class Transactions implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.transactionService.deleteTransactions(selectedTransactions).subscribe({
-          next: () => {
-            const selectedIds = new Set(selectedTransactions.map((t) => t.id));
-            this.transactions.update((transactions) =>
-              transactions.filter((t) => !selectedIds.has(t.id)),
-            );
-            this.totalRecords.update((count) => count - selectedTransactions.length);
+          next: (deletedCount) => {
             this.selectedTransactions.set([]);
+
+            // Hors de la dernière page, une ligne de la page suivante doit remonter :
+            // impossible à deviner côté client, un recomptage serveur est la seule
+            // option correcte. Sur la dernière page, rien ne remonte derrière, donc une
+            // mise à jour locale suffit et évite un aller-retour réseau ; `deletedCount`
+            // (et non selectedTransactions.length) protège `totalRecords` d'une dérive
+            // si le serveur a silencieusement ignoré un id déjà supprimé ailleurs.
+            if (!this.isOnLastPage()) {
+              this.reloadCurrentPage();
+            } else {
+              const selectedIds = new Set(selectedTransactions.map((t) => t.id));
+              const pageWillEmpty = this.transactions().length === selectedTransactions.length;
+              this.transactions.update((transactions) =>
+                transactions.filter((t) => !selectedIds.has(t.id)),
+              );
+              this.totalRecords.update((count) => count - deletedCount);
+              if (pageWillEmpty && this.transactionParams.pageNumber > 1) {
+                this.transactionParams.pageNumber--;
+                this.reloadCurrentPage();
+              }
+            }
+
             this.messageService.add({
               severity: 'success',
               summary: this.translate.instant('common.success'),
@@ -378,14 +386,25 @@ export class Transactions implements OnInit {
               detail: this.translate.instant('transaction.list.deleted'),
               life: 3000,
             });
-            this.transactions.update((transactions) =>
-              transactions.filter((t) => t.id !== transaction.id),
-            );
-            this.totalRecords.update((count) => count - 1);
             this.selectedTransaction.set(null);
-            if (this.transactions().length === 1 && this.transactionParams.pageNumber > 1) {
-              this.transactionParams.pageNumber--;
+
+            // Hors de la dernière page, la ligne suivante doit remonter depuis le
+            // serveur : un splice local laisserait la page affichée avec une rangée de
+            // moins qu'une page pleine. Sur la dernière page, rien ne remonte derrière,
+            // une mise à jour locale suffit et évite l'aller-retour réseau.
+            if (!this.isOnLastPage()) {
               this.reloadCurrentPage();
+            } else {
+              // Testé avant la mutation : est-ce la dernière ligne de cette page ?
+              const emptiesPage = this.transactions().length === 1;
+              this.transactions.update((transactions) =>
+                transactions.filter((t) => t.id !== transaction.id),
+              );
+              this.totalRecords.update((count) => count - 1);
+              if (emptiesPage && this.transactionParams.pageNumber > 1) {
+                this.transactionParams.pageNumber--;
+                this.reloadCurrentPage();
+              }
             }
           },
           error: () => {
@@ -486,5 +505,12 @@ export class Transactions implements OnInit {
     const page = this.transactionParams.pageNumber;
     const pageSize = this.transactionParams.pageSize;
     this.loadTransactions({ first: (page - 1) * pageSize, rows: pageSize });
+  }
+
+  /** Dernière page : aucune ligne suivante à faire remonter, une suppression peut donc
+   *  se contenter d'une mise à jour locale plutôt que d'un recomptage serveur. */
+  private isOnLastPage(): boolean {
+    const { pageNumber, pageSize } = this.transactionParams;
+    return pageNumber === Math.ceil(this.totalRecords() / pageSize);
   }
 }
