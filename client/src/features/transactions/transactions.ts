@@ -328,12 +328,16 @@ export class Transactions implements OnInit {
       accept: () => {
         this.transactionService.deleteTransactions(selectedTransactions).subscribe({
           next: () => {
-            const selectedIds = new Set(selectedTransactions.map((t) => t.id));
-            this.transactions.update((transactions) =>
-              transactions.filter((t) => !selectedIds.has(t.id)),
-            );
-            this.totalRecords.update((count) => count - selectedTransactions.length);
+            // Le serveur ne renvoie pas le nombre réellement supprimé (un id périmé,
+            // déjà supprimé ailleurs, est ignoré silencieusement) : `totalRecords -
+            // selectedTransactions.length` dérivait dans ce cas. Un recomptage
+            // serveur, comme pour la suppression simple, ne suppose jamais un compte.
+            const pageWillEmpty = this.transactions().length === selectedTransactions.length;
             this.selectedTransactions.set([]);
+            if (pageWillEmpty && this.transactionParams.pageNumber > 1) {
+              this.transactionParams.pageNumber--;
+            }
+            this.reloadCurrentPage();
             this.messageService.add({
               severity: 'success',
               summary: this.translate.instant('common.success'),
