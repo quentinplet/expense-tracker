@@ -252,17 +252,13 @@ export class Transactions implements OnInit {
     this.transactionParams.transactionType = undefined;
     this.transactionParams.dateFrom = undefined;
     this.transactionParams.dateTo = undefined;
-    this.transactionParams.sortBy = undefined;
     this.transactionParams.sortDirection = 'desc';
     this.transactionParams.pageNumber = 1;
 
-    // reset PrimeNG table state
+    // `dt.reset()` remet l'affichage à zéro (tri, icônes, première page) et émet lui-même
+    // un `onLazyLoad` puisque la table est en mode lazy — inutile de rappeler
+    // `loadTransactions` en plus, ça doublait la requête réseau à chaque réinitialisation.
     this.dt.reset();
-
-    this.loadTransactions({
-      first: 0,
-      rows: this.transactionParams.pageSize,
-    } as TableLazyLoadEvent);
   }
 
   loadTransactions(event: TableLazyLoadEvent) {
@@ -276,12 +272,16 @@ export class Transactions implements OnInit {
     // la pagination, donc le seul qui puisse désynchroniser les deux paginateurs.
     this.paging.set({ first, rows });
 
-    // Sort
+    // Sort. `sortOrder` n'a de sens que rattaché à une colonne triée : `dt.reset()`
+    // émet lui-même un `onLazyLoad` avec `sortField: null` mais `sortOrder: 1` (valeur
+    // par défaut de PrimeNG), qui écraserait sinon la direction voulue par l'appelant.
     if (typeof event.sortField === 'string') {
       this.transactionParams.sortBy = event.sortField;
-    }
-    if (event.sortOrder !== undefined && event.sortOrder !== null) {
-      this.transactionParams.sortDirection = event.sortOrder === 1 ? 'asc' : 'desc';
+      if (event.sortOrder !== undefined && event.sortOrder !== null) {
+        this.transactionParams.sortDirection = event.sortOrder === 1 ? 'asc' : 'desc';
+      }
+    } else {
+      this.transactionParams.sortBy = undefined;
     }
 
     // La table est paginée côté serveur : une sélection conservée d'une page à l'autre
