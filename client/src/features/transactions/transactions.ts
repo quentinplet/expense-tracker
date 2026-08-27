@@ -16,7 +16,6 @@ import {
   TransactionParams,
   UpdateTransactionDto,
 } from '@/types/transaction';
-import { Paginator, PaginatorState } from 'primeng/paginator';
 import { DatePicker } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { BusyService } from '@/core/services/busy-service';
@@ -45,7 +44,6 @@ import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
     SelectModule,
     InputIconModule,
     IconFieldModule,
-    Paginator,
     TransactionModalForm,
     TranslatePipe,
     CategoryNamePipe,
@@ -107,12 +105,9 @@ export class Transactions implements OnInit {
   protected dateFormat = computed(() => (this.locale() === 'fr' ? 'dd/mm/yy' : 'mm/dd/yy'));
 
   /**
-   * Source unique de la pagination. Les deux paginateurs — celui de la p-table et
-   * celui du bandeau — la **lisent** ; aucun ne la détient. Sans ça, changer de page
-   * sur l'un laissait l'autre affiché sur l'ancienne.
-   *
-   * Pas de boucle possible : le setter `first` de la p-table est une simple
-   * affectation, il n'émet pas `onLazyLoad`. Seul son propre paginateur le fait.
+   * Source unique de la pagination, écrite uniquement par `loadTransactions`. La
+   * p-table la **lit** via `first()`/`rows()` ; son propre setter `first` est une
+   * simple affectation, il n'émet pas `onLazyLoad` et ne peut donc pas boucler.
    */
   private paging = signal({ first: 0, rows: new TransactionParams().pageSize });
   protected first = computed(() => this.paging().first);
@@ -306,12 +301,6 @@ export class Transactions implements OnInit {
         this.categories.set(categories);
       },
     });
-  }
-
-  /** Paginateur du bandeau. Il délègue à loadTransactions, qui écrit `paging` et
-   *  repousse donc la nouvelle page dans le paginateur de la table. */
-  onPageChange(event: PaginatorState) {
-    this.loadTransactions({ first: event.first, rows: event.rows });
   }
 
   // La transaction sélectionnée est le seul état transmis : le dialogue possède son

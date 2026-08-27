@@ -159,14 +159,6 @@
                 size="small"
               />
             }
-            <!-- Second paginateur, synchronisé avec celui de la table par `first()`/`rows()`. -->
-            <p-paginator
-              [first]="first()"
-              [rows]="rows()"
-              [totalRecords]="totalRecords()"
-              [rowsPerPageOptions]="[5, 10, 20, 30]"
-              (onPageChange)="onPageChange($event)"
-            />
           </div>
         </div>
       </ng-template>
