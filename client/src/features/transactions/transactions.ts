@@ -187,7 +187,13 @@ export class Transactions implements OnInit {
     type: ['Expense' as TransactionType, Validators.required],
     categoryId: ['', Validators.required],
     // §3.C : le montant est toujours positif, le sens est porté par `type`.
-    amount: [0, [Validators.required, Validators.min(0.01)]],
+    //
+    // Nullable, et c'est le but : à 0 le champ s'ouvrait sur « 0,00 € » et le
+    // p-inputnumber insérait les chiffres frappés dans ce zéro — saisir « 68 »
+    // donnait 680,00 €. Vide, il se remplit normalement.
+    amount: this.fb.control<number | null>(null, {
+      validators: [Validators.required, Validators.min(0.01)],
+    }),
     date: [new Date(), Validators.required],
   });
 
@@ -429,7 +435,9 @@ export class Transactions implements OnInit {
       note: note || null,
       type,
       categoryId,
-      amount,
+      // `required` + `min(0.01)` : on n'arrive ici que par un formulaire valide,
+      // donc jamais avec un montant nul.
+      amount: amount ?? 0,
       // L'API attend une DateOnly : date locale au format yyyy-MM-dd, sans fuseau.
       date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`,
     };
@@ -445,7 +453,6 @@ export class Transactions implements OnInit {
   }
 
   addNewTransaction(transactionData: CreateTransactionDto) {
-    console.log('Adding new transaction with data:', transactionData);
     const newTransaction: CreateTransactionDto = {
       ...transactionData,
     };

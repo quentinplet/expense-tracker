@@ -81,6 +81,7 @@
       "createTitle": "Nouvelle transaction",
       "editTitle": "Modifier la transaction",
       "amount": "Montant",
+      "amountPlaceholder": "0,00 €",
       "category": "Catégorie",
       "date": "Date",
       "label": "Libellé",
