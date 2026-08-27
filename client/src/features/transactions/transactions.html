@@ -149,28 +149,29 @@
       "
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[5, 10, 20, 30]"
+      [dt]="headerTokens"
     >
       <ng-template #header>
         <tr>
           <th style="width: 3rem">
             <p-tableHeaderCheckbox />
           </th>
-          <th class="text-xs tracking-wider uppercase" style="min-width: 18rem">
+          <th class="text-sm tracking-wider uppercase" style="min-width: 18rem">
             {{ 'transaction.columns.label' | translate }}
           </th>
-          <th pSortableColumn="category" class="text-xs tracking-wider uppercase">
+          <th pSortableColumn="category" class="text-sm tracking-wider uppercase">
             {{ 'transaction.columns.category' | translate }}
             <p-sortIcon field="category" />
           </th>
-          <th pSortableColumn="date" class="text-xs tracking-wider uppercase">
+          <th pSortableColumn="date" class="text-sm tracking-wider uppercase">
             {{ 'transaction.columns.date' | translate }}
             <p-sortIcon field="date" />
           </th>
-          <th pSortableColumn="amount" class="text-right text-xs tracking-wider uppercase">
+          <th pSortableColumn="amount" class="text-right text-sm tracking-wider uppercase">
             {{ 'transaction.columns.amount' | translate }}
             <p-sortIcon field="amount" />
           </th>
-          <th class="text-xs tracking-wider uppercase" style="width: 8rem">
+          <th class="text-sm tracking-wider uppercase" style="width: 8rem">
             {{ 'transaction.columns.actions' | translate }}
           </th>
         </tr>

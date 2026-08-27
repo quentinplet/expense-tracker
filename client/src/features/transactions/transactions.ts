@@ -62,6 +62,10 @@ export class Transactions implements OnInit {
   protected transactionParams = new TransactionParams();
   totalRecords = signal(0);
 
+  /** Aura fixe le padding des en-têtes en CSS non-layered : une classe Tailwind
+   *  py-* n'aurait aucun effet dessus, il faut passer par le token du composant. */
+  protected readonly headerTokens = { headerCell: { padding: '1rem 1rem' } };
+
   transactionDialog = false;
   transactions = signal<Transaction[]>([]);
   categories = signal<Categorie[]>([]);
