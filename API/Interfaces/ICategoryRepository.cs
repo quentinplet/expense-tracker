@@ -5,10 +5,17 @@ namespace API.Interfaces;
 
 public interface ICategoryRepository
 {
-    /// Catégories système (UserId null) + celles créées par cet utilisateur.
-    Task<List<Category>> GetAllAsync(Guid userId);
-    Task<List<Category>> GetByTypeAsync(Guid userId, TransactionType type);
+    /// Catégories de l'utilisateur, triées par Type puis Name. `type` filtre en
+    /// plus si fourni (sélecteurs de formulaire).
+    Task<List<Category>> GetAllAsync(Guid userId, TransactionType? type = null);
     Task<Category?> GetByIdAsync(Guid id);
+
+    /// Cible de réaffectation à la suppression d'une catégorie utilisée — la
+    /// catégorie verrouillée ("Other") du même Type pour cet utilisateur.
+    Task<Category?> GetLockedByTypeAsync(Guid userId, TransactionType type);
+
+    /// Unicité par (UserId, Name, Type) — exclut `excludeId` sur un update.
+    Task<bool> ExistsAsync(Guid userId, string name, TransactionType type, Guid? excludeId = null);
 
     void Add(Category category);
     void Update(Category category);

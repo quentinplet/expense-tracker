@@ -31,6 +31,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '@/core/services/language-service';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
+import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 
 @Component({
   selector: 'app-transactions',
@@ -49,6 +50,7 @@ import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
     CategoryNamePipe,
     DatePicker,
     TooltipModule,
+    CategoryBadge,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',

@@ -8,8 +8,18 @@ export type Categorie = {
   translationKey?: string | null;
   icon?: string | null;
   color?: string | null;
-  isSystem: boolean;
+  isLocked: boolean;
 };
 
-export type CreateCategorieDto = Omit<Categorie, 'id' | 'isSystem' | 'translationKey'>;
-export type UpdateCategorieDto = Partial<CreateCategorieDto>;
+export type CreateCategorieDto = {
+  name: string;
+  icon: string;
+  color: string;
+  type: TransactionType;
+};
+
+export type UpdateCategorieDto = CreateCategorieDto;
+
+export type CategoryDeletedDto = {
+  reassignedTransactionCount: number;
+};

@@ -12,6 +12,6 @@ public class CategoryResponseDto
     public string? TranslationKey { get; set; }
     public string? Icon { get; set; }
     public string? Color { get; set; }
-    public bool IsSystem { get; set; }
+    public bool IsLocked { get; set; }
 
 }

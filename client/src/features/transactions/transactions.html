@@ -24,7 +24,7 @@
         [pTooltip]="'transaction.list.importCsvSoon' | translate"
         tooltipPosition="bottom"
       />
-      <p-button (click)="openNew()" [label]="'common.create' | translate" icon="pi pi-plus" />
+      <p-button (click)="openNew()" [label]="'transaction.list.add' | translate" icon="pi pi-plus" />
     </div>
   </div>
 
@@ -185,18 +185,7 @@
 
           <td>
             <div class="flex items-center gap-3">
-              <!-- Couleur de catégorie en style inline, jamais en classe générée (§18). -->
-              <span
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                [style.color]="transaction.categoryColor || 'var(--p-surface-400)'"
-                [style.background-color]="
-                  'color-mix(in oklch, ' +
-                  (transaction.categoryColor || 'var(--p-surface-400)') +
-                  ' 15%, transparent)'
-                "
-              >
-                <i class="pi text-sm" [class]="transaction.categoryIcon || 'pi-tag'"></i>
-              </span>
+              <app-category-badge [icon]="transaction.categoryIcon" [color]="transaction.categoryColor" />
               <span class="min-w-0">
                 <span class="block truncate font-medium text-surface-900 dark:text-surface-0">
                   {{ transaction.label }}

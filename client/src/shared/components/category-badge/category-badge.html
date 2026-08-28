@@ -1,0 +1,10 @@
+<span
+  class="flex shrink-0 items-center justify-center"
+  [class]="size() === 'sm' ? 'h-[1.2rem] w-[1.2rem] rounded-md' : 'h-9 w-9 rounded-lg'"
+  [style.color]="color() || 'var(--p-surface-400)'"
+  [style.background-color]="
+    'color-mix(in oklch, ' + (color() || 'var(--p-surface-400)') + ' 15%, transparent)'
+  "
+>
+  <i class="pi" [class]="[size() === 'sm' ? 'text-xs' : 'text-sm', icon() || 'pi-tag']"></i>
+</span>

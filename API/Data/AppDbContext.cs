@@ -54,7 +54,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         {
             e.Property(c => c.Type).HasColumnType("transaction_type");
             e.Property(c => c.Name).HasMaxLength(100).IsRequired();
-            e.HasIndex(c => new { c.UserId, c.Name }).IsUnique();
+            e.HasIndex(c => new { c.UserId, c.Name, c.Type }).IsUnique();
         });
 
         modelBuilder.Entity<Budget>(e =>

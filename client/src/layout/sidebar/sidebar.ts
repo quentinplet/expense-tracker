@@ -34,6 +34,7 @@ export class SidebarComponent implements OnInit {
   protected readonly menuItems: NavItem[] = [
     { labelKey: 'nav.dashboard', icon: 'pi pi-th-large', route: '/dashboard', available: true },
     { labelKey: 'nav.transactions', icon: 'pi pi-list', route: '/transactions', available: true },
+    { labelKey: 'nav.categories', icon: 'pi pi-tags', route: '/categories', available: true },
     { labelKey: 'nav.budgets', icon: 'pi pi-chart-pie', route: '/budgets', available: false },
     { labelKey: 'nav.recurring', icon: 'pi pi-sync', route: '/recurring', available: false },
     { labelKey: 'nav.reports', icon: 'pi pi-chart-bar', route: '/reports', available: false },

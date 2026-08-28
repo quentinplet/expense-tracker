@@ -117,6 +117,26 @@
       "icon": "pi-gift",
       "color": "#A855F7",
       "translationKey": "category.system.gift"
+    },
+    {
+      "id": 13,
+      "name": "Other",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-ellipsis-h",
+      "color": "#6b7280",
+      "translationKey": "category.system.other",
+      "isLocked": true
+    },
+    {
+      "id": 14,
+      "name": "Other",
+      "enabled": true,
+      "transactionTypeId": 2,
+      "icon": "pi-ellipsis-h",
+      "color": "#84cc16",
+      "translationKey": "category.system.other",
+      "isLocked": true
     }
   ],
   "transactions": [

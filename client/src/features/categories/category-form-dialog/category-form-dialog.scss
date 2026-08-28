@@ -1,0 +1,25 @@
+/**
+ * Portée par la classe du dialogue, pas par `:host` : `appendTo="body"` sort le
+ * p-dialog du DOM du composant (voir transaction-modal-form.scss pour le détail).
+ */
+::ng-deep .category-dialog {
+  /**
+   * Même piège que le dialogue de transaction : cliquer sur une icône ou une
+   * pastille de couleur fait perdre le focus au champ Nom, ce qui suffit à le
+   * marquer `ng-touched` — la règle globale d'`assets/styles.scss` le colorerait
+   * en rouge avant toute tentative de soumission. `[invalid]`, piloté par
+   * `showErrors()`, porte seul cet état ici.
+   */
+  .p-inputtext.ng-invalid.ng-touched:not(:focus) {
+    border-color: var(--p-inputtext-border-color);
+  }
+
+  .p-inputtext.p-invalid,
+  .p-inputtext.ng-invalid.ng-touched.p-invalid {
+    border-color: var(--p-inputtext-invalid-border-color);
+  }
+
+  .p-inputtext::placeholder {
+    color: var(--p-inputtext-placeholder-color);
+  }
+}

@@ -50,12 +50,15 @@ public class Seed
 
         if (data == null) return;
 
-        // Les identifiants du fichier de seed sont locaux : on les remappe vers les Guid générés.
-        var categoryIds = new Dictionary<int, Guid>();
-
-        if (!await context.Categories.AnyAsync())
+        // Chaque utilisateur reçoit sa propre copie du jeu de départ (14 catégories,
+        // dont les 2 verrouillées "Other") — jamais une ligne partagée entre deux
+        // utilisateurs. Idempotent par utilisateur, pas seulement globalement.
+        var users = await context.Users.ToListAsync();
+        foreach (var user in users)
         {
-            var categories = data.Categories.Select(c => new Category
+            if (await context.Categories.AnyAsync(c => c.UserId == user.Id)) continue;
+
+            var personalCategories = data.Categories.Select(c => new Category
             {
                 Id = Guid.NewGuid(),
                 Name = c.Name,
@@ -64,35 +67,32 @@ public class Seed
                 Icon = c.Icon,
                 Color = c.Color,
                 TranslationKey = c.TranslationKey,
-                IsSystem = true,
-                UserId = null
+                IsLocked = c.IsLocked,
+                UserId = user.Id
             }).ToList();
 
-            foreach (var (dto, entity) in data.Categories.Zip(categories))
-            {
-                categoryIds[dto.Id] = entity.Id;
-            }
-
-            context.Categories.AddRange(categories);
-            await context.SaveChangesAsync();
+            context.Categories.AddRange(personalCategories);
         }
-        else
-        {
-            var existing = await context.Categories.ToListAsync();
-            foreach (var dto in data.Categories)
-            {
-                var match = existing.FirstOrDefault(c => c.Name == dto.Name);
-                if (match != null) categoryIds[dto.Id] = match.Id;
-            }
-        }
+        await context.SaveChangesAsync();
 
         if (!await context.Transactions.AnyAsync())
         {
             var john = await context.Users.FirstOrDefaultAsync(u => u.UserName == "john");
             if (john == null) return;
 
-            var categoryTypes = await context.Categories
-                .ToDictionaryAsync(c => c.Id, c => c.Type);
+            var johnCategories = await context.Categories.Where(c => c.UserId == john.Id).ToListAsync();
+
+            // Les identifiants du fichier de seed sont locaux : on les remappe vers les
+            // catégories personnelles de John (même Name + Type).
+            var categoryIds = new Dictionary<int, Guid>();
+            foreach (var dto in data.Categories)
+            {
+                var type = dto.TransactionTypeId == 2 ? TransactionType.Income : TransactionType.Expense;
+                var match = johnCategories.FirstOrDefault(c => c.Name == dto.Name && c.Type == type);
+                if (match != null) categoryIds[dto.Id] = match.Id;
+            }
+
+            var categoryTypes = johnCategories.ToDictionary(c => c.Id, c => c.Type);
 
             var transactions = data.Transactions
                 .Where(t => categoryIds.ContainsKey(t.CategoryId))

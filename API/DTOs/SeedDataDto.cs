@@ -20,6 +20,9 @@ public class CategorySeedDto
     public string Icon { get; set; } = null!;
     public string Color { get; set; } = null!;
     public string TranslationKey { get; set; } = null!;
+
+    /// True uniquement pour les deux lignes "Other" (une par TransactionTypeId).
+    public bool IsLocked { get; set; }
 }
 
 public class TransactionSeedDto

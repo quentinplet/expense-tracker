@@ -30,6 +30,13 @@ public class BudgetRepository(AppDbContext context) : IBudgetRepository
             .Include(b => b.Category)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
+    public async Task<List<Budget>> GetByCategoryIdAsync(Guid userId, Guid categoryId)
+    {
+        return await context.Budgets
+            .Where(b => b.UserId == userId && b.CategoryId == categoryId)
+            .ToListAsync();
+    }
+
     public void Add(Budget budget)
     {
         context.Budgets.Add(budget);

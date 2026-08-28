@@ -98,6 +98,13 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             .ToListAsync();
     }
 
+    public async Task<List<Transaction>> GetByCategoryIdAsync(Guid userId, Guid categoryId)
+    {
+        return await context.Transactions
+            .Where(t => t.UserId == userId && t.CategoryId == categoryId)
+            .ToListAsync();
+    }
+
     public async Task<Transaction?> GetTransactionByIdAsync(Guid id)
     {
         return await context.Transactions

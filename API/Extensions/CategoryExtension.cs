@@ -16,7 +16,7 @@ public static class CategoryExtension
             TranslationKey = category.TranslationKey,
             Icon = category.Icon,
             Color = category.Color,
-            IsSystem = category.IsSystem
+            IsLocked = category.IsLocked
         };
     }
 

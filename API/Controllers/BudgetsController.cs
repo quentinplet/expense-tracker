@@ -39,6 +39,7 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
 
         var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId);
         if (category == null) return NotFound();
+        if (category.UserId != userId) return Forbid();
         if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
 
         var budget = new Budget
@@ -64,6 +65,7 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
 
         var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId);
         if (category == null) return NotFound();
+        if (category.UserId != userId) return Forbid();
         if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
 
         budget.Amount = dto.Amount;

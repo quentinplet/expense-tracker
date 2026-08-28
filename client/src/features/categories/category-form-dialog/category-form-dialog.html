@@ -1,0 +1,135 @@
+<p-dialog
+  [(visible)]="visible"
+  [style]="{ width: '28rem' }"
+  [header]="
+    (isEditing() ? 'category.form.editTitle' : 'category.form.createTitle') | translate
+  "
+  [modal]="true"
+  [draggable]="false"
+  appendTo="body"
+  styleClass="category-dialog"
+  (onHide)="onClose()"
+>
+  <ng-template #content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Segmenté Dépense | Revenu, uniquement à la création : Type est immuable
+           après création (le backend l'ignore silencieusement sur un PUT), donc
+           l'UI ne le propose même pas en édition. -->
+      @if (!isEditing()) {
+        <div
+          class="mb-6 flex items-center gap-1 rounded-full border border-surface-200 bg-surface-100 p-1 dark:border-surface-800 dark:bg-surface-950"
+          role="group"
+          [attr.aria-label]="'transaction.columns.type' | translate"
+        >
+          <button
+            type="button"
+            (click)="selectType('Expense')"
+            [attr.aria-pressed]="activeType() === 'Expense'"
+            class="flex-1 cursor-pointer rounded-full border-0 px-4 py-3 text-sm font-semibold transition-colors"
+            [class]="
+              activeType() === 'Expense'
+                ? 'bg-surface-0 text-red-600 shadow-sm dark:bg-surface-800 dark:text-red-400'
+                : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
+            "
+          >
+            {{ 'transaction.type.expense' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="selectType('Income')"
+            [attr.aria-pressed]="activeType() === 'Income'"
+            class="flex-1 cursor-pointer rounded-full border-0 px-4 py-3 text-sm font-semibold transition-colors"
+            [class]="
+              activeType() === 'Income'
+                ? 'bg-surface-0 text-emerald-600 shadow-sm dark:bg-surface-800 dark:text-emerald-400'
+                : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
+            "
+          >
+            {{ 'transaction.type.income' | translate }}
+          </button>
+        </div>
+      }
+
+      <div class="mb-5">
+        <label for="name" class="mb-2 block text-sm font-semibold">
+          {{ 'category.form.name' | translate }}
+        </label>
+        <input
+          formControlName="name"
+          type="text"
+          pInputText
+          id="name"
+          [placeholder]="'category.form.namePlaceholder' | translate"
+          [invalid]="!!errors()['Name'] || (showErrors() && form.controls.name.invalid)"
+          [dt]="fieldTokens"
+          fluid
+        />
+        @if (errors()['Name']) {
+          <small class="mt-2 block text-sm text-red-500">{{ errors()['Name'][0] }}</small>
+        } @else if (showErrors() && form.controls.name.invalid) {
+          <small class="mt-2 block text-sm text-red-500">
+            {{ 'category.form.nameRequired' | translate }}
+          </small>
+        }
+      </div>
+
+      <div class="mb-5">
+        <span class="mb-2 block text-sm font-semibold">{{ 'category.form.icon' | translate }}</span>
+        <div class="flex flex-wrap gap-2">
+          @for (icon of icons; track icon) {
+            <button
+              type="button"
+              (click)="selectIcon(icon)"
+              [attr.aria-pressed]="form.controls.icon.value === icon"
+              class="cursor-pointer rounded-lg border-2 bg-transparent p-0 transition-colors"
+              [class]="
+                form.controls.icon.value === icon
+                  ? 'border-primary'
+                  : 'border-transparent hover:border-surface-300 dark:hover:border-surface-600'
+              "
+            >
+              <app-category-badge [icon]="icon" [color]="form.controls.color.value" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <div>
+        <span class="mb-2 block text-sm font-semibold">{{ 'category.form.color' | translate }}</span>
+        <div class="flex flex-wrap gap-2">
+          @for (color of colors; track color) {
+            <button
+              type="button"
+              (click)="selectColor(color)"
+              [attr.aria-pressed]="form.controls.color.value === color"
+              [attr.aria-label]="color"
+              class="h-7 w-7 cursor-pointer rounded-full border-2 p-0 transition-colors"
+              [style.background-color]="color"
+              [class]="
+                form.controls.color.value === color
+                  ? 'border-surface-900 dark:border-surface-0'
+                  : 'border-transparent'
+              "
+            ></button>
+          }
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #footer>
+    <div class="flex w-full items-center justify-end gap-3">
+      <p-button
+        [label]="'common.cancel' | translate"
+        severity="secondary"
+        outlined
+        (onClick)="onClose()"
+      />
+      <p-button
+        [label]="(isEditing() ? 'common.update' : 'common.create') | translate"
+        type="button"
+        (onClick)="onSubmit()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

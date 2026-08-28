@@ -1,0 +1,69 @@
+<div class="w-full">
+  <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="m-0 text-3xl font-bold text-surface-900 dark:text-surface-0">
+        {{ 'category.list.title' | translate }}
+      </h1>
+      <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
+        {{ 'category.list.count' | translate: { count: categories().length } }}
+      </p>
+    </div>
+
+    <p-button (click)="openNew()" [label]="'category.list.add' | translate" icon="pi pi-plus" />
+  </div>
+
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    @for (section of sections(); track section.titleKey) {
+      <div
+        class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
+      >
+        <h2
+          class="m-0 border-b border-surface-200 px-5 py-4 text-sm font-semibold tracking-wider text-surface-500 uppercase dark:border-surface-800 dark:text-surface-400"
+        >
+          {{ section.titleKey | translate }}
+        </h2>
+        <ul class="m-0 flex list-none flex-col p-0">
+          @for (category of section.categories; track category.id) {
+            <li
+              class="flex items-center gap-3 border-b border-surface-100 px-5 py-3 last:border-b-0 dark:border-surface-800"
+            >
+              <app-category-badge [icon]="category.icon" [color]="category.color" />
+              <span
+                class="min-w-0 flex-1 truncate font-medium text-surface-900 dark:text-surface-0"
+              >
+                {{ category | categoryName }}
+              </span>
+              <p-button
+                (click)="editCategory(category)"
+                icon="pi pi-pencil"
+                class="mr-2"
+                [rounded]="true"
+                [outlined]="true"
+                [attr.aria-label]="'common.update' | translate"
+              />
+              <p-button
+                (click)="deleteCategory(category)"
+                icon="pi pi-trash"
+                severity="danger"
+                [rounded]="true"
+                [outlined]="true"
+                [disabled]="category.isLocked"
+                [pTooltip]="category.isLocked ? ('category.list.lockedTooltip' | translate) : ''"
+                tooltipPosition="top"
+                [attr.aria-label]="'common.delete' | translate"
+              />
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+
+  <app-category-form-dialog
+    [(visible)]="categoryDialog"
+    [category]="selectedCategory()"
+    [errors]="errors()"
+    (close)="hideDialog()"
+    (save)="submit($event)"
+  />
+</div>

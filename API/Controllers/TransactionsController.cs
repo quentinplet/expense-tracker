@@ -53,6 +53,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
 
         var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId!.Value);
         if (category == null) return NotFound();
+        if (category.UserId != userId) return Forbid();
         if (category.Type != dto.Type!.Value) return BadRequest("The category does not match the transaction type.");
 
         var transaction = dto.ToEntity(userId);
@@ -78,6 +79,7 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
 
         var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId!.Value);
         if (category == null) return NotFound();
+        if (category.UserId != userId) return Forbid();
         if (category.Type != dto.Type!.Value) return BadRequest("The category does not match the transaction type.");
 
         dto.Apply(transaction);

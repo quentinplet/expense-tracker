@@ -23,6 +23,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Categorie } from '@/types/categorie';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
+import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 import { LanguageService } from '@/core/services/language-service';
 
 /**
@@ -51,6 +52,7 @@ export type TransactionFormValue = {
     InputTextModule,
     ReactiveFormsModule,
     TranslatePipe,
+    CategoryBadge,
   ],
   templateUrl: './transaction-modal-form.html',
   styleUrl: './transaction-modal-form.scss',

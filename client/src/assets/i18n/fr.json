@@ -45,6 +45,7 @@
   "transaction": {
     "list": {
       "title": "Transactions",
+      "add": "Ajouter une transaction",
       "count": "{{count}} transactions au total",
       "empty": "Aucune transaction",
       "emptyHint": "Ajoutez votre première transaction pour commencer.",
@@ -162,7 +163,31 @@
       "salary": "Salaire",
       "freelance": "Freelance",
       "investment": "Investissement",
-      "gift": "Cadeau"
+      "gift": "Cadeau",
+      "other": "Autre"
+    },
+    "list": {
+      "title": "Catégories",
+      "add": "Ajouter une catégorie",
+      "count": "{{count}} catégories au total",
+      "deleteOne": "Voulez-vous vraiment supprimer « {{name}} » ?",
+      "deleted": "Catégorie supprimée",
+      "deletedWithReassignment": "Catégorie supprimée, {{count}} transactions déplacées vers Autre",
+      "deleteFailed": "La suppression a échoué.",
+      "lockedTooltip": "Cette catégorie ne peut pas être supprimée"
+    },
+    "form": {
+      "createTitle": "Nouvelle catégorie",
+      "editTitle": "Modifier la catégorie",
+      "name": "Nom",
+      "namePlaceholder": "Ex. Restaurants",
+      "nameRequired": "Le nom est obligatoire.",
+      "icon": "Icône",
+      "color": "Couleur",
+      "created": "Catégorie ajoutée",
+      "updated": "Catégorie modifiée",
+      "createFailed": "La création a échoué.",
+      "updateFailed": "La modification a échoué."
     }
   },
   "auth": {
