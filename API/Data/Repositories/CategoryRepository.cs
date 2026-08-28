@@ -7,15 +7,17 @@ namespace API.Data.Repositories;
 
 public class CategoryRepository(AppDbContext context) : ICategoryRepository
 {
-    public async Task<List<Category>> GetAllAsync()
-    {
-        return await context.Categories.ToListAsync();
-    }
-
-    public async Task<List<Category>> GetByTypeAsync(TransactionType type)
+    public async Task<List<Category>> GetAllAsync(Guid userId)
     {
         return await context.Categories
-            .Where(c => c.Type == type)
+            .Where(c => c.UserId == null || c.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<List<Category>> GetByTypeAsync(Guid userId, TransactionType type)
+    {
+        return await context.Categories
+            .Where(c => c.Type == type && (c.UserId == null || c.UserId == userId))
             .ToListAsync();
     }
 

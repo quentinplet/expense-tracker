@@ -15,22 +15,24 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     [HttpGet] // api/category
     public async Task<ActionResult<List<CategoryResponseDto>>> GetAll()
     {
-        var categories = await uow.CategoryRepository.GetAllAsync();
+        var categories = await uow.CategoryRepository.GetAllAsync(User.GetMemberId());
         return Ok(categories.Select(c => c.ToCategoryResponseDto()));
     }
 
     [HttpGet("type/{transactionTypeName}")] // api/category/by-type/Expense
     public async Task<ActionResult<List<CategoryResponseDto>>> GetByType(TransactionType transactionTypeName)
     {
-        var categories = await uow.CategoryRepository.GetByTypeAsync(transactionTypeName);
+        var categories = await uow.CategoryRepository.GetByTypeAsync(User.GetMemberId(), transactionTypeName);
         return Ok(categories.Select(c => c.ToCategoryResponseDto()));
     }
 
     [HttpGet("{id}")] // api/category/5
     public async Task<ActionResult<CategoryResponseDto>> GetById(Guid id)
     {
+        var userId = User.GetMemberId();
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
+        if (category.UserId != null && category.UserId != userId) return Forbid();
         return Ok(category.ToCategoryResponseDto());
     }
 
@@ -56,10 +58,11 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     [HttpPut("{id}")] // api/category/5
     public async Task<ActionResult> Update(Guid id, CategoryRequestDto categoryRequestDto)
     {
+        var userId = User.GetMemberId();
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
-
         if (category.IsSystem) return BadRequest("System categories cannot be modified.");
+        if (category.UserId != userId) return Forbid();
 
         category.Name = categoryRequestDto.Name;
         category.Type = categoryRequestDto.Type;
@@ -72,8 +75,10 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     [HttpPatch("{id}/toggle")] // api/category/5/toggle
     public async Task<ActionResult> ToggleEnabled(Guid id)
     {
+        var userId = User.GetMemberId();
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
+        if (!category.IsSystem && category.UserId != userId) return Forbid();
         category.Enabled = !category.Enabled;
         uow.CategoryRepository.Update(category);
         if (await uow.Complete()) return NoContent();
@@ -83,9 +88,11 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
     [HttpDelete("{id}")] // api/category/5
     public async Task<ActionResult> Delete(Guid id)
     {
+        var userId = User.GetMemberId();
         var category = await uow.CategoryRepository.GetByIdAsync(id);
         if (category == null) return NotFound();
         if (category.IsSystem) return BadRequest("System categories cannot be deleted.");
+        if (category.UserId != userId) return Forbid();
         uow.CategoryRepository.Delete(category);
         if (await uow.Complete()) return NoContent();
         return BadRequest("Failed to delete category");
