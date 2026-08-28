@@ -36,6 +36,11 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     public async Task<ActionResult<BudgetResponseDto>> CreateBudget([FromBody] BudgetRequestDto dto)
     {
         var userId = User.GetMemberId();
+
+        var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId);
+        if (category == null) return NotFound();
+        if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
+
         var budget = new Budget
         {
             Amount = dto.Amount,
@@ -56,6 +61,10 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();
+
+        var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId);
+        if (category == null) return NotFound();
+        if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
 
         budget.Amount = dto.Amount;
         budget.Month = dto.Month;

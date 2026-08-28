@@ -5,8 +5,9 @@ namespace API.Interfaces;
 
 public interface ICategoryRepository
 {
-    Task<List<Category>> GetAllAsync();
-    Task<List<Category>> GetByTypeAsync(TransactionType type);
+    /// Catégories système (UserId null) + celles créées par cet utilisateur.
+    Task<List<Category>> GetAllAsync(Guid userId);
+    Task<List<Category>> GetByTypeAsync(Guid userId, TransactionType type);
     Task<Category?> GetByIdAsync(Guid id);
 
     void Add(Category category);
