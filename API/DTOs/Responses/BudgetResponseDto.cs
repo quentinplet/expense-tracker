@@ -16,6 +16,12 @@ public class BudgetResponseDto
 
     public decimal AmountLimit { get; set; }
     public bool AutoRenew { get; set; }
+
+    /// True si AutoRenew est actif ET qu'un budget existe déjà le mois suivant pour la
+    /// même cible : la duplication automatique n'aura alors aucun effet (le job
+    /// BudgetAutoRenewJob saute silencieusement dans ce cas — voir BudgetService).
+    public bool AutoRenewConflict { get; set; }
+
     public decimal Spent { get; set; }
 
     /// AmountLimit - Spent, peut être négatif.

@@ -112,16 +112,26 @@
         </div>
       }
 
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <label for="autoRenew" class="block text-sm font-semibold">
-            {{ 'budgets.form.autoRenew' | translate }}
-          </label>
-          <p class="m-0 text-xs text-surface-500 dark:text-surface-400">
-            {{ 'budgets.form.autoRenewHint' | translate }}
-          </p>
+      <div>
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <label for="autoRenew" class="block text-sm font-semibold">
+              {{ 'budgets.form.autoRenew' | translate }}
+            </label>
+            <p class="m-0 text-xs text-surface-500 dark:text-surface-400">
+              {{ 'budgets.form.autoRenewHint' | translate }}
+            </p>
+          </div>
+          <p-toggleswitch formControlName="autoRenew" inputId="autoRenew" />
         </div>
-        <p-toggleswitch formControlName="autoRenew" inputId="autoRenew" />
+        @if (autoRenewConflict()) {
+          <!-- Même message que budget-card.html : un budget existe déjà le mois
+               suivant pour cette cible, la duplication n'aura donc aucun effet. -->
+          <p class="mt-2 mb-0 flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
+            <i class="pi pi-exclamation-triangle text-xs"></i>
+            {{ 'budgets.card.autoRenewConflict' | translate }}
+          </p>
+        }
       </div>
     </form>
   </ng-template>

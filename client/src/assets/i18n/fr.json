@@ -202,7 +202,8 @@
     },
     "card": {
       "global": "Budget global",
-      "define": "Définir un budget global"
+      "define": "Définir un budget global",
+      "autoRenewConflict": "Duplication automatique sans effet — un budget existe déjà le mois suivant."
     },
     "form": {
       "createTitle": "Nouveau budget",

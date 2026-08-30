@@ -202,7 +202,8 @@
     },
     "card": {
       "global": "Global budget",
-      "define": "Set a global budget"
+      "define": "Set a global budget",
+      "autoRenewConflict": "Auto-renew has no effect — a budget already exists for next month."
     },
     "form": {
       "createTitle": "New budget",

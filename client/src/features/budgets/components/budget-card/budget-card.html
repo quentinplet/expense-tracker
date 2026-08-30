@@ -22,6 +22,16 @@
           }}
         </span>
       }
+      @if (budget().autoRenewConflict) {
+        <!-- AutoRenew actif mais sans effet : un budget existe déjà le mois suivant
+             pour cette cible, le job de duplication le saute silencieusement
+             (§ BudgetService.GetBudgetsForMonthAsync côté backend). -->
+        <i
+          class="pi pi-exclamation-triangle shrink-0 text-xs text-amber-500 dark:text-amber-400"
+          [pTooltip]="'budgets.card.autoRenewConflict' | translate"
+          tooltipPosition="top"
+        ></i>
+      }
     </div>
 
     <div class="flex shrink-0 items-center gap-1">

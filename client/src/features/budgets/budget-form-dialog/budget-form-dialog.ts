@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { distinctUntilChanged, map, of, switchMap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, map, of, startWith, switchMap } from 'rxjs';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
@@ -24,7 +24,7 @@ import { CategoryBadge } from '@/shared/components/category-badge/category-badge
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { AmountInput } from '@/shared/components/amount-input/amount-input';
 import { BudgetService } from '@/core/services/budget-service';
-import { MonthKey, monthKeyToDate, toMonthKey } from '@/features/dashboard/month';
+import { MonthKey, monthKeyToDate, shiftMonth, toMonthKey } from '@/features/dashboard/month';
 
 /** Valeur bornée du select : ne coïncide avec aucun Guid de catégorie, et n'est
  *  jamais `null` — `null` reste réservé à « rien encore choisi » pour que
@@ -121,6 +121,54 @@ export class BudgetFormDialog implements OnChanges {
     ),
     { initialValue: null },
   );
+
+  /**
+   * Catégories déjà budgétées le mois SUIVANT celui du formulaire — sert à prévenir
+   * dans le dialog lui-même que la duplication automatique n'aura aucun effet
+   * (§ BudgetService.GetBudgetsForMonthAsync côté backend, § budget-card.html côté
+   * carte). Ne part en requête que si `autoRenew` est actif : c'est la seule
+   * situation où la question se pose, pas la peine d'interroger l'API sinon.
+   */
+  private nextMonthTaken = toSignal(
+    combineLatest([
+      this.form.controls.month.valueChanges.pipe(
+        startWith(this.form.controls.month.value),
+        map((date) => toMonthKey(date)),
+        distinctUntilChanged(),
+      ),
+      this.form.controls.autoRenew.valueChanges.pipe(
+        startWith(this.form.controls.autoRenew.value),
+        distinctUntilChanged(),
+      ),
+    ]).pipe(
+      switchMap(([monthKey, autoRenew]) =>
+        autoRenew
+          ? this.budgetService
+              .getBudgets(shiftMonth(monthKey, 1))
+              .pipe(map((budgets) => budgets.map((b) => b.categoryId)))
+          : of(null),
+      ),
+    ),
+    { initialValue: null },
+  );
+
+  /** Miroir signal de `categoryId` — même raison que `liveTakenSelections` (la valeur
+   *  d'un FormControl n'est pas un signal). */
+  private selectedCategoryId = toSignal(this.form.controls.categoryId.valueChanges, {
+    initialValue: this.form.controls.categoryId.value,
+  });
+
+  /** True quand la duplication automatique, une fois activée, n'aura concrètement
+   *  aucun effet : un budget existe déjà le mois suivant pour la cible choisie. */
+  protected autoRenewConflict = computed(() => {
+    const taken = this.nextMonthTaken();
+    if (taken === null) return false;
+
+    const categoryId = this.selectedCategoryId();
+    if (!categoryId) return false;
+
+    return new Set(taken).has(categoryId === GLOBAL_OPTION_ID ? null : categoryId);
+  });
 
   /** N'affiche une erreur qu'après une tentative de soumission — même raison que
    *  transaction-modal-form.ts : `touched` seul se déclenche sur un simple blur. */

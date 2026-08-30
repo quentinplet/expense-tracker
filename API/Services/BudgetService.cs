@@ -19,11 +19,22 @@ public class BudgetService(IUnitOfWork uow) : IBudgetService
         // celui d'un budget catégorie ne filtre que la sienne (§ Key Gotchas backend).
         var totalSpent = spentByCategory.Sum(s => s.Total);
 
+        // AutoRenewConflict (§ BudgetResponseDto) : un aller-retour de plus, seulement
+        // si au moins un budget du mois a AutoRenew actif — sinon la question ne se
+        // pose pour personne et l'appel est sauté.
+        var nextMonthCategoryIds = budgets.Any(b => b.AutoRenew)
+            ? (await uow.BudgetRepository.GetAllByUserIdAndMonthAsync(userId, NextMonthKey(month)))
+                .Select(b => b.CategoryId)
+                .ToHashSet()
+            : [];
+
         return
         [
             .. budgets
                 .OrderBy(b => b.CategoryId == null ? 0 : 1) // budget global en tête
-                .Select(b => b.ToBudgetResponseDto(Spent(b, spentByCategory, totalSpent))),
+                .Select(b => b.ToBudgetResponseDto(
+                    Spent(b, spentByCategory, totalSpent),
+                    b.AutoRenew && nextMonthCategoryIds.Contains(b.CategoryId))),
         ];
     }
 
@@ -77,6 +88,12 @@ public class BudgetService(IUnitOfWork uow) : IBudgetService
     }
 
     private static string ToMonthKey(DateTime date) => date.ToString("yyyy-MM");
+
+    private static string NextMonthKey(string month)
+    {
+        var (from, _) = ResolveMonthRange(month);
+        return from.AddMonths(1).ToString("yyyy-MM");
+    }
 
     private static (DateOnly From, DateOnly ToExclusive) ResolveMonthRange(string month)
     {

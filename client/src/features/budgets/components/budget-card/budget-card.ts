@@ -2,6 +2,7 @@ import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, computed, inject, input, output } from '@angular/core';
 import { Button } from 'primeng/button';
 import { ProgressBar } from 'primeng/progressbar';
+import { TooltipModule } from 'primeng/tooltip';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '@/core/services/language-service';
 import { Budget } from '@/types/budget';
@@ -15,7 +16,16 @@ const GLOBAL_ACCENT = 'var(--p-primary-500)';
 
 @Component({
   selector: 'app-budget-card',
-  imports: [Button, ProgressBar, TranslatePipe, CategoryBadge, CategoryNamePipe, CurrencyPipe, DecimalPipe],
+  imports: [
+    Button,
+    ProgressBar,
+    TooltipModule,
+    TranslatePipe,
+    CategoryBadge,
+    CategoryNamePipe,
+    CurrencyPipe,
+    DecimalPipe,
+  ],
   templateUrl: './budget-card.html',
   styleUrl: './budget-card.scss',
 })

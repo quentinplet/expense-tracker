@@ -66,6 +66,7 @@ export class Budgets {
         categoryColor: null,
         amountLimit: 0,
         autoRenew: false,
+        autoRenewConflict: false,
         spent: 0,
         remaining: 0,
       },

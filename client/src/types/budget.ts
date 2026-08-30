@@ -10,6 +10,9 @@ export type Budget = {
   categoryColor: string | null;
   amountLimit: number;
   autoRenew: boolean;
+  /** True si autoRenew est actif ET qu'un budget existe déjà le mois suivant pour la
+   *  même cible : la duplication automatique n'aura alors aucun effet. */
+  autoRenewConflict: boolean;
   spent: number;
   /** amountLimit - spent, peut être négatif. */
   remaining: number;
