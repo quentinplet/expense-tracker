@@ -63,9 +63,6 @@
               {{ 'budgets.form.categoryRequired' | translate }}
             </small>
           }
-          <p class="mt-2 mb-0 text-xs text-surface-500 dark:text-surface-400">
-            {{ 'budgets.form.forMonth' | translate: { month: month() } }}
-          </p>
         </div>
       }
 
@@ -88,6 +85,32 @@
           </small>
         }
       </div>
+
+      @if (!isEditing()) {
+        <div class="mb-5">
+          <label for="budgetMonth" class="mb-2 block text-sm font-semibold">
+            {{ 'budgets.form.month' | translate }}
+          </label>
+          <!--
+            Aucune borne min/max : un budget se planifie aussi bien en avance que sur
+            un mois passé (§ Planifier un budget futur). `showButtonBar` donne un
+            retour au mois courant en un clic, sans naviguer année par année.
+          -->
+          <p-date-picker
+            formControlName="month"
+            inputId="budgetMonth"
+            view="month"
+            dateFormat="MM yy"
+            [readonlyInput]="true"
+            [showButtonBar]="true"
+            [showIcon]="true"
+            iconDisplay="input"
+            appendTo="body"
+            [style]="datePickerTokens"
+            fluid
+          />
+        </div>
+      }
 
       <div class="flex items-center justify-between gap-3">
         <div>

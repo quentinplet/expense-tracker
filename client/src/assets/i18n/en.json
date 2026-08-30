@@ -211,7 +211,7 @@
       "categoryPlaceholder": "Choose a category",
       "categoryRequired": "Category is required.",
       "global": "Global budget",
-      "forMonth": "For {{month}}",
+      "month": "Month",
       "amountLimit": "Limit",
       "amountLimitPlaceholder": "€0.00",
       "amountLimitRequired": "The limit is required and cannot be negative.",

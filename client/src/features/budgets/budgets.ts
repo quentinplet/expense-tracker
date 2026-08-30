@@ -183,9 +183,7 @@ export class Budgets {
   }
 
   private createBudget(value: BudgetFormValue) {
-    const dto: CreateBudgetDto = { ...value, month: this.currentMonth() };
-
-    this.budgetService.createBudget(dto).subscribe({
+    this.budgetService.createBudget(value).subscribe({
       next: () => {
         this.loadData(this.currentMonth());
         this.hideDialog();

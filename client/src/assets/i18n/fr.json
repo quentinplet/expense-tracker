@@ -211,7 +211,7 @@
       "categoryPlaceholder": "Choisir une catégorie",
       "categoryRequired": "La catégorie est obligatoire.",
       "global": "Budget global",
-      "forMonth": "Pour {{month}}",
+      "month": "Mois",
       "amountLimit": "Plafond",
       "amountLimitPlaceholder": "0,00 €",
       "amountLimitRequired": "Le plafond est obligatoire et ne peut pas être négatif.",

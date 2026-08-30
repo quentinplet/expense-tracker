@@ -10,7 +10,12 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
-      <app-period-selector [month]="currentMonth()" [busy]="loading()" (monthChange)="setMonth($event)" />
+      <app-period-selector
+        [month]="currentMonth()"
+        [busy]="loading()"
+        [allowFuture]="true"
+        (monthChange)="setMonth($event)"
+      />
       <p-button (click)="openNew()" [label]="'budgets.list.add' | translate" icon="pi pi-plus" />
     </div>
   </header>

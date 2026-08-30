@@ -30,15 +30,26 @@ export class PeriodSelector {
    */
   busy = input(false);
 
+  /**
+   * Le plafond au mois courant n'a de sens que pour consulter des données passées
+   * (dashboard) : un mois futur n'a rien à y afficher. Les budgets s'y planifient à
+   * l'avance, donc cette page lève le plafond (§ budgets.ts).
+   */
+  allowFuture = input(false);
+
   monthChange = output<MonthKey>();
 
   protected locale = computed(() => this.languageService.current());
 
   protected pickerDate = computed(() => monthKeyToDate(this.month()));
 
-  protected maxDate = computed(() => monthKeyToDate(currentMonthKey()));
+  protected maxDate = computed(() =>
+    this.allowFuture() ? undefined : monthKeyToDate(currentMonthKey()),
+  );
 
-  protected atCurrentMonth = computed(() => isAtOrAfterCurrentMonth(this.month()));
+  protected atCurrentMonth = computed(
+    () => !this.allowFuture() && isAtOrAfterCurrentMonth(this.month()),
+  );
 
   shift(offset: number) {
     this.monthChange.emit(shiftMonth(this.month(), offset));
