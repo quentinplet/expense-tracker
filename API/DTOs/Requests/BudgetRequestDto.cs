@@ -14,7 +14,7 @@ public class BudgetRequestDto
     public string? Month { get; set; }
 
     [Required(ErrorMessage = "The Budget Amount Limit is required")]
-    [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "The Budget Amount Limit must be greater than 0")]
+    [Range(0, (double)decimal.MaxValue, ErrorMessage = "The Budget Amount Limit cannot be negative")]
     public decimal? AmountLimit { get; set; }
 
     [Required(ErrorMessage = "The Budget AutoRenew flag is required")]

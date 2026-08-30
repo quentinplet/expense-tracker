@@ -248,19 +248,22 @@
       </ng-template>
 
       <ng-template #emptymessage>
-        <tr>
-          <td colspan="6" class="py-12 text-center">
-            <p class="m-0 font-medium text-surface-600 dark:text-surface-300">
-              {{
-                (hasActiveFilters() ? 'transaction.list.emptyFiltered' : 'transaction.list.empty')
-                  | translate
-              }}
-            </p>
-            @if (!hasActiveFilters()) {
-              <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
-                {{ 'transaction.list.emptyHint' | translate }}
+        <tr class="empty-row">
+          <td colspan="6" class="empty-cell p-0">
+            <div class="flex min-h-96 flex-col items-center justify-center gap-1 text-center">
+              <p class="m-0 font-medium text-surface-600 dark:text-surface-300">
+                {{
+                  (hasActiveFilters() ? 'transaction.list.emptyFiltered' : 'transaction.list.empty')
+                    | translate
+                }}
               </p>
-            }
+              @if (!hasActiveFilters()) {
+                <p class="mt-1 mb-4 text-sm text-surface-500 dark:text-surface-400">
+                  {{ 'transaction.list.emptyHint' | translate }}
+                </p>
+                <p-button (click)="openNew()" [label]="'transaction.list.add' | translate" icon="pi pi-plus" />
+              }
+            </div>
           </td>
         </tr>
       </ng-template>

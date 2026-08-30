@@ -195,7 +195,7 @@
       "title": "Budgets",
       "add": "Add a budget",
       "count": "{{count}} budgets tracked this month",
-      "empty": "No budget for this month yet. Add one to track your spending.",
+      "empty": "No category budget for this month yet. Add one to track spending by category.",
       "deleteConfirm": "Are you sure you want to delete this budget?",
       "deleted": "Budget deleted",
       "deleteFailed": "Deletion failed."
@@ -214,7 +214,7 @@
       "forMonth": "For {{month}}",
       "amountLimit": "Limit",
       "amountLimitPlaceholder": "€0.00",
-      "amountLimitRequired": "The limit must be greater than 0.",
+      "amountLimitRequired": "The limit is required and cannot be negative.",
       "autoRenew": "Auto-renew",
       "autoRenewHint": "Recreates this budget next month, same limit, no rollover.",
       "created": "Budget added",

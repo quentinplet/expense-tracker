@@ -84,7 +84,7 @@ export class BudgetFormDialog implements OnChanges {
 
   protected form = this.fb.group({
     categoryId: this.fb.nonNullable.control('', Validators.required),
-    amountLimit: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    amountLimit: this.fb.control<number | null>(null, [Validators.required, Validators.min(0)]),
     autoRenew: this.fb.nonNullable.control(false),
   });
 
@@ -161,7 +161,7 @@ export class BudgetFormDialog implements OnChanges {
       const globalStillAvailable = !this.takenSelections().includes(null);
       this.form.reset({
         categoryId: this.presetGlobal() && globalStillAvailable ? GLOBAL_OPTION_ID : '',
-        amountLimit: null,
+        amountLimit: 0,
         autoRenew: false,
       });
       return;
@@ -185,6 +185,17 @@ export class BudgetFormDialog implements OnChanges {
     Object.defineProperty(replay, 'which', { get: () => decimal.charCodeAt(0) });
     Object.defineProperty(replay, 'keyCode', { get: () => decimal.charCodeAt(0) });
     (event.target as HTMLInputElement).dispatchEvent(replay);
+  }
+
+  /**
+   * Le champ démarre à 0 € plutôt que vide (demande du 30/08). `p-inputnumber`
+   * insère sinon les chiffres tapés dans le « 0,00 € » affiché au lieu de le
+   * remplacer — même piège que documenté sur le montant de transaction, qu'un
+   * défaut `null` avait évité là-bas. Ici on sélectionne tout au focus, pour que
+   * la première frappe remplace le zéro plutôt que de s'y insérer.
+   */
+  onAmountFocus(event: Event) {
+    (event.target as HTMLInputElement).select();
   }
 
   onClose() {

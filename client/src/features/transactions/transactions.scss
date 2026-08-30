@@ -17,4 +17,24 @@
     border-right: 0;
     border-bottom: 0;
   }
+
+  /**
+   * `.p-datatable-tbody > tr > td { text-align: start }` est posé par PrimeNG hors
+   * layer — la classe Tailwind `text-center` sur la même cellule ne peut pas la
+   * battre (même piège que documenté sur les hauteurs de champ des dialogues).
+   */
+  .empty-cell {
+    text-align: center;
+  }
+
+  /**
+   * `[rowHover]="true"` teinte n'importe quel <tr> du tbody au survol, y compris
+   * cette ligne-là — qui n'est pas une donnée cliquable. `.p-datatable-hoverable
+   * .p-datatable-tbody > tr:not(.p-datatable-row-selected):hover` étant lui aussi
+   * hors layer, il faut au moins autant de spécificité pour le neutraliser ici.
+   */
+  .p-datatable-hoverable .p-datatable-tbody > tr.empty-row:hover {
+    background: transparent;
+    color: inherit;
+  }
 }

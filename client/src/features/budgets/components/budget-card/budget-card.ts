@@ -36,18 +36,19 @@ export class BudgetCard {
   protected isPlaceholder = computed(() => this.budget().id === '');
 
   /**
-   * Peut dépasser 100 : c'est justement ce que la carte doit montrer sur un budget
-   * dépassé. `amountLimit` est normalement toujours > 0 (validé côté serveur), sauf
-   * pour le placeholder du budget global — d'où la garde, plutôt qu'une division
-   * par zéro produisant `NaN`.
+   * Plafonné à 100 — au-delà, le nombre ne raconte plus rien d'utile (un budget à
+   * 1 € dépensé de 50 € donnerait « 5000 % », sans commune mesure avec un budget à
+   * 0 € dépensé qui, lui, tombe pile sur 100 %). Le vrai dépassement reste lisible
+   * via les montants en euros juste en dessous ; ce nombre-ci n'est qu'une jauge.
+   * `amountLimit` peut valoir 0 sur un vrai budget (pas seulement le placeholder
+   * du budget global) — sans dépense, 0 % ; avec la moindre dépense contre un
+   * plafond nul, 100 % (dépassé d'office, rien à diviser).
    */
   protected percentage = computed(() => {
     const { spent, amountLimit } = this.budget();
-    return amountLimit > 0 ? (spent / amountLimit) * 100 : 0;
+    if (amountLimit <= 0) return spent > 0 ? 100 : 0;
+    return Math.min(100, (spent / amountLimit) * 100);
   });
-
-  /** La largeur de la barre, elle, se plafonne à 100 — rien au-delà du conteneur. */
-  protected barValue = computed(() => Math.min(100, this.percentage()));
 
   protected status = computed<BudgetStatus>(() => {
     const pct = this.percentage();
@@ -68,8 +69,7 @@ export class BudgetCard {
    * de catégorie (§18). Indépendant de la catégorie : la barre porte la sévérité
    * (dépensé vs plafond), le badge porte l'identité.
    */
-  protected barColor = computed(() => {
-    const ratio = Math.min(100, Math.max(0, this.percentage()));
-    return `color-mix(in oklch, var(--p-red-500) ${ratio}%, var(--p-green-500))`;
-  });
+  protected barColor = computed(
+    () => `color-mix(in oklch, var(--p-red-500) ${this.percentage()}%, var(--p-green-500))`,
+  );
 }

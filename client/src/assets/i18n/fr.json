@@ -195,7 +195,7 @@
       "title": "Budgets",
       "add": "Ajouter un budget",
       "count": "{{count}} budgets suivis ce mois",
-      "empty": "Aucun budget pour ce mois. Ajoutez-en un pour suivre vos dépenses.",
+      "empty": "Aucun budget par catégorie pour ce mois. Ajoutez-en un pour suivre vos dépenses par catégorie.",
       "deleteConfirm": "Voulez-vous vraiment supprimer ce budget ?",
       "deleted": "Budget supprimé",
       "deleteFailed": "La suppression a échoué."
@@ -214,7 +214,7 @@
       "forMonth": "Pour {{month}}",
       "amountLimit": "Plafond",
       "amountLimitPlaceholder": "0,00 €",
-      "amountLimitRequired": "Le plafond doit être supérieur à 0.",
+      "amountLimitRequired": "Le plafond est obligatoire et ne peut pas être négatif.",
       "autoRenew": "Duplication automatique",
       "autoRenewHint": "Recrée ce budget le mois suivant, même plafond, sans report.",
       "created": "Budget ajouté",

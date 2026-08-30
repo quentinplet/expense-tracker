@@ -78,10 +78,12 @@
           inputId="amountLimit"
           mode="currency"
           currency="EUR"
+          [min]="0"
           [locale]="locale()"
           [placeholder]="'budgets.form.amountLimitPlaceholder' | translate"
           [invalid]="!!errors()['AmountLimit'] || (showErrors() && form.controls.amountLimit.invalid)"
           (keydown)="onAmountKeydown($event)"
+          (onFocus)="onAmountFocus($event)"
           fluid
         />
         @if (errors()['AmountLimit']) {
