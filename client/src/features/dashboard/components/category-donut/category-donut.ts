@@ -83,9 +83,21 @@ export class CategoryDonut {
    * Le graphique ne porte que les arcs : la légende est du HTML à côté. Chart.js
    * ne connaît ni le thème ni la langue, donc tout ce qui est texte reste hors
    * du canvas et suit Angular naturellement.
+   *
+   * Sans dépense, un anneau plein neutre plutôt qu'un donut vide de tout arc :
+   * la carte garde sa forme de graphique, avec un texte d'accompagnement à côté
+   * (voir le template) plutôt que le canvas disparaissant purement et simplement.
    */
   protected chartData = computed(() => {
     const slices = this.slices();
+    if (slices.length === 0) {
+      return {
+        labels: [],
+        datasets: [
+          { data: [1], backgroundColor: ['var(--p-surface-200)'], borderWidth: 0, hoverOffset: 0 },
+        ],
+      };
+    }
     return {
       labels: slices.map((s) => s.label),
       datasets: [

@@ -57,14 +57,8 @@
        donc la carte ne change pas de taille en basculant de portée — et la carte
        voisine, qui partage la même ligne de grille, ne bouge pas non plus. -->
   <div class="mt-4 h-56">
-    @if (hasData()) {
-      <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="224px" />
-    } @else {
-      <p
-        class="m-0 flex h-full items-center justify-center text-sm text-surface-500 dark:text-surface-400"
-      >
-        {{ 'dashboard.trend.empty' | translate }}
-      </p>
-    }
+    <!-- Toujours le graphique, même sans aucune donnée : à zéro partout, Chart.js
+         trace juste une ligne plate — un vrai graphique vide, pas un texte à la place. -->
+    <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="224px" />
   </div>
 </div>

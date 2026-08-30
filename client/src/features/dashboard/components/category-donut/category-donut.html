@@ -46,30 +46,33 @@
        sur une ligne, la hauteur ne dépend donc plus du nombre de catégories, et ni la
        bascule de portée ni un état vide ne déplacent la carte voisine. -->
   <div class="mt-4 min-h-50">
-    @if (slices().length) {
-      <div class="flex h-full flex-col items-center gap-6 sm:flex-row">
-        <div class="relative h-44 w-44 shrink-0">
-          <p-chart type="doughnut" [data]="chartData()" [options]="chartOptions" height="176px" />
+    <!-- Toujours l'anneau, même sans dépense : un anneau neutre plein (voir
+         chartData()) plutôt qu'un canvas absent. Seule la légende à droite bascule
+         sur un texte. -->
+    <div class="flex h-full flex-col items-center gap-6 sm:flex-row">
+      <div class="relative h-44 w-44 shrink-0">
+        <p-chart type="doughnut" [data]="chartData()" [options]="chartOptions" height="176px" />
 
-          <!-- Le total est du HTML par-dessus le canvas : Chart.js ne sait pas
-             écrire au centre d'un donut, et ce texte doit suivre thème et langue. -->
-          <div
-            class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
-          >
-            <span class="text-lg font-bold text-surface-900 dark:text-surface-0">
-              {{ total() | currency: 'EUR' : 'symbol' : '1.0-0' : locale() }}
-            </span>
-            <span class="text-xs text-surface-500 dark:text-surface-400">
-              {{
-                (scope() === 'all'
-                  ? 'dashboard.breakdown.allTime'
-                  : 'dashboard.breakdown.thisMonth'
-                ) | translate
-              }}
-            </span>
-          </div>
+        <!-- Le total est du HTML par-dessus le canvas : Chart.js ne sait pas
+           écrire au centre d'un donut, et ce texte doit suivre thème et langue. -->
+        <div
+          class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
+        >
+          <span class="text-lg font-bold text-surface-900 dark:text-surface-0">
+            {{ total() | currency: 'EUR' : 'symbol' : '1.0-0' : locale() }}
+          </span>
+          <span class="text-xs text-surface-500 dark:text-surface-400">
+            {{
+              (scope() === 'all'
+                ? 'dashboard.breakdown.allTime'
+                : 'dashboard.breakdown.thisMonth'
+              ) | translate
+            }}
+          </span>
         </div>
+      </div>
 
+      @if (slices().length) {
         <ul class="m-0 min-w-0 flex-1 list-none space-y-2.5 p-0">
           @for (slice of slices(); track slice.key) {
             <li class="flex items-center gap-2.5 text-sm">
@@ -95,16 +98,16 @@
             </li>
           }
         </ul>
-      </div>
-    } @else {
-      <p
-        class="m-0 flex h-full min-h-50 items-center justify-center text-sm text-surface-500 dark:text-surface-400"
-      >
-        {{
-          (scope() === 'all' ? 'dashboard.breakdown.emptyAll' : 'dashboard.breakdown.empty')
-            | translate
-        }}
-      </p>
-    }
+      } @else {
+        <p
+          class="m-0 flex flex-1 items-center justify-center text-sm text-surface-500 dark:text-surface-400 sm:h-44"
+        >
+          {{
+            (scope() === 'all' ? 'dashboard.breakdown.emptyAll' : 'dashboard.breakdown.empty')
+              | translate
+          }}
+        </p>
+      }
+    </div>
   </div>
 </div>

@@ -28,41 +28,30 @@
       </p>
     </div>
   } @else if (data(); as dashboard) {
-    @if (hasNoHistory()) {
-      <!-- Aucune donnée nulle part : message d'accueil, pas un état vide de widget. -->
-      <div
-        class="rounded-2xl border border-surface-200 bg-surface-0 p-12 text-center dark:border-surface-800 dark:bg-surface-900"
-      >
-        <h2 class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0">
-          {{ 'dashboard.empty.title' | translate }}
-        </h2>
-        <p class="mx-auto mt-2 mb-0 max-w-md text-sm text-surface-500 dark:text-surface-400">
-          {{ 'dashboard.empty.hint' | translate }}
-        </p>
-      </div>
-    } @else {
-      <app-kpi-cards
-        [totals]="dashboard.totals"
-        [cumulativeNet]="dashboard.cumulativeNet"
-        [month]="currentMonth()"
-      />
+    <!-- Aucune transaction, jamais : les widgets restent affichés, chacun avec son
+         propre état à zéro (§ category-donut/trend-chart/recent-transactions) plutôt
+         qu'un écran d'accueil qui les remplacerait tous. -->
+    <app-kpi-cards
+      [totals]="dashboard.totals"
+      [cumulativeNet]="dashboard.cumulativeNet"
+      [month]="currentMonth()"
+    />
 
-      <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
-        <div class="lg:col-span-2">
-          <app-category-donut
-            [monthBreakdown]="dashboard.breakdown"
-            [allTimeBreakdown]="dashboard.breakdownAllTime"
-            [monthExpenses]="dashboard.totals.expenses"
-            [allTimeExpenses]="dashboard.allTimeExpenses"
-          />
-        </div>
-        <div class="lg:col-span-3">
-          <app-trend-chart [dailyTrend]="dashboard.dailyTrend" [trend]="dashboard.trend" />
-        </div>
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
+      <div class="lg:col-span-2">
+        <app-category-donut
+          [monthBreakdown]="dashboard.breakdown"
+          [allTimeBreakdown]="dashboard.breakdownAllTime"
+          [monthExpenses]="dashboard.totals.expenses"
+          [allTimeExpenses]="dashboard.allTimeExpenses"
+        />
       </div>
+      <div class="lg:col-span-3">
+        <app-trend-chart [dailyTrend]="dashboard.dailyTrend" [trend]="dashboard.trend" />
+      </div>
+    </div>
 
-      <!-- Les récentes ignorent volontairement la période sélectionnée. -->
-      <app-recent-transactions [transactions]="dashboard.recentTransactions" />
-    }
+    <!-- Les récentes ignorent volontairement la période sélectionnée. -->
+    <app-recent-transactions [transactions]="dashboard.recentTransactions" />
   }
 </div>

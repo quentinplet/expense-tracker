@@ -88,18 +88,6 @@ export class Dashboard {
     { initialValue: null as DashboardResponse | null },
   );
 
-  /**
-   * Deux vides différents : aucune donnée nulle part appelle un message d'accueil,
-   * un mois vide alors qu'il existe de l'historique ailleurs n'appelle qu'un
-   * état vide par widget. Montrer l'accueil à quelqu'un qui a simplement changé de
-   * mois se lirait comme une perte de données.
-   */
-  protected hasNoHistory = computed(() => {
-    const data = this.data();
-    if (!data) return false;
-    return data.cumulativeNet === 0 && data.trend.every((p) => !p.income && !p.expenses);
-  });
-
   setMonth(month: MonthKey) {
     this.router.navigate([], {
       relativeTo: this.route,

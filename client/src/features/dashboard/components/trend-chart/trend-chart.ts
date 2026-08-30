@@ -46,8 +46,6 @@ export class TrendChart {
       : this.dailyTrend().map((p) => ({ ...p, label: dayKeyToDate(p.date) })),
   );
 
-  protected hasData = computed(() => this.points().some((p) => p.expenses > 0 || p.income > 0));
-
   /** Les étiquettes sont dans le canvas : elles ne se retraduisent pas
    *  toutes seules, il faut reconstruire les données au changement de langue. */
   protected chartData = computed(() => {
