@@ -31,14 +31,16 @@
     />
 
     @if (categoryBudgets().length === 0 && !loading()) {
-      <div
-        class="rounded-2xl border border-surface-200 bg-surface-0 p-10 text-center dark:border-surface-800 dark:bg-surface-900"
-      >
-        <p class="m-0 mb-4 text-sm text-surface-500 dark:text-surface-400">
-          {{ 'budgets.list.empty' | translate }}
-        </p>
-        <p-button (click)="openNew()" [label]="'budgets.list.add' | translate" icon="pi pi-plus" />
-      </div>
+      <!--
+        Pas de carte encadrée ni de bouton ici : le budget global (toujours affiché
+        au-dessus) couvre déjà la plupart des cas, et un budget par catégorie est
+        optionnel — le header porte déjà le seul CTA "Ajouter un budget" de l'écran.
+        Un second bouton identique dans cette zone laissait croire à une étape
+        obligatoire.
+      -->
+      <p class="m-0 text-center text-sm text-surface-500 dark:text-surface-400">
+        {{ 'budgets.list.empty' | translate }}
+      </p>
     } @else {
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         @for (budget of categoryBudgets(); track budget.id) {
