@@ -224,6 +224,46 @@
       "updateFailed": "Update failed."
     }
   },
+  "recurring": {
+    "list": {
+      "title": "Recurring expenses",
+      "add": "Add a recurring expense",
+      "count": "{{count}} recurring expenses",
+      "nextDueDate": "Next due:",
+      "empty": "No recurring expense yet.",
+      "emptyHint": "Add one to never miss a rent payment or a subscription again.",
+      "deleteConfirm": "Are you sure you want to delete \"{{label}}\"? Transactions already generated will not be deleted.",
+      "deleted": "Recurring expense deleted",
+      "deleteFailed": "Deletion failed.",
+      "toggleFailed": "Update failed."
+    },
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "form": {
+      "createTitle": "New recurring expense",
+      "editTitle": "Edit recurring expense",
+      "amount": "Amount",
+      "amountPlaceholder": "€0.00",
+      "amountRequired": "The amount must be greater than 0.",
+      "label": "Label",
+      "labelPlaceholder": "Rent, subscription…",
+      "labelRequired": "Label is required.",
+      "category": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "categoryRequired": "Category is required.",
+      "frequency": "Frequency",
+      "nextDueDate": "Next due date",
+      "active": "Active",
+      "created": "Recurring expense added",
+      "updated": "Recurring expense updated",
+      "createFailed": "Creation failed.",
+      "updateFailed": "Update failed."
+    }
+  },
   "auth": {
     "login": {
       "title": "Sign in",

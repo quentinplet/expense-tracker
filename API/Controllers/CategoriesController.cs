@@ -102,8 +102,9 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
 
         var transactions = await uow.TransactionRepository.GetByCategoryIdAsync(userId, id);
         var budgets = await uow.BudgetRepository.GetByCategoryIdAsync(userId, id);
+        var recurringExpenses = await uow.RecurringExpenseRepository.GetByCategoryIdAsync(userId, id);
 
-        if (transactions.Count > 0 || budgets.Count > 0)
+        if (transactions.Count > 0 || budgets.Count > 0 || recurringExpenses.Count > 0)
         {
             var other = await uow.CategoryRepository.GetLockedByTypeAsync(userId, category.Type)
                 ?? throw new InvalidOperationException($"No locked category found for user {userId} and type {category.Type}.");
@@ -130,6 +131,15 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
                     budget.CategoryId = other.Id;
                     uow.BudgetRepository.Update(budget);
                 }
+            }
+
+            // Contrairement aux budgets, plusieurs charges récurrentes peuvent
+            // partager "Other" sans contrainte d'unicité — une réaffectation
+            // directe suffit, comme pour les transactions.
+            foreach (var recurringExpense in recurringExpenses)
+            {
+                recurringExpense.CategoryId = other.Id;
+                uow.RecurringExpenseRepository.Update(recurringExpense);
             }
         }
 

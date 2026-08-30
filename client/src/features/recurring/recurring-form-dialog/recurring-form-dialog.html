@@ -1,0 +1,215 @@
+<p-dialog
+  [(visible)]="visible"
+  [style]="{ width: '34rem' }"
+  [header]="(isEditing() ? 'recurring.form.editTitle' : 'recurring.form.createTitle') | translate"
+  [modal]="true"
+  [draggable]="false"
+  [focusOnShow]="false"
+  appendTo="body"
+  styleClass="recurring-dialog"
+  (onShow)="onShow()"
+  (onHide)="onClose()"
+>
+  <ng-template #content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <button type="submit" class="hidden" tabindex="-1" aria-hidden="true"></button>
+
+      @if (isEditing()) {
+        <!-- Type est immuable après création (§ Key Gotchas backend) : affiché en
+             lecture seule, jamais dans un contrôle éditable — même traitement que
+             Category.Type dans le dialog Catégories. -->
+        <div
+          class="mb-6 flex items-center gap-1 rounded-full border border-surface-200 bg-surface-100 p-1 dark:border-surface-800 dark:bg-surface-950"
+        >
+          <span
+            class="flex-1 rounded-full px-4 py-3 text-center text-sm font-semibold"
+            [class]="
+              activeType() === 'Expense'
+                ? 'bg-surface-0 text-red-600 shadow-sm dark:bg-surface-800 dark:text-red-400'
+                : 'bg-surface-0 text-emerald-600 shadow-sm dark:bg-surface-800 dark:text-emerald-400'
+            "
+          >
+            {{
+              (activeType() === 'Expense' ? 'transaction.type.expense' : 'transaction.type.income')
+                | translate
+            }}
+          </span>
+        </div>
+      } @else {
+        <div
+          class="mb-6 flex items-center gap-1 rounded-full border border-surface-200 bg-surface-100 p-1 dark:border-surface-800 dark:bg-surface-950"
+          role="group"
+          [attr.aria-label]="'transaction.columns.type' | translate"
+        >
+          <button
+            type="button"
+            (click)="selectType('Expense')"
+            [attr.aria-pressed]="activeType() === 'Expense'"
+            class="flex-1 cursor-pointer rounded-full border-0 px-4 py-3 text-sm font-semibold transition-colors"
+            [class]="
+              activeType() === 'Expense'
+                ? 'bg-surface-0 text-red-600 shadow-sm dark:bg-surface-800 dark:text-red-400'
+                : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
+            "
+          >
+            {{ 'transaction.type.expense' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="selectType('Income')"
+            [attr.aria-pressed]="activeType() === 'Income'"
+            class="flex-1 cursor-pointer rounded-full border-0 px-4 py-3 text-sm font-semibold transition-colors"
+            [class]="
+              activeType() === 'Income'
+                ? 'bg-surface-0 text-emerald-600 shadow-sm dark:bg-surface-800 dark:text-emerald-400'
+                : 'bg-transparent text-surface-500 hover:text-surface-800 dark:text-surface-400 dark:hover:text-surface-100'
+            "
+          >
+            {{ 'transaction.type.income' | translate }}
+          </button>
+        </div>
+      }
+
+      <div class="mb-5">
+        <label for="recurringAmount" class="mb-2 block text-sm font-semibold">
+          {{ 'recurring.form.amount' | translate }}
+        </label>
+        <app-amount-input
+          #amountInput
+          formControlName="amount"
+          inputId="recurringAmount"
+          [placeholder]="'recurring.form.amountPlaceholder' | translate"
+          [invalid]="!!errors()['Amount'] || (showErrors() && form.controls.amount.invalid)"
+          inputStyleClass="text-3xl! font-bold! py-3!"
+        />
+        @if (errors()['Amount']) {
+          <small class="mt-2 block text-sm text-red-500">{{ errors()['Amount'][0] }}</small>
+        } @else if (showErrors() && form.controls.amount.invalid) {
+          <small class="mt-2 block text-sm text-red-500">
+            {{ 'recurring.form.amountRequired' | translate }}
+          </small>
+        }
+      </div>
+
+      <div class="mb-5">
+        <label for="recurringLabel" class="mb-2 block text-sm font-semibold">
+          {{ 'recurring.form.label' | translate }}
+        </label>
+        <input
+          formControlName="label"
+          type="text"
+          pInputText
+          id="recurringLabel"
+          [placeholder]="'recurring.form.labelPlaceholder' | translate"
+          [invalid]="showErrors() && form.controls.label.invalid"
+          [dt]="fieldTokens"
+          fluid
+        />
+        @if (showErrors() && form.controls.label.invalid) {
+          <small class="mt-2 block text-sm text-red-500">
+            {{ 'recurring.form.labelRequired' | translate }}
+          </small>
+        }
+      </div>
+
+      <div class="mb-5">
+        <!-- Pas de `for` : `inputId` pose l'id sur un `<span role="combobox">`,
+             qui n'est pas un élément « labelable » — voir transaction-modal-form.html. -->
+        <label id="recurringCategoryLabel" class="mb-2 block text-sm font-semibold">
+          {{ 'recurring.form.category' | translate }}
+        </label>
+        <p-select
+          formControlName="categoryId"
+          ariaLabelledBy="recurringCategoryLabel"
+          [options]="categoryOptions()"
+          optionLabel="label"
+          optionValue="id"
+          [placeholder]="'recurring.form.categoryPlaceholder' | translate"
+          [invalid]="showErrors() && form.controls.categoryId.invalid"
+          appendTo="body"
+          [dt]="fieldTokens"
+          fluid
+        >
+          <ng-template #selectedItem let-option>
+            @if (option) {
+              <span class="flex items-center gap-2">
+                <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+                {{ option.label }}
+              </span>
+            }
+          </ng-template>
+          <ng-template #item let-option>
+            <span class="flex items-center gap-2">
+              <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+              {{ option.label }}
+            </span>
+          </ng-template>
+        </p-select>
+        @if (showErrors() && form.controls.categoryId.invalid) {
+          <small class="mt-2 block text-sm text-red-500">
+            {{ 'recurring.form.categoryRequired' | translate }}
+          </small>
+        }
+      </div>
+
+      <div class="mb-5 grid grid-cols-2 gap-4">
+        <div>
+          <label id="recurringFrequencyLabel" class="mb-2 block text-sm font-semibold">
+            {{ 'recurring.form.frequency' | translate }}
+          </label>
+          <p-select
+            formControlName="frequency"
+            ariaLabelledBy="recurringFrequencyLabel"
+            [options]="frequencyOptions()"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            [dt]="fieldTokens"
+            fluid
+          />
+        </div>
+
+        <div>
+          <label for="recurringNextDueDate" class="mb-2 block text-sm font-semibold">
+            {{ 'recurring.form.nextDueDate' | translate }}
+          </label>
+          <p-date-picker
+            formControlName="nextDueDate"
+            inputId="recurringNextDueDate"
+            [showButtonBar]="true"
+            [dateFormat]="dateFormat()"
+            [showIcon]="true"
+            iconDisplay="input"
+            appendTo="body"
+            [style]="datePickerTokens"
+            [invalid]="showErrors() && form.controls.nextDueDate.invalid"
+            fluid
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-3">
+        <label for="recurringActive" class="block text-sm font-semibold">
+          {{ 'recurring.form.active' | translate }}
+        </label>
+        <p-toggleswitch formControlName="active" inputId="recurringActive" />
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #footer>
+    <div class="flex w-full items-center justify-end gap-3">
+      <p-button
+        [label]="'common.cancel' | translate"
+        severity="secondary"
+        outlined
+        (onClick)="onClose()"
+      />
+      <p-button
+        [label]="(isEditing() ? 'common.update' : 'common.create') | translate"
+        type="button"
+        (onClick)="onSubmit()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

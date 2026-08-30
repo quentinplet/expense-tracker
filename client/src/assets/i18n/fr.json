@@ -224,6 +224,46 @@
       "updateFailed": "La modification a échoué."
     }
   },
+  "recurring": {
+    "list": {
+      "title": "Charges récurrentes",
+      "add": "Ajouter une charge",
+      "count": "{{count}} charges récurrentes",
+      "nextDueDate": "Prochaine échéance :",
+      "empty": "Aucune charge récurrente pour l'instant.",
+      "emptyHint": "Ajoutez-en une pour ne plus oublier un loyer ou un abonnement.",
+      "deleteConfirm": "Voulez-vous vraiment supprimer « {{label}} » ? Les transactions déjà générées ne seront pas supprimées.",
+      "deleted": "Charge récurrente supprimée",
+      "deleteFailed": "La suppression a échoué.",
+      "toggleFailed": "La mise à jour a échoué."
+    },
+    "frequency": {
+      "daily": "Quotidienne",
+      "weekly": "Hebdomadaire",
+      "monthly": "Mensuelle",
+      "yearly": "Annuelle"
+    },
+    "form": {
+      "createTitle": "Nouvelle charge récurrente",
+      "editTitle": "Modifier la charge récurrente",
+      "amount": "Montant",
+      "amountPlaceholder": "0,00 €",
+      "amountRequired": "Le montant doit être supérieur à 0.",
+      "label": "Libellé",
+      "labelPlaceholder": "Loyer, abonnement…",
+      "labelRequired": "Le libellé est obligatoire.",
+      "category": "Catégorie",
+      "categoryPlaceholder": "Choisir une catégorie",
+      "categoryRequired": "La catégorie est obligatoire.",
+      "frequency": "Fréquence",
+      "nextDueDate": "Prochaine échéance",
+      "active": "Active",
+      "created": "Charge récurrente ajoutée",
+      "updated": "Charge récurrente modifiée",
+      "createFailed": "La création a échoué.",
+      "updateFailed": "La modification a échoué."
+    }
+  },
   "auth": {
     "login": {
       "title": "Connexion",

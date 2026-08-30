@@ -42,8 +42,10 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IRecurringExpenseService, RecurringExpenseService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddHostedService<BudgetAutoRenewJob>();
+builder.Services.AddHostedService<RecurringExpenseGenerationJob>();
 
 builder.Services.AddIdentityCore<AppUser>(opt =>
 {

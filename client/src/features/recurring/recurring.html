@@ -1,0 +1,102 @@
+<div class="w-full">
+  <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="m-0 text-3xl font-bold text-surface-900 dark:text-surface-0">
+        {{ 'recurring.list.title' | translate }}
+      </h1>
+      <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
+        {{ 'recurring.list.count' | translate: { count: expenses().length } }}
+      </p>
+    </div>
+
+    <p-button (click)="openNew()" [label]="'recurring.list.add' | translate" icon="pi pi-plus" />
+  </div>
+
+  @if (expenses().length > 0) {
+    <div
+      class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
+    >
+      <ul class="m-0 flex list-none flex-col p-0">
+        @for (expense of expenses(); track expense.id) {
+          <li
+            class="flex items-center gap-4 border-b border-surface-100 px-5 py-4 last:border-b-0 dark:border-surface-800"
+            [class.opacity-50]="!expense.active"
+          >
+            <app-category-badge [icon]="expense.categoryIcon" [color]="expense.categoryColor" />
+
+            <div class="min-w-0 flex-1">
+              <span class="block truncate font-medium text-surface-900 dark:text-surface-0">
+                {{ expense.label }}
+              </span>
+              <span class="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                {{
+                  { name: expense.categoryName, translationKey: expense.categoryTranslationKey }
+                    | categoryName
+                }}
+                <span class="text-surface-300 dark:text-surface-700">&middot;</span>
+                {{ 'recurring.frequency.' + expense.frequency.toLowerCase() | translate }}
+              </span>
+            </div>
+
+            <div class="text-right">
+              <span
+                class="block font-semibold tabular-nums"
+                [class]="expense.type === 'Income' ? 'text-green-500' : 'text-red-500'"
+              >
+                {{ expense.type === 'Income' ? '+' : '−'
+                }}{{ expense.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
+              </span>
+              <span class="block text-xs text-surface-500 dark:text-surface-400">
+                {{ 'recurring.list.nextDueDate' | translate }}
+                {{ expense.nextDueDate | date: 'mediumDate' : undefined : locale() }}
+              </span>
+            </div>
+
+            <p-toggleswitch
+              [ngModel]="expense.active"
+              (onChange)="toggleActive(expense)"
+              [attr.aria-label]="'recurring.form.active' | translate"
+            />
+
+            <p-button
+              (click)="editExpense(expense)"
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [outlined]="true"
+              [attr.aria-label]="'common.update' | translate"
+            />
+            <p-button
+              (click)="deleteExpense(expense)"
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              [outlined]="true"
+              [attr.aria-label]="'common.delete' | translate"
+            />
+          </li>
+        }
+      </ul>
+    </div>
+  } @else {
+    <div
+      class="flex min-h-96 flex-col items-center justify-center gap-1 rounded-2xl border border-surface-200 bg-surface-0 text-center dark:border-surface-800 dark:bg-surface-900"
+    >
+      <p class="m-0 font-medium text-surface-600 dark:text-surface-300">
+        {{ 'recurring.list.empty' | translate }}
+      </p>
+      <p class="mt-1 mb-4 text-sm text-surface-500 dark:text-surface-400">
+        {{ 'recurring.list.emptyHint' | translate }}
+      </p>
+      <p-button (click)="openNew()" [label]="'recurring.list.add' | translate" icon="pi pi-plus" />
+    </div>
+  }
+
+  <app-recurring-form-dialog
+    [(visible)]="recurringDialog"
+    [categories]="categories()"
+    [expense]="selectedExpense()"
+    [errors]="errors()"
+    (close)="hideDialog()"
+    (save)="submit($event)"
+  />
+</div>
