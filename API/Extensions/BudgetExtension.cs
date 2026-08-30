@@ -6,16 +6,23 @@ namespace API.Extensions;
 
 public static class BudgetExtension
 {
-    public static BudgetResponseDto ToBudgetResponseDto(this Budget budget)
+    /// `spent` est calculé par le service (agrégation sur les transactions), jamais
+    /// stocké sur l'entité — voir BudgetService.
+    public static BudgetResponseDto ToBudgetResponseDto(this Budget budget, decimal spent)
     {
         return new BudgetResponseDto
         {
             Id = budget.Id,
-            Amount = budget.Amount,
             Month = budget.Month,
-            Year = budget.Year,
             CategoryId = budget.CategoryId,
-            CategoryName = budget.Category.Name
+            CategoryName = budget.Category?.Name,
+            CategoryTranslationKey = budget.Category?.TranslationKey,
+            CategoryIcon = budget.Category?.Icon,
+            CategoryColor = budget.Category?.Color,
+            AmountLimit = budget.AmountLimit,
+            AutoRenew = budget.AutoRenew,
+            Spent = spent,
+            Remaining = budget.AmountLimit - spent
         };
     }
 }

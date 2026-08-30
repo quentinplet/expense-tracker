@@ -5,10 +5,19 @@ namespace API.DTOs.Responses;
 public class BudgetResponseDto
 {
     public Guid Id { get; set; }
-    public decimal Amount { get; set; }
-    public int Month { get; set; }
-    public int Year { get; set; }
-    public Guid CategoryId { get; set; }
-    public string CategoryName { get; set; } = string.Empty;
+    public string Month { get; set; } = null!;
 
+    // Tous null pour un budget global (CategoryId == null).
+    public Guid? CategoryId { get; set; }
+    public string? CategoryName { get; set; }
+    public string? CategoryTranslationKey { get; set; }
+    public string? CategoryIcon { get; set; }
+    public string? CategoryColor { get; set; }
+
+    public decimal AmountLimit { get; set; }
+    public bool AutoRenew { get; set; }
+    public decimal Spent { get; set; }
+
+    /// AmountLimit - Spent, peut être négatif.
+    public decimal Remaining { get; set; }
 }

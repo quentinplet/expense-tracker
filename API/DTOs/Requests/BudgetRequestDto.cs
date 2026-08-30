@@ -5,18 +5,18 @@ namespace API.DTOs.Requests;
 
 public class BudgetRequestDto
 {
-    [Required]
-    [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
-    public decimal Amount { get; set; }
+    // Pas de [Required] : absent ou null == budget global. Ignoré au PUT (CategoryId
+    // est immuable après création), comme Month ci-dessous.
+    public Guid? CategoryId { get; set; }
 
-    [Required]
-    [Range(1, 12, ErrorMessage = "Month must be between 1 and 12.")]
-    public int Month { get; set; }
-    [Required]
-    [Range(2000, 2100, ErrorMessage = "Year must be between 2000 and 2100.")]
-    public int Year { get; set; }
+    [Required(ErrorMessage = "The Budget Month is required")]
+    [RegularExpression(@"^\d{4}-(0[1-9]|1[0-2])$", ErrorMessage = "The Budget Month must be in YYYY-MM format")]
+    public string? Month { get; set; }
 
-    [Required]
-    public Guid CategoryId { get; set; }
+    [Required(ErrorMessage = "The Budget Amount Limit is required")]
+    [Range(0.01, (double)decimal.MaxValue, ErrorMessage = "The Budget Amount Limit must be greater than 0")]
+    public decimal? AmountLimit { get; set; }
 
+    [Required(ErrorMessage = "The Budget AutoRenew flag is required")]
+    public bool? AutoRenew { get; set; }
 }

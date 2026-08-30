@@ -5,14 +5,18 @@ namespace API.Entities;
 public class Budget
 {
     public Guid Id { get; set; }
-    public required decimal Amount { get; set; }
+    public required decimal AmountLimit { get; set; }
 
-    public required int Month { get; set; }
-    public required int Year { get; set; }
+    /// "YYYY-MM", même format que le mois du dashboard.
+    public required string Month { get; set; }
 
-    //navigation properties for category
-    public Guid CategoryId { get; set; }
-    public Category Category { get; set; } = null!;
+    /// Duplique ce budget sur le mois suivant (même plafond, sans report) tant
+    /// que le mois suivant n'a pas déjà sa propre ligne.
+    public bool AutoRenew { get; set; }
+
+    /// Null = budget global (toutes catégories de dépense confondues).
+    public Guid? CategoryId { get; set; }
+    public Category? Category { get; set; }
 
     //navigation properties for user
     public Guid UserId { get; set; }

@@ -3,6 +3,7 @@ using API.Data;
 using API.Data.Repositories;
 using API.Entities;
 using API.Interfaces;
+using API.Jobs;
 using API.Middleware;
 using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,7 +41,9 @@ builder.Services.AddCors();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddHostedService<BudgetAutoRenewJob>();
 
 builder.Services.AddIdentityCore<AppUser>(opt =>
 {

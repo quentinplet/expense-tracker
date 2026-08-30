@@ -190,6 +190,39 @@
       "updateFailed": "Update failed."
     }
   },
+  "budgets": {
+    "list": {
+      "title": "Budgets",
+      "add": "Add a budget",
+      "count": "{{count}} budgets tracked this month",
+      "empty": "No budget for this month yet. Add one to track your spending.",
+      "deleteConfirm": "Are you sure you want to delete this budget?",
+      "deleted": "Budget deleted",
+      "deleteFailed": "Deletion failed."
+    },
+    "card": {
+      "global": "Global budget",
+      "define": "Set a global budget"
+    },
+    "form": {
+      "createTitle": "New budget",
+      "editTitle": "Edit budget",
+      "category": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "categoryRequired": "Category is required.",
+      "global": "Global budget",
+      "forMonth": "For {{month}}",
+      "amountLimit": "Limit",
+      "amountLimitPlaceholder": "€0.00",
+      "amountLimitRequired": "The limit must be greater than 0.",
+      "autoRenew": "Auto-renew",
+      "autoRenewHint": "Recreates this budget next month, same limit, no rollover.",
+      "created": "Budget added",
+      "updated": "Budget updated",
+      "createFailed": "Creation failed.",
+      "updateFailed": "Update failed."
+    }
+  },
   "auth": {
     "login": {
       "title": "Sign in",

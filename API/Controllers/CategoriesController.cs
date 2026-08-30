@@ -116,8 +116,20 @@ public class CategoriesController(IUnitOfWork uow) : BaseApiController
 
             foreach (var budget in budgets)
             {
-                budget.CategoryId = other.Id;
-                uow.BudgetRepository.Update(budget);
+                // Réaffecter vers "Other" violerait l'index unique partiel
+                // (UserId, Month, CategoryId) si "Other" a déjà son propre budget
+                // ce mois-ci — un budget n'a rien d'historique à préserver comme
+                // une transaction, donc on le supprime plutôt que de planter sur
+                // une contrainte au SaveChanges.
+                if (await uow.BudgetRepository.ExistsAsync(userId, budget.Month, other.Id))
+                {
+                    uow.BudgetRepository.Delete(budget);
+                }
+                else
+                {
+                    budget.CategoryId = other.Id;
+                    uow.BudgetRepository.Update(budget);
+                }
             }
         }
 

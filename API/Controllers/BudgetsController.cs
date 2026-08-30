@@ -10,15 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [Authorize]
-public class BudgetsController(IUnitOfWork uow) : BaseApiController
+public class BudgetsController(IUnitOfWork uow, IBudgetService budgetService) : BaseApiController
 {
+    /// GET /api/budgets?month=2026-08 — le budget global d'abord s'il existe, puis
+    /// les budgets catégorie, chacun avec Spent/Remaining calculés en un aller-retour.
     [HttpGet]
-    public async Task<ActionResult<List<BudgetResponseDto>>> GetAllBudgets()
+    public async Task<ActionResult<List<BudgetResponseDto>>> GetAllBudgets([FromQuery] BudgetQueryDto query)
     {
         var userId = User.GetMemberId();
-
-        var budgets = await uow.BudgetRepository.GetAllByUserIdAsync(userId);
-        return Ok(budgets.Select(b => b.ToBudgetResponseDto()));
+        return Ok(await budgetService.GetBudgetsForMonthAsync(userId, query.Month));
     }
 
     [HttpGet("{id}")]
@@ -29,7 +29,9 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();
-        return Ok(budget.ToBudgetResponseDto());
+
+        var spent = await budgetService.GetSpentAsync(userId, budget);
+        return Ok(budget.ToBudgetResponseDto(spent));
     }
 
     [HttpPost]
@@ -37,44 +39,54 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
     {
         var userId = User.GetMemberId();
 
-        var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId);
-        if (category == null) return NotFound();
-        if (category.UserId != userId) return Forbid();
-        if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
+        // Validation croisée uniquement si une catégorie est fournie : un budget
+        // global n'a rien à charger ni à valider.
+        if (dto.CategoryId.HasValue)
+        {
+            var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId.Value);
+            if (category == null) return NotFound();
+            if (category.UserId != userId) return Forbid();
+            if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
+        }
+
+        if (await uow.BudgetRepository.ExistsAsync(userId, dto.Month!, dto.CategoryId))
+            return BadRequest(dto.CategoryId.HasValue
+                ? "A budget already exists for this category and month."
+                : "A global budget already exists for this month.");
 
         var budget = new Budget
         {
-            Amount = dto.Amount,
-            Month = dto.Month,
-            Year = dto.Year,
+            AmountLimit = dto.AmountLimit!.Value,
+            Month = dto.Month!,
+            AutoRenew = dto.AutoRenew!.Value,
             CategoryId = dto.CategoryId,
             UserId = userId
         };
         uow.BudgetRepository.Add(budget);
-        if (await uow.Complete()) return CreatedAtAction(nameof(GetBudgetById), new { id = budget.Id }, budget.ToBudgetResponseDto());
-        return BadRequest("Failed to create budget");
+        if (!await uow.Complete()) return BadRequest("Failed to create budget");
+
+        // Rien à dépenser sur un budget qui vient d'être créé.
+        return CreatedAtAction(nameof(GetBudgetById), new { id = budget.Id }, budget.ToBudgetResponseDto(0));
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateBudget(Guid id, [FromBody] BudgetRequestDto dto)
+    public async Task<ActionResult<BudgetResponseDto>> UpdateBudget(Guid id, [FromBody] BudgetRequestDto dto)
     {
         var userId = User.GetMemberId();
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();
 
-        var category = await uow.CategoryRepository.GetByIdAsync(dto.CategoryId);
-        if (category == null) return NotFound();
-        if (category.UserId != userId) return Forbid();
-        if (category.Type != TransactionType.Expense) return BadRequest("Budgets can only target expense categories.");
+        // CategoryId et Month sont immuables après création : reçus dans le DTO
+        // (partagé POST/PUT), mais toujours ignorés ici.
+        budget.AmountLimit = dto.AmountLimit!.Value;
+        budget.AutoRenew = dto.AutoRenew!.Value;
 
-        budget.Amount = dto.Amount;
-        budget.Month = dto.Month;
-        budget.Year = dto.Year;
-        budget.CategoryId = dto.CategoryId;
         uow.BudgetRepository.Update(budget);
-        if (await uow.Complete()) return NoContent();
-        return BadRequest("Failed to update budget");
+        if (!await uow.Complete()) return BadRequest("Failed to update budget");
+
+        var spent = await budgetService.GetSpentAsync(userId, budget);
+        return Ok(budget.ToBudgetResponseDto(spent));
     }
 
     [HttpDelete("{id}")]
@@ -84,6 +96,7 @@ public class BudgetsController(IUnitOfWork uow) : BaseApiController
         var budget = await uow.BudgetRepository.GetByIdAsync(id);
         if (budget == null) return NotFound();
         if (budget.UserId != userId) return Forbid();
+
         uow.BudgetRepository.Delete(budget);
         if (await uow.Complete()) return NoContent();
         return BadRequest("Failed to delete budget");

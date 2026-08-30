@@ -4,6 +4,7 @@ import { Auth } from '../features/account/auth/auth';
 import { Dashboard } from '@/features/dashboard/dashboard';
 import { Transactions } from '@/features/transactions/transactions';
 import { Categories } from '@/features/categories/categories';
+import { Budgets } from '@/features/budgets/budgets';
 import { AuthLayout } from '@/layout/auth-layout/auth-layout';
 import { MainLayout } from '@/layout/main-layout/main-layout';
 import { authGuard } from '@/core/guards/auth-guard';
@@ -30,7 +31,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: Dashboard },
       { path: 'transactions', component: Transactions },
       { path: 'categories', component: Categories },
-      // { path: 'budgets', component: Budgets },
+      { path: 'budgets', component: Budgets },
       {
         path: 'test-errors',
         component: TestErrors,

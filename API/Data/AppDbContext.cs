@@ -59,8 +59,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         modelBuilder.Entity<Budget>(e =>
         {
-            e.Property(b => b.Amount).HasPrecision(18, 2);
-            e.HasIndex(b => new { b.UserId, b.Year, b.Month, b.CategoryId }).IsUnique();
+            e.Property(b => b.AmountLimit).HasPrecision(18, 2);
+            e.Property(b => b.Month).HasMaxLength(7).IsRequired();
+
+            // Deux index uniques partiels plutôt qu'un seul : Postgres traite chaque
+            // NULL comme distinct des autres dans un index unique classique, donc
+            // (UserId, Month, CategoryId) seul laisserait passer plusieurs budgets
+            // globaux le même mois pour le même utilisateur.
+            e.HasIndex(b => new { b.UserId, b.Month, b.CategoryId })
+             .IsUnique()
+             .HasFilter("\"CategoryId\" IS NOT NULL");
+            e.HasIndex(b => new { b.UserId, b.Month })
+             .IsUnique()
+             .HasFilter("\"CategoryId\" IS NULL");
 
             e.HasOne(b => b.Category)
              .WithMany(c => c.Budgets)

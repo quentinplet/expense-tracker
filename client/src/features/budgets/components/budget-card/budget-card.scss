@@ -1,0 +1,9 @@
+/**
+ * `h-2!` seul ne suffit pas : PrimeNG injecte son thème hors layer Tailwind (voir
+ * transaction-modal-form.scss pour la même règle sur les champs). La hauteur de
+ * `.p-progressbar` vient d'un token, pas d'une classe Tailwind.
+ */
+:host ::ng-deep .p-progressbar {
+  height: 0.5rem;
+  border-radius: 999px;
+}

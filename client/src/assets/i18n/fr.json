@@ -190,6 +190,39 @@
       "updateFailed": "La modification a échoué."
     }
   },
+  "budgets": {
+    "list": {
+      "title": "Budgets",
+      "add": "Ajouter un budget",
+      "count": "{{count}} budgets suivis ce mois",
+      "empty": "Aucun budget pour ce mois. Ajoutez-en un pour suivre vos dépenses.",
+      "deleteConfirm": "Voulez-vous vraiment supprimer ce budget ?",
+      "deleted": "Budget supprimé",
+      "deleteFailed": "La suppression a échoué."
+    },
+    "card": {
+      "global": "Budget global",
+      "define": "Définir un budget global"
+    },
+    "form": {
+      "createTitle": "Nouveau budget",
+      "editTitle": "Modifier le budget",
+      "category": "Catégorie",
+      "categoryPlaceholder": "Choisir une catégorie",
+      "categoryRequired": "La catégorie est obligatoire.",
+      "global": "Budget global",
+      "forMonth": "Pour {{month}}",
+      "amountLimit": "Plafond",
+      "amountLimitPlaceholder": "0,00 €",
+      "amountLimitRequired": "Le plafond doit être supérieur à 0.",
+      "autoRenew": "Duplication automatique",
+      "autoRenewHint": "Recrée ce budget le mois suivant, même plafond, sans report.",
+      "created": "Budget ajouté",
+      "updated": "Budget modifié",
+      "createFailed": "La création a échoué.",
+      "updateFailed": "La modification a échoué."
+    }
+  },
   "auth": {
     "login": {
       "title": "Connexion",

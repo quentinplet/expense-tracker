@@ -1,0 +1,28 @@
+/**
+ * Portée par la classe du dialogue, pas par `:host` : `appendTo="body"` sort le
+ * p-dialog du DOM du composant (voir transaction-modal-form.scss pour la raison
+ * complète — même piège de scroll-referme-l'overlay que le menu profil).
+ */
+::ng-deep .budget-dialog {
+  .p-select-label {
+    display: flex;
+    align-items: center;
+  }
+
+  /**
+   * `assets/styles.scss` colore en rouge tout `.ng-invalid.ng-touched` dès le
+   * premier blur. Neutralisé ici, `[invalid]` porte l'état à la place, piloté par
+   * `showErrors()` — même règle que transaction-modal-form.scss.
+   */
+  .p-inputtext.ng-invalid.ng-touched:not(:focus),
+  .p-select.ng-invalid.ng-touched:not(.p-focus) {
+    border-color: var(--p-inputtext-border-color);
+  }
+
+  .p-inputtext.p-invalid,
+  .p-select.p-invalid,
+  .p-inputtext.ng-invalid.ng-touched.p-invalid,
+  .p-select.ng-invalid.ng-touched.p-invalid {
+    border-color: var(--p-inputtext-invalid-border-color);
+  }
+}
