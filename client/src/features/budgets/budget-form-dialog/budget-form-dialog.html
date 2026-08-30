@@ -73,18 +73,12 @@
         <label for="amountLimit" class="mb-2 block text-sm font-semibold">
           {{ 'budgets.form.amountLimit' | translate }}
         </label>
-        <p-inputnumber
+        <app-amount-input
           formControlName="amountLimit"
           inputId="amountLimit"
-          mode="currency"
-          currency="EUR"
           [min]="0"
-          [locale]="locale()"
           [placeholder]="'budgets.form.amountLimitPlaceholder' | translate"
           [invalid]="!!errors()['AmountLimit'] || (showErrors() && form.controls.amountLimit.invalid)"
-          (keydown)="onAmountKeydown($event)"
-          (onFocus)="onAmountFocus($event)"
-          fluid
         />
         @if (errors()['AmountLimit']) {
           <small class="mt-2 block text-sm text-red-500">{{ errors()['AmountLimit'][0] }}</small>

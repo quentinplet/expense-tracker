@@ -1,0 +1,18 @@
+<p-inputnumber
+  #inputNumberRef
+  [ngModel]="value"
+  (ngModelChange)="onModelChange($event)"
+  [inputId]="inputId()"
+  mode="currency"
+  currency="EUR"
+  [locale]="locale()"
+  [placeholder]="placeholder()"
+  [invalid]="invalid()"
+  [min]="min()"
+  [disabled]="disabled"
+  [inputStyleClass]="inputStyleClass()"
+  (keydown)="onKeydown($event)"
+  (onFocus)="onFocus($event)"
+  (onBlur)="onBlur()"
+  fluid
+/>

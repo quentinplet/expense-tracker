@@ -12,7 +12,6 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
-import { InputNumber } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -20,7 +19,7 @@ import { Categorie } from '@/types/categorie';
 import { Budget } from '@/types/budget';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
-import { LanguageService } from '@/core/services/language-service';
+import { AmountInput } from '@/shared/components/amount-input/amount-input';
 
 /** Valeur bornée du select : ne coïncide avec aucun Guid de catégorie, et n'est
  *  jamais `null` — `null` reste réservé à « rien encore choisi » pour que
@@ -40,11 +39,11 @@ export type BudgetFormValue = {
     Dialog,
     Button,
     Select,
-    InputNumber,
     ToggleSwitch,
     ReactiveFormsModule,
     TranslatePipe,
     CategoryBadge,
+    AmountInput,
   ],
   templateUrl: './budget-form-dialog.html',
   styleUrl: './budget-form-dialog.scss',
@@ -78,9 +77,6 @@ export class BudgetFormDialog implements OnChanges {
   private fb = inject(FormBuilder);
   private translate = inject(TranslateService);
   private categoryNamePipe = inject(CategoryNamePipe);
-  private languageService = inject(LanguageService);
-
-  protected locale = computed(() => this.languageService.current());
 
   protected form = this.fb.group({
     categoryId: this.fb.nonNullable.control('', Validators.required),
@@ -98,13 +94,6 @@ export class BudgetFormDialog implements OnChanges {
   /** Mêmes tokens que les autres champs de dialogue (§ transaction-modal-form.ts) :
    *  Tailwind ne peut pas battre le thème PrimeNG injecté hors layer. */
   protected readonly fieldTokens = { paddingY: '0.9rem' };
-
-  /** Séparateur décimal de la locale active : `,` en français, `.` en anglais. */
-  private decimalChar = computed(() =>
-    new Intl.NumberFormat(this.locale(), { minimumFractionDigits: 1 })
-      .format(1.1)
-      .replace(/\d/g, ''),
-  );
 
   /** Libellé de l'en-tête en édition : catégorie ou « Budget global », lecture seule. */
   protected editingCategoryLabel = computed(() => {
@@ -172,30 +161,6 @@ export class BudgetFormDialog implements OnChanges {
       amountLimit: budget.amountLimit,
       autoRenew: budget.autoRenew,
     });
-  }
-
-  /** Même contournement que transaction-modal-form.ts : PrimeNG traduit la touche
-   *  décimale du pavé numérique mais pas le point de la rangée principale. */
-  onAmountKeydown(event: KeyboardEvent) {
-    const decimal = this.decimalChar();
-    if (event.key !== '.' || decimal === '.') return;
-
-    event.preventDefault();
-    const replay = new KeyboardEvent('keypress', { bubbles: true, cancelable: true });
-    Object.defineProperty(replay, 'which', { get: () => decimal.charCodeAt(0) });
-    Object.defineProperty(replay, 'keyCode', { get: () => decimal.charCodeAt(0) });
-    (event.target as HTMLInputElement).dispatchEvent(replay);
-  }
-
-  /**
-   * Le champ démarre à 0 € plutôt que vide (demande du 30/08). `p-inputnumber`
-   * insère sinon les chiffres tapés dans le « 0,00 € » affiché au lieu de le
-   * remplacer — même piège que documenté sur le montant de transaction, qu'un
-   * défaut `null` avait évité là-bas. Ici on sélectionne tout au focus, pour que
-   * la première frappe remplace le zéro plutôt que de s'y insérer.
-   */
-  onAmountFocus(event: Event) {
-    (event.target as HTMLInputElement).select();
   }
 
   onClose() {

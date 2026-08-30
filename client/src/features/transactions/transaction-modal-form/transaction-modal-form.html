@@ -72,18 +72,13 @@
         <label for="amount" class="mb-2 block text-sm font-semibold">
           {{ 'transaction.form.amount' | translate }}
         </label>
-        <p-inputnumber
+        <app-amount-input
           #amountInput
           formControlName="amount"
           inputId="amount"
-          mode="currency"
-          currency="EUR"
-          [locale]="locale()"
           [placeholder]="'transaction.form.amountPlaceholder' | translate"
           [invalid]="!!errors()['Amount'] || (showErrors() && form.controls.amount.invalid)"
           inputStyleClass="text-3xl! font-bold! py-3!"
-          (keydown)="onAmountKeydown($event)"
-          fluid
         />
         @if (errors()['Amount']) {
           <small class="mt-2 block text-sm text-red-500">{{ errors()['Amount'][0] }}</small>

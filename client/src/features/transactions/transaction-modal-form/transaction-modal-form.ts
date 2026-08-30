@@ -15,7 +15,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
-import { InputNumber } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
@@ -24,6 +23,7 @@ import { Categorie } from '@/types/categorie';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
+import { AmountInput } from '@/shared/components/amount-input/amount-input';
 import { LanguageService } from '@/core/services/language-service';
 
 /**
@@ -44,7 +44,6 @@ export type TransactionFormValue = {
   selector: 'app-transaction-modal-form',
   imports: [
     Dialog,
-    InputNumber,
     DatePicker,
     Button,
     Select,
@@ -53,6 +52,7 @@ export type TransactionFormValue = {
     ReactiveFormsModule,
     TranslatePipe,
     CategoryBadge,
+    AmountInput,
   ],
   templateUrl: './transaction-modal-form.html',
   styleUrl: './transaction-modal-form.scss',
@@ -76,7 +76,7 @@ export class TransactionModalForm implements OnChanges {
   private translate = inject(TranslateService);
   private categoryNamePipe = inject(CategoryNamePipe);
 
-  private amountInput = viewChild<InputNumber>('amountInput');
+  private amountInput = viewChild<AmountInput>('amountInput');
 
   /**
    * Le montant est nullable pour que le champ s'ouvre vide : à 0 le p-inputnumber
@@ -132,13 +132,6 @@ export class TransactionModalForm implements OnChanges {
    * ordinaire. La variable posée sur l'hôte descend par héritage CSS jusqu'à l'input.
    */
   protected readonly datePickerTokens = { '--p-inputtext-padding-y': '0.9rem' };
-
-  /** Séparateur décimal de la locale active : `,` en français, `.` en anglais. */
-  private decimalChar = computed(() =>
-    new Intl.NumberFormat(this.locale(), { minimumFractionDigits: 1 })
-      .format(1.1)
-      .replace(/\d/g, ''),
-  );
 
   /**
    * Réinitialise à chaque ouverture.
@@ -210,31 +203,13 @@ export class TransactionModalForm implements OnChanges {
   }
 
   /**
-   * PrimeNG traduit la touche décimale du PAVÉ numérique vers le séparateur de la locale
-   * (`event.code === 'NumpadDecimal'`) mais pas le point de la rangée principale : en
-   * français il était avalé, `4` `.` `5` donnant `45,00 €`. On rejoue la frappe avec la
-   * virgule ; `onInputKeyPress` lit `event.which || event.keyCode`, d'où les propriétés
-   * redéfinies — le constructeur de KeyboardEvent ignore ces champs hérités.
-   */
-  onAmountKeydown(event: KeyboardEvent) {
-    const decimal = this.decimalChar();
-    if (event.key !== '.' || decimal === '.') return;
-
-    event.preventDefault();
-    const replay = new KeyboardEvent('keypress', { bubbles: true, cancelable: true });
-    Object.defineProperty(replay, 'which', { get: () => decimal.charCodeAt(0) });
-    Object.defineProperty(replay, 'keyCode', { get: () => decimal.charCodeAt(0) });
-    (event.target as HTMLInputElement).dispatchEvent(replay);
-  }
-
-  /**
    * Le focus va au montant, le champ que l'on vient saisir (§2). Le p-dialog le poserait
    * sinon sur le premier élément focusable depuis un `setTimeout` calé sur la durée de
    * transition — donc après le nôtre — et ce blur marquait le montant `touched`. D'où
    * `[focusOnShow]="false"` sur le dialogue.
    */
   onShow() {
-    setTimeout(() => this.amountInput()?.input?.nativeElement.focus());
+    setTimeout(() => this.amountInput()?.focus());
   }
 
   onClose() {
