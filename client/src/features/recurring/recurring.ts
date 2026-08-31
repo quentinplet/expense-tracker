@@ -59,11 +59,17 @@ export class Recurring implements OnInit {
     {
       type: 'Expense' as TransactionType,
       titleKey: 'transaction.filters.typeExpense',
+      // Même icône que le KPI « Dépenses » du dashboard (kpi-cards.ts) — la même
+      // paire icône/sens partout dans l'app, jamais réinventée par écran.
+      icon: 'pi-arrow-up-right',
+      iconClass: 'text-red-500',
       items: this.recurringTransactions().filter((r) => r.type === 'Expense'),
     },
     {
       type: 'Income' as TransactionType,
       titleKey: 'transaction.filters.typeIncome',
+      icon: 'pi-arrow-down-left',
+      iconClass: 'text-green-500',
       items: this.recurringTransactions().filter((r) => r.type === 'Income'),
     },
   ]);

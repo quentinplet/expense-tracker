@@ -16,15 +16,16 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
       @for (column of columns(); track column.type) {
         <div
-          class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
+          class="flex min-h-128 flex-col overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
         >
           <div
             class="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-800"
           >
             <h2
-              class="m-0 text-sm font-semibold tracking-wider text-surface-500 uppercase dark:text-surface-400"
+              class="m-0 flex items-center gap-1.5 text-sm font-semibold text-surface-700 dark:text-surface-200"
             >
               {{ column.titleKey | translate }}
+              <i class="pi text-xs" [class]="column.icon + ' ' + column.iconClass"></i>
             </h2>
             <p-button
               (click)="openNew(column.type)"
@@ -97,7 +98,12 @@
             </ul>
           } @else {
             <p class="m-0 px-5 py-6 text-center text-sm text-surface-500 dark:text-surface-400">
-              {{ 'recurring.list.emptyColumn' | translate }}
+              {{
+                (column.type === 'Income'
+                  ? 'recurring.list.emptyColumnIncome'
+                  : 'recurring.list.emptyColumnExpense'
+                ) | translate
+              }}
             </p>
           }
         </div>

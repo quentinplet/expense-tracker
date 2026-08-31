@@ -227,11 +227,12 @@
   "recurring": {
     "list": {
       "title": "Recurring transactions",
-      "add": "Add a recurring transaction",
+      "add": "Add",
       "count": "{{count}} recurring transactions",
       "empty": "No recurring transaction yet.",
       "emptyHint": "Add one to never miss a rent payment, a subscription, or a regular income again.",
-      "emptyColumn": "No recurring transaction here.",
+      "emptyColumnExpense": "No recurring expense yet.",
+      "emptyColumnIncome": "No recurring income yet.",
       "deleteConfirm": "Are you sure you want to delete \"{{label}}\"? Transactions already generated will not be deleted.",
       "deleted": "Recurring transaction deleted",
       "deleteFailed": "Deletion failed.",

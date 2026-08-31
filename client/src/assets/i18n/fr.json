@@ -227,11 +227,12 @@
   "recurring": {
     "list": {
       "title": "Transactions récurrentes",
-      "add": "Ajouter une transaction récurrente",
+      "add": "Ajouter",
       "count": "{{count}} transactions récurrentes",
       "empty": "Aucune transaction récurrente pour l'instant.",
       "emptyHint": "Ajoutez-en une pour ne plus oublier un loyer, un abonnement ou un revenu régulier.",
-      "emptyColumn": "Aucune transaction récurrente ici.",
+      "emptyColumnExpense": "Aucune dépense récurrente pour l'instant.",
+      "emptyColumnIncome": "Aucun revenu récurrent pour l'instant.",
       "deleteConfirm": "Voulez-vous vraiment supprimer « {{label}} » ? Les transactions déjà générées ne seront pas supprimées.",
       "deleted": "Transaction récurrente supprimée",
       "deleteFailed": "La suppression a échoué.",
