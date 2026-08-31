@@ -75,25 +75,25 @@ public class Seed
         }
         await context.SaveChangesAsync();
 
+        var johnUser = await context.Users.FirstOrDefaultAsync(u => u.UserName == "john");
+        if (johnUser == null) return;
+
+        var johnCategories = await context.Categories.Where(c => c.UserId == johnUser.Id).ToListAsync();
+
+        // Les identifiants du fichier de seed sont locaux : on les remappe vers les
+        // catégories personnelles de John (même Name + Type).
+        var categoryIds = new Dictionary<int, Guid>();
+        foreach (var dto in data.Categories)
+        {
+            var type = dto.TransactionTypeId == 2 ? TransactionType.Income : TransactionType.Expense;
+            var match = johnCategories.FirstOrDefault(c => c.Name == dto.Name && c.Type == type);
+            if (match != null) categoryIds[dto.Id] = match.Id;
+        }
+
+        var categoryTypes = johnCategories.ToDictionary(c => c.Id, c => c.Type);
+
         if (!await context.Transactions.AnyAsync())
         {
-            var john = await context.Users.FirstOrDefaultAsync(u => u.UserName == "john");
-            if (john == null) return;
-
-            var johnCategories = await context.Categories.Where(c => c.UserId == john.Id).ToListAsync();
-
-            // Les identifiants du fichier de seed sont locaux : on les remappe vers les
-            // catégories personnelles de John (même Name + Type).
-            var categoryIds = new Dictionary<int, Guid>();
-            foreach (var dto in data.Categories)
-            {
-                var type = dto.TransactionTypeId == 2 ? TransactionType.Income : TransactionType.Expense;
-                var match = johnCategories.FirstOrDefault(c => c.Name == dto.Name && c.Type == type);
-                if (match != null) categoryIds[dto.Id] = match.Id;
-            }
-
-            var categoryTypes = johnCategories.ToDictionary(c => c.Id, c => c.Type);
-
             var transactions = data.Transactions
                 .Where(t => categoryIds.ContainsKey(t.CategoryId))
                 .Select(t =>
@@ -107,11 +107,52 @@ public class Seed
                         Date = t.Date,
                         Label = t.Description ?? "Untitled",
                         CategoryId = categoryId,
-                        UserId = john.Id
+                        UserId = johnUser.Id
                     };
                 }).ToList();
 
             context.Transactions.AddRange(transactions);
+            await context.SaveChangesAsync();
+        }
+
+        if (!await context.Budgets.AnyAsync())
+        {
+            var budgets = data.Budgets
+                .Where(b => b.CategoryId == null || categoryIds.ContainsKey(b.CategoryId.Value))
+                .Select(b => new Budget
+                {
+                    AmountLimit = b.AmountLimit,
+                    Month = b.Month,
+                    AutoRenew = b.AutoRenew,
+                    CategoryId = b.CategoryId.HasValue ? categoryIds[b.CategoryId.Value] : null,
+                    UserId = johnUser.Id
+                }).ToList();
+
+            context.Budgets.AddRange(budgets);
+            await context.SaveChangesAsync();
+        }
+
+        if (!await context.RecurringTransactions.AnyAsync())
+        {
+            var recurringTransactions = data.RecurringTransactions
+                .Where(r => categoryIds.ContainsKey(r.CategoryId))
+                .Select(r =>
+                {
+                    var categoryId = categoryIds[r.CategoryId];
+                    return new RecurringTransaction
+                    {
+                        Label = r.Label,
+                        Amount = r.Amount,
+                        Type = categoryTypes[categoryId],
+                        Frequency = Enum.Parse<Frequency>(r.Frequency, ignoreCase: true),
+                        NextDueDate = r.NextDueDate,
+                        Active = r.Active,
+                        CategoryId = categoryId,
+                        UserId = johnUser.Id
+                    };
+                }).ToList();
+
+            context.RecurringTransactions.AddRange(recurringTransactions);
             await context.SaveChangesAsync();
         }
     }

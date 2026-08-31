@@ -6,6 +6,8 @@ public class SeedDataDto
 {
     public List<CategorySeedDto> Categories { get; set; } = [];
     public List<TransactionSeedDto> Transactions { get; set; } = [];
+    public List<BudgetSeedDto> Budgets { get; set; } = [];
+    public List<RecurringTransactionSeedDto> RecurringTransactions { get; set; } = [];
 }
 
 public class CategorySeedDto
@@ -34,4 +36,31 @@ public class TransactionSeedDto
     /// Référence l'Id local d'une CategorySeedDto.
     public int CategoryId { get; set; }
     public string UserId { get; set; } = null!;
+}
+
+public class BudgetSeedDto
+{
+    public decimal AmountLimit { get; set; }
+
+    /// "YYYY-MM"
+    public string Month { get; set; } = null!;
+    public bool AutoRenew { get; set; }
+
+    /// Référence l'Id local d'une CategorySeedDto. Null = budget global.
+    public int? CategoryId { get; set; }
+}
+
+public class RecurringTransactionSeedDto
+{
+    public string Label { get; set; } = null!;
+    public decimal Amount { get; set; }
+
+    /// "Daily" | "Weekly" | "Monthly" | "Yearly"
+    public string Frequency { get; set; } = null!;
+    public DateOnly NextDueDate { get; set; }
+    public bool Active { get; set; } = true;
+
+    /// Référence l'Id local d'une CategorySeedDto. Le Type de la transaction
+    /// récurrente est dérivé du Type de cette catégorie.
+    public int CategoryId { get; set; }
 }

@@ -137,392 +137,162 @@
       "color": "#84cc16",
       "translationKey": "category.system.other",
       "isLocked": true
-    }
-  ],
-  "transactions": [
-    {
-      "id": 1,
-      "amount": 2800.0,
-      "date": "2026-01-01",
-      "description": "Monthly salary",
-      "categoryId": 9,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 2,
-      "amount": 850.0,
-      "date": "2026-01-02",
-      "description": "Monthly rent",
-      "categoryId": 3,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 3,
-      "amount": 65.4,
-      "date": "2026-01-03",
-      "description": "Weekly groceries - Carrefour",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 4,
-      "amount": 38.5,
-      "date": "2026-01-05",
-      "description": "Monthly metro pass",
-      "categoryId": 2,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 5,
-      "amount": 120.0,
-      "date": "2026-01-06",
-      "description": "Electricity bill",
-      "categoryId": 7,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 6,
-      "amount": 45.0,
-      "date": "2026-01-07",
-      "description": "Restaurant dinner with friends",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 7,
-      "amount": 500.0,
-      "date": "2026-01-08",
-      "description": "Freelance web project",
-      "categoryId": 10,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 8,
-      "amount": 15.99,
-      "date": "2026-01-09",
-      "description": "Netflix subscription",
-      "categoryId": 5,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 9,
-      "amount": 55.0,
-      "date": "2026-01-10",
-      "description": "Doctor consultation",
-      "categoryId": 4,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 10,
-      "amount": 89.99,
-      "date": "2026-01-12",
-      "description": "New running shoes",
-      "categoryId": 6,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 11,
-      "amount": 35.0,
-      "date": "2026-01-14",
-      "description": "Weekly groceries - Lidl",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 12,
-      "amount": 40.0,
-      "date": "2026-01-15",
-      "description": "Gym membership",
-      "categoryId": 8,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 13,
-      "amount": 200.0,
-      "date": "2026-01-16",
-      "description": "Dividend from stocks",
-      "categoryId": 11,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 14,
-      "amount": 12.5,
-      "date": "2026-01-17",
-      "description": "Uber ride",
-      "categoryId": 2,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
     },
     {
       "id": 15,
-      "amount": 75.0,
-      "date": "2026-01-18",
-      "description": "Internet bill",
-      "categoryId": 7,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
+      "name": "Subscriptions",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-mobile",
+      "color": "#06B6D4",
+      "translationKey": "category.system.subscriptions"
     },
     {
       "id": 16,
-      "amount": 29.99,
-      "date": "2026-01-19",
-      "description": "Spotify + Apple Music",
-      "categoryId": 5,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
+      "name": "Insurance",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-shield",
+      "color": "#64748B",
+      "translationKey": "category.system.insurance"
+    }
+  ],
+  "transactions": [
+    { "id": 1, "amount": 2800.00, "date": "2026-03-01", "description": "Virement salaire net - mars", "categoryId": 9 },
+    { "id": 2, "amount": 850.00, "date": "2026-03-02", "description": "Loyer appartement - mars", "categoryId": 3 },
+    { "id": 3, "amount": 32.00, "date": "2026-03-03", "description": "Prélèvement MAIF", "categoryId": 16 },
+    { "id": 4, "amount": 62.30, "date": "2026-03-04", "description": "Carrefour City", "categoryId": 1 },
+    { "id": 5, "amount": 45.00, "date": "2026-03-05", "description": "Orange - forfait + Livebox", "categoryId": 15 },
+    { "id": 6, "amount": 98.50, "date": "2026-03-06", "description": "EDF - relevé mensuel", "categoryId": 7 },
+    { "id": 7, "amount": 34.90, "date": "2026-03-07", "description": "Basic-Fit mensuel", "categoryId": 8 },
+    { "id": 8, "amount": 15.99, "date": "2026-03-09", "description": "Netflix + Spotify", "categoryId": 5 },
+    { "id": 9, "amount": 84.10, "date": "2026-03-10", "description": "Abonnement transport mensuel", "categoryId": 2 },
+    { "id": 10, "amount": 38.20, "date": "2026-03-11", "description": "Lidl", "categoryId": 1 },
+    { "id": 11, "amount": 46.00, "date": "2026-03-14", "description": "Restaurant Le Bistrot", "categoryId": 1 },
+    { "id": 12, "amount": 55.40, "date": "2026-03-18", "description": "Monoprix", "categoryId": 1 },
+    { "id": 13, "amount": 18.70, "date": "2026-03-20", "description": "Médicaments", "categoryId": 4 },
+    { "id": 14, "amount": 500.00, "date": "2026-03-22", "description": "Refonte site vitrine", "categoryId": 10 },
+    { "id": 15, "amount": 41.60, "date": "2026-03-25", "description": "Auchan", "categoryId": 1 },
+    { "id": 16, "amount": 22.00, "date": "2026-03-27", "description": "Séance UGC Ciné Cité", "categoryId": 5 },
+
+    { "id": 17, "amount": 2800.00, "date": "2026-04-01", "description": "Virement salaire net - avril", "categoryId": 9 },
+    { "id": 18, "amount": 850.00, "date": "2026-04-02", "description": "Loyer appartement - avril", "categoryId": 3 },
+    { "id": 19, "amount": 32.00, "date": "2026-04-03", "description": "Prélèvement MAIF", "categoryId": 16 },
+    { "id": 20, "amount": 58.90, "date": "2026-04-04", "description": "Carrefour City", "categoryId": 1 },
+    { "id": 21, "amount": 45.00, "date": "2026-04-05", "description": "Orange - forfait + Livebox", "categoryId": 15 },
+    { "id": 22, "amount": 75.20, "date": "2026-04-06", "description": "EDF - relevé mensuel", "categoryId": 7 },
+    { "id": 23, "amount": 34.90, "date": "2026-04-07", "description": "Basic-Fit mensuel", "categoryId": 8 },
+    { "id": 24, "amount": 15.99, "date": "2026-04-09", "description": "Netflix + Spotify", "categoryId": 5 },
+    { "id": 25, "amount": 84.10, "date": "2026-04-10", "description": "Abonnement transport mensuel", "categoryId": 2 },
+    { "id": 26, "amount": 44.50, "date": "2026-04-13", "description": "Lidl", "categoryId": 1 },
+    { "id": 27, "amount": 89.99, "date": "2026-04-16", "description": "Decathlon - nouvelles baskets", "categoryId": 6 },
+    { "id": 28, "amount": 20.00, "date": "2026-04-19", "description": "Généraliste - visite de contrôle", "categoryId": 4 },
+    { "id": 29, "amount": 52.30, "date": "2026-04-21", "description": "Monoprix", "categoryId": 1 },
+    { "id": 30, "amount": 200.00, "date": "2026-04-24", "description": "Versement PEA", "categoryId": 11 },
+    { "id": 31, "amount": 60.00, "date": "2026-04-27", "description": "Station Total - plein d'essence", "categoryId": 2 },
+
+    { "id": 32, "amount": 2800.00, "date": "2026-05-01", "description": "Virement salaire net - mai", "categoryId": 9 },
+    { "id": 33, "amount": 850.00, "date": "2026-05-02", "description": "Loyer appartement - mai", "categoryId": 3 },
+    { "id": 34, "amount": 32.00, "date": "2026-05-03", "description": "Prélèvement MAIF", "categoryId": 16 },
+    { "id": 35, "amount": 49.80, "date": "2026-05-04", "description": "Carrefour City", "categoryId": 1 },
+    { "id": 36, "amount": 45.00, "date": "2026-05-05", "description": "Orange - forfait + Livebox", "categoryId": 15 },
+    { "id": 37, "amount": 62.80, "date": "2026-05-06", "description": "EDF - relevé mensuel", "categoryId": 7 },
+    { "id": 38, "amount": 34.90, "date": "2026-05-07", "description": "Basic-Fit mensuel", "categoryId": 8 },
+    { "id": 39, "amount": 15.99, "date": "2026-05-09", "description": "Netflix + Spotify", "categoryId": 5 },
+    { "id": 40, "amount": 84.10, "date": "2026-05-10", "description": "Abonnement transport mensuel", "categoryId": 2 },
+    { "id": 41, "amount": 36.70, "date": "2026-05-12", "description": "Lidl", "categoryId": 1 },
+    { "id": 42, "amount": 150.00, "date": "2026-05-15", "description": "Anniversaire - virement famille", "categoryId": 12 },
+    { "id": 43, "amount": 45.60, "date": "2026-05-18", "description": "Monoprix", "categoryId": 1 },
+    { "id": 44, "amount": 34.00, "date": "2026-05-21", "description": "Zénith - places concert", "categoryId": 5 },
+    { "id": 45, "amount": 700.00, "date": "2026-05-24", "description": "Développement app mobile", "categoryId": 10 },
+    { "id": 46, "amount": 39.90, "date": "2026-05-28", "description": "Auchan", "categoryId": 1 },
+
+    { "id": 47, "amount": 2800.00, "date": "2026-06-01", "description": "Virement salaire net - juin", "categoryId": 9 },
+    { "id": 48, "amount": 850.00, "date": "2026-06-02", "description": "Loyer appartement - juin", "categoryId": 3 },
+    { "id": 49, "amount": 32.00, "date": "2026-06-03", "description": "Prélèvement MAIF", "categoryId": 16 },
+    { "id": 50, "amount": 53.40, "date": "2026-06-04", "description": "Carrefour City", "categoryId": 1 },
+    { "id": 51, "amount": 47.50, "date": "2026-06-05", "description": "Orange - dépassement forfait data", "categoryId": 15 },
+    { "id": 52, "amount": 55.40, "date": "2026-06-06", "description": "EDF - relevé mensuel", "categoryId": 7 },
+    { "id": 53, "amount": 34.90, "date": "2026-06-07", "description": "Basic-Fit mensuel", "categoryId": 8 },
+    { "id": 54, "amount": 15.99, "date": "2026-06-09", "description": "Netflix + Spotify", "categoryId": 5 },
+    { "id": 55, "amount": 84.10, "date": "2026-06-10", "description": "Abonnement transport mensuel", "categoryId": 2 },
+    { "id": 56, "amount": 47.20, "date": "2026-06-13", "description": "Lidl", "categoryId": 1 },
+    { "id": 57, "amount": 129.90, "date": "2026-06-16", "description": "Zara - vêtements d'été", "categoryId": 6 },
+    { "id": 58, "amount": 65.00, "date": "2026-06-19", "description": "Dentiste - détartrage annuel", "categoryId": 4 },
+    { "id": 59, "amount": 44.80, "date": "2026-06-22", "description": "Monoprix", "categoryId": 1 },
+    { "id": 60, "amount": 38.50, "date": "2026-06-26", "description": "Auchan", "categoryId": 1 },
+
+    { "id": 61, "amount": 2800.00, "date": "2026-07-01", "description": "Virement salaire net - juillet", "categoryId": 9 },
+    { "id": 62, "amount": 850.00, "date": "2026-07-02", "description": "Loyer appartement - juillet", "categoryId": 3 },
+    { "id": 63, "amount": 32.00, "date": "2026-07-03", "description": "Prélèvement MAIF", "categoryId": 16 },
+    { "id": 64, "amount": 61.20, "date": "2026-07-04", "description": "Carrefour City", "categoryId": 1 },
+    { "id": 65, "amount": 45.00, "date": "2026-07-05", "description": "Orange - forfait + Livebox", "categoryId": 15 },
+    { "id": 66, "amount": 58.90, "date": "2026-07-06", "description": "EDF - relevé mensuel", "categoryId": 7 },
+    { "id": 67, "amount": 34.90, "date": "2026-07-07", "description": "Basic-Fit mensuel", "categoryId": 8 },
+    { "id": 68, "amount": 15.99, "date": "2026-07-09", "description": "Netflix + Spotify", "categoryId": 5 },
+    { "id": 69, "amount": 450.00, "date": "2026-07-11", "description": "Vacances d'été - vol aller-retour", "categoryId": 2 },
+    { "id": 70, "amount": 72.30, "date": "2026-07-14", "description": "Lidl", "categoryId": 1 },
+    { "id": 71, "amount": 55.00, "date": "2026-07-17", "description": "Dîner d'été en terrasse entre amis", "categoryId": 5 },
+    { "id": 72, "amount": 48.60, "date": "2026-07-20", "description": "Monoprix", "categoryId": 1 },
+    { "id": 73, "amount": 200.00, "date": "2026-07-24", "description": "Versement PEA", "categoryId": 11 },
+    { "id": 74, "amount": 43.10, "date": "2026-07-28", "description": "Auchan", "categoryId": 1 },
+
+    { "id": 75, "amount": 2800.00, "date": "2026-08-01", "description": "Virement salaire net - août", "categoryId": 9 },
+    { "id": 76, "amount": 850.00, "date": "2026-08-02", "description": "Loyer appartement - août", "categoryId": 3 },
+    { "id": 77, "amount": 32.00, "date": "2026-08-03", "description": "Prélèvement MAIF", "categoryId": 16 },
+    { "id": 78, "amount": 57.80, "date": "2026-08-04", "description": "Carrefour City", "categoryId": 1 },
+    { "id": 79, "amount": 45.00, "date": "2026-08-05", "description": "Orange - forfait + Livebox", "categoryId": 15 },
+    { "id": 80, "amount": 61.30, "date": "2026-08-06", "description": "EDF - relevé mensuel", "categoryId": 7 },
+    { "id": 81, "amount": 34.90, "date": "2026-08-07", "description": "Basic-Fit mensuel", "categoryId": 8 },
+    { "id": 82, "amount": 15.99, "date": "2026-08-09", "description": "Netflix + Spotify", "categoryId": 5 },
+    { "id": 83, "amount": 84.10, "date": "2026-08-10", "description": "Abonnement transport mensuel", "categoryId": 2 },
+    { "id": 84, "amount": 46.50, "date": "2026-08-13", "description": "Lidl", "categoryId": 1 },
+    { "id": 85, "amount": 34.99, "date": "2026-08-17", "description": "Fnac - livre & fournitures", "categoryId": 6 },
+    { "id": 86, "amount": 49.90, "date": "2026-08-20", "description": "Monoprix", "categoryId": 1 },
+    { "id": 87, "amount": 600.00, "date": "2026-08-24", "description": "Audit technique - client externe", "categoryId": 10 },
+    { "id": 88, "amount": 41.20, "date": "2026-08-27", "description": "Auchan", "categoryId": 1 },
+    { "id": 89, "amount": 28.50, "date": "2026-08-30", "description": "Séance UGC Ciné Cité", "categoryId": 5 }
+  ],
+  "budgets": [
+    {
+      "amountLimit": 2200.00,
+      "month": "2026-08",
+      "autoRenew": true,
+      "categoryId": null
+    }
+  ],
+  "recurringTransactions": [
+    {
+      "label": "Salaire mensuel",
+      "amount": 2800.00,
+      "frequency": "Monthly",
+      "nextDueDate": "2026-09-01",
+      "active": true,
+      "categoryId": 9
     },
     {
-      "id": 17,
-      "amount": 150.0,
-      "date": "2026-01-20",
-      "description": "Birthday gift from parents",
-      "categoryId": 12,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
+      "label": "Loyer",
+      "amount": 850.00,
+      "frequency": "Monthly",
+      "nextDueDate": "2026-09-02",
+      "active": true,
+      "categoryId": 3
     },
     {
-      "id": 18,
-      "amount": 55.3,
-      "date": "2026-01-21",
-      "description": "Weekly groceries - Monoprix",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
+      "label": "Assurance habitation",
+      "amount": 32.00,
+      "frequency": "Monthly",
+      "nextDueDate": "2026-09-03",
+      "active": true,
+      "categoryId": 16
     },
     {
-      "id": 19,
-      "amount": 25.0,
-      "date": "2026-01-23",
-      "description": "Cinema tickets x2",
-      "categoryId": 5,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 20,
-      "amount": 320.0,
-      "date": "2026-01-25",
-      "description": "Winter jacket - Zara",
-      "categoryId": 6,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 21,
-      "amount": 2800.0,
-      "date": "2026-02-01",
-      "description": "Monthly salary",
-      "categoryId": 9,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 22,
-      "amount": 850.0,
-      "date": "2026-02-02",
-      "description": "Monthly rent",
-      "categoryId": 3,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 23,
-      "amount": 70.2,
-      "date": "2026-02-03",
-      "description": "Weekly groceries - Carrefour",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 24,
-      "amount": 38.5,
-      "date": "2026-02-04",
-      "description": "Monthly metro pass",
-      "categoryId": 2,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 25,
-      "amount": 750.0,
-      "date": "2026-02-05",
-      "description": "Freelance mobile app project",
-      "categoryId": 10,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 26,
-      "amount": 95.0,
-      "date": "2026-02-06",
-      "description": "Electricity bill",
-      "categoryId": 7,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 27,
-      "amount": 40.0,
-      "date": "2026-02-07",
-      "description": "Gym membership",
-      "categoryId": 8,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 28,
-      "amount": 15.99,
-      "date": "2026-02-09",
-      "description": "Netflix subscription",
-      "categoryId": 5,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 29,
-      "amount": 48.5,
-      "date": "2026-02-11",
-      "description": "Valentine's day dinner",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 30,
-      "amount": 200.0,
-      "date": "2026-02-14",
-      "description": "Dividend from stocks",
-      "categoryId": 11,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 31,
-      "amount": 65.0,
-      "date": "2026-02-15",
-      "description": "Pharmacy",
-      "categoryId": 4,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 32,
-      "amount": 199.99,
-      "date": "2026-02-17",
-      "description": "New headphones - Sony",
-      "categoryId": 6,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 33,
-      "amount": 75.0,
-      "date": "2026-02-18",
-      "description": "Internet bill",
-      "categoryId": 7,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 34,
-      "amount": 42.8,
-      "date": "2026-02-20",
-      "description": "Weekly groceries - Lidl",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 35,
-      "amount": 2800.0,
-      "date": "2026-03-01",
-      "description": "Monthly salary",
-      "categoryId": 9,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 36,
-      "amount": 850.0,
-      "date": "2026-03-02",
-      "description": "Monthly rent",
-      "categoryId": 3,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 37,
-      "amount": 600.0,
-      "date": "2026-03-03",
-      "description": "Freelance design project",
-      "categoryId": 10,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 38,
-      "amount": 68.9,
-      "date": "2026-03-04",
-      "description": "Weekly groceries - Carrefour",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 39,
-      "amount": 38.5,
-      "date": "2026-03-05",
-      "description": "Monthly metro pass",
-      "categoryId": 2,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 40,
-      "amount": 110.0,
-      "date": "2026-03-06",
-      "description": "Electricity bill",
-      "categoryId": 7,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 41,
-      "amount": 40.0,
-      "date": "2026-03-07",
-      "description": "Gym membership",
-      "categoryId": 8,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 42,
-      "amount": 15.99,
-      "date": "2026-03-09",
-      "description": "Netflix subscription",
-      "categoryId": 5,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 43,
-      "amount": 200.0,
-      "date": "2026-03-15",
-      "description": "Dividend from stocks",
-      "categoryId": 11,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 44,
-      "amount": 450.0,
-      "date": "2026-03-16",
-      "description": "Flight tickets - Spring break",
-      "categoryId": 2,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 45,
-      "amount": 75.0,
-      "date": "2026-03-18",
-      "description": "Internet bill",
-      "categoryId": 7,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 46,
-      "amount": 280.0,
-      "date": "2026-03-20",
-      "description": "New sneakers - Nike",
-      "categoryId": 6,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 47,
-      "amount": 55.6,
-      "date": "2026-03-22",
-      "description": "Weekly groceries - Monoprix",
-      "categoryId": 1,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
-    },
-    {
-      "id": 48,
-      "amount": 30.0,
-      "date": "2026-03-25",
-      "description": "Concert tickets",
-      "categoryId": 5,
-      "userId": "5c39f6a7-eb50-4c9c-834b-ac3778c42454"
+      "label": "Forfait mobile & internet",
+      "amount": 45.00,
+      "frequency": "Monthly",
+      "nextDueDate": "2026-09-05",
+      "active": true,
+      "categoryId": 15
     }
   ]
 }
