@@ -15,11 +15,11 @@ public interface ITransactionRepository
     Task<List<Entities.Transaction>> GetByCategoryIdAsync(Guid userId, Guid categoryId);
     Task<Entities.Transaction?> GetTransactionByIdAsync(Guid id);
 
-    /// Dates déjà couvertes par une transaction générée pour une charge récurrente,
+    /// Dates déjà couvertes par une transaction générée pour une transaction récurrente,
     /// sur une fenêtre donnée — une seule requête pour toute la fenêtre de
     /// rattrapage d'une charge, pas un aller-retour par échéance (§ idempotence
-    /// de RecurringExpenseGenerationJob).
-    Task<HashSet<DateOnly>> GetGeneratedDatesAsync(Guid recurringExpenseId, DateOnly from, DateOnly toInclusive);
+    /// de RecurringTransactionGenerationJob).
+    Task<HashSet<DateOnly>> GetGeneratedDatesAsync(Guid recurringTransactionId, DateOnly from, DateOnly toInclusive);
 
     void AddTransaction(Entities.Transaction transaction);
     void UpdateTransaction(Entities.Transaction transaction);

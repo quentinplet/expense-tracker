@@ -13,7 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Budget> Budgets { get; set; }
-    public DbSet<RecurringExpense> RecurringExpenses { get; set; }
+    public DbSet<RecurringTransaction> RecurringTransactions { get; set; }
 
     public static readonly Guid MemberRoleId = new("11111111-1111-1111-1111-111111111111");
     public static readonly Guid AdminRoleId = new("22222222-2222-2222-2222-222222222222");
@@ -26,11 +26,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         modelBuilder.HasPostgresEnum<TransactionType>();
 
         // Mapping explicite des propriétés (FORCE le type de colonne)
-        modelBuilder.Entity<RecurringExpense>()
+        modelBuilder.Entity<RecurringTransaction>()
             .Property(x => x.Frequency)
             .HasColumnType("frequency");
 
-        modelBuilder.Entity<RecurringExpense>()
+        modelBuilder.Entity<RecurringTransaction>()
             .Property(x => x.Type)
             .HasColumnType("transaction_type");
 
@@ -50,10 +50,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
              .OnDelete(DeleteBehavior.Restrict);
 
             // Détacher plutôt que supprimer : une transaction déjà générée reste
-            // un fait financier indépendant si la charge récurrente est supprimée.
-            e.HasOne(t => t.RecurringExpense)
+            // un fait financier indépendant si la transaction récurrente est supprimée.
+            e.HasOne(t => t.RecurringTransaction)
              .WithMany(r => r.Transactions)
-             .HasForeignKey(t => t.RecurringExpenseId)
+             .HasForeignKey(t => t.RecurringTransactionId)
              .OnDelete(DeleteBehavior.SetNull);
         });
 
@@ -86,13 +86,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
              .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<RecurringExpense>(e =>
+        modelBuilder.Entity<RecurringTransaction>(e =>
         {
             e.Property(r => r.Amount).HasPrecision(18, 2);
             e.Property(r => r.Label).HasMaxLength(200).IsRequired();
 
             e.HasOne(r => r.Category)
-             .WithMany(c => c.RecurringExpenses)
+             .WithMany(c => c.RecurringTransactions)
              .HasForeignKey(r => r.CategoryId)
              .OnDelete(DeleteBehavior.Restrict);
         });

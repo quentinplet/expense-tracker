@@ -27,11 +27,11 @@ public class Transaction
     public Guid UserId { get; set; }
     public AppUser User { get; set; } = null!;
 
-    /// Renseigné si cette transaction a été générée par une charge récurrente.
+    /// Renseigné si cette transaction a été générée par une transaction récurrente.
     /// Détaché (mis à null) si la charge est supprimée — la transaction reste
     /// un fait financier indépendant une fois créée.
-    public Guid? RecurringExpenseId { get; set; }
-    public RecurringExpense? RecurringExpense { get; set; }
+    public Guid? RecurringTransactionId { get; set; }
+    public RecurringTransaction? RecurringTransaction { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -112,10 +112,10 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
-    public async Task<HashSet<DateOnly>> GetGeneratedDatesAsync(Guid recurringExpenseId, DateOnly from, DateOnly toInclusive)
+    public async Task<HashSet<DateOnly>> GetGeneratedDatesAsync(Guid recurringTransactionId, DateOnly from, DateOnly toInclusive)
     {
         var dates = await context.Transactions
-            .Where(t => t.RecurringExpenseId == recurringExpenseId && t.Date >= from && t.Date <= toInclusive)
+            .Where(t => t.RecurringTransactionId == recurringTransactionId && t.Date >= from && t.Date <= toInclusive)
             .Select(t => t.Date)
             .ToListAsync();
 

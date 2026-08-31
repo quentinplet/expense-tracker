@@ -2,7 +2,7 @@ import { TransactionType } from './transaction';
 
 export type Frequency = 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
 
-export type RecurringExpense = {
+export type RecurringTransaction = {
   id: string;
   label: string;
   amount: number;
@@ -18,7 +18,7 @@ export type RecurringExpense = {
   categoryColor?: string | null;
 };
 
-export type CreateRecurringExpenseDto = {
+export type CreateRecurringTransactionDto = {
   label: string;
   amount: number;
   type: TransactionType;
@@ -28,4 +28,4 @@ export type CreateRecurringExpenseDto = {
   categoryId: string;
 };
 
-export type UpdateRecurringExpenseDto = CreateRecurringExpenseDto;
+export type UpdateRecurringTransactionDto = CreateRecurringTransactionDto;

@@ -5,11 +5,12 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { RecurringExpenseService } from '@/core/services/recurring-expense-service';
+import { RecurringTransactionService } from '@/core/services/recurring-transaction-service';
 import { CategorieService } from '@/core/services/categorie-service';
 import { LanguageService } from '@/core/services/language-service';
-import { CreateRecurringExpenseDto, RecurringExpense } from '@/types/recurring-expense';
+import { CreateRecurringTransactionDto, RecurringTransaction } from '@/types/recurring-transaction';
 import { Categorie } from '@/types/categorie';
+import { TransactionType } from '@/types/transaction';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { RecurringFormDialog, RecurringFormValue } from './recurring-form-dialog/recurring-form-dialog';
@@ -31,31 +32,51 @@ import { RecurringFormDialog, RecurringFormValue } from './recurring-form-dialog
   styleUrl: './recurring.scss',
 })
 export class Recurring implements OnInit {
-  private recurringExpenseService = inject(RecurringExpenseService);
+  private recurringTransactionService = inject(RecurringTransactionService);
   private categorieService = inject(CategorieService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private translate = inject(TranslateService);
   private languageService = inject(LanguageService);
 
-  protected expenses = signal<RecurringExpense[]>([]);
+  protected recurringTransactions = signal<RecurringTransaction[]>([]);
   protected categories = signal<Categorie[]>([]);
   protected errors = signal<Record<string, string[]>>({});
 
   protected recurringDialog = false;
-  protected selectedExpense = signal<RecurringExpense | null>(null);
+  protected selectedRecurringTransaction = signal<RecurringTransaction | null>(null);
+
+  /** Présélectionne le sens à l'ouverture d'une création — déclenché par le `+`
+   *  d'une colonne plutôt que par le bouton d'en-tête. */
+  protected presetType = signal<TransactionType | null>(null);
 
   protected locale = computed(() => this.languageService.current());
 
+  /** Une colonne par sens (§ demande du 31/08 : « diviser en 2 colonnes »),
+   *  même pattern que Categories' `sections` — chaque colonne garde son propre
+   *  filtrage plutôt qu'une liste unique mélangeant dépenses et revenus. */
+  protected columns = computed(() => [
+    {
+      type: 'Expense' as TransactionType,
+      titleKey: 'transaction.filters.typeExpense',
+      items: this.recurringTransactions().filter((r) => r.type === 'Expense'),
+    },
+    {
+      type: 'Income' as TransactionType,
+      titleKey: 'transaction.filters.typeIncome',
+      items: this.recurringTransactions().filter((r) => r.type === 'Income'),
+    },
+  ]);
+
   ngOnInit() {
     this.loadCategories();
-    this.loadExpenses();
+    this.loadRecurringTransactions();
   }
 
-  private loadExpenses() {
+  private loadRecurringTransactions() {
     // Déjà triées par NextDueDate croissant côté serveur (§ requirement).
-    this.recurringExpenseService.getRecurringExpenses().subscribe({
-      next: (expenses) => this.expenses.set(expenses),
+    this.recurringTransactionService.getRecurringTransactions().subscribe({
+      next: (recurringTransactions) => this.recurringTransactions.set(recurringTransactions),
     });
   }
 
@@ -65,14 +86,16 @@ export class Recurring implements OnInit {
     });
   }
 
-  openNew() {
-    this.selectedExpense.set(null);
+  openNew(type: TransactionType | null = null) {
+    this.selectedRecurringTransaction.set(null);
+    this.presetType.set(type);
     this.errors.set({});
     this.recurringDialog = true;
   }
 
-  editExpense(expense: RecurringExpense) {
-    this.selectedExpense.set(expense);
+  editRecurringTransaction(recurringTransaction: RecurringTransaction) {
+    this.selectedRecurringTransaction.set(recurringTransaction);
+    this.presetType.set(null);
     this.errors.set({});
     this.recurringDialog = true;
   }
@@ -80,23 +103,25 @@ export class Recurring implements OnInit {
   /**
    * Bascule directement depuis la liste, sans repasser par le dialog complet
    * (§ Key Gotchas frontend : « mettre en pause un abonnement annulé doit être
-   * un clic »). Même RecurringExpenseRequestDto que le dialog, seul `active`
+   * un clic »). Même RecurringTransactionRequestDto que le dialog, seul `active`
    * change — pas d'endpoint dédié, contrairement au toggle Category.Enabled.
    */
-  toggleActive(expense: RecurringExpense) {
-    const dto: CreateRecurringExpenseDto = {
-      label: expense.label,
-      amount: expense.amount,
-      type: expense.type,
-      frequency: expense.frequency,
-      nextDueDate: expense.nextDueDate,
-      active: !expense.active,
-      categoryId: expense.categoryId,
+  toggleActive(recurringTransaction: RecurringTransaction) {
+    const dto: CreateRecurringTransactionDto = {
+      label: recurringTransaction.label,
+      amount: recurringTransaction.amount,
+      type: recurringTransaction.type,
+      frequency: recurringTransaction.frequency,
+      nextDueDate: recurringTransaction.nextDueDate,
+      active: !recurringTransaction.active,
+      categoryId: recurringTransaction.categoryId,
     };
 
-    this.recurringExpenseService.updateRecurringExpense(expense.id, dto).subscribe({
+    this.recurringTransactionService.updateRecurringTransaction(recurringTransaction.id, dto).subscribe({
       next: (updated) => {
-        this.expenses.update((expenses) => expenses.map((e) => (e.id === updated.id ? updated : e)));
+        this.recurringTransactions.update((items) =>
+          items.map((item) => (item.id === updated.id ? updated : item)),
+        );
       },
       error: () => {
         this.messageService.add({
@@ -108,15 +133,19 @@ export class Recurring implements OnInit {
     });
   }
 
-  deleteExpense(expense: RecurringExpense) {
+  deleteRecurringTransaction(recurringTransaction: RecurringTransaction) {
     this.confirmationService.confirm({
-      message: this.translate.instant('recurring.list.deleteConfirm', { label: expense.label }),
+      message: this.translate.instant('recurring.list.deleteConfirm', {
+        label: recurringTransaction.label,
+      }),
       header: this.translate.instant('common.confirm'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.recurringExpenseService.deleteRecurringExpense(expense.id).subscribe({
+        this.recurringTransactionService.deleteRecurringTransaction(recurringTransaction.id).subscribe({
           next: () => {
-            this.expenses.update((expenses) => expenses.filter((e) => e.id !== expense.id));
+            this.recurringTransactions.update((items) =>
+              items.filter((item) => item.id !== recurringTransaction.id),
+            );
             this.messageService.add({
               severity: 'success',
               summary: this.translate.instant('common.success'),
@@ -137,20 +166,23 @@ export class Recurring implements OnInit {
   }
 
   submit(value: RecurringFormValue) {
-    const selected = this.selectedExpense();
+    const selected = this.selectedRecurringTransaction();
     if (selected) {
-      this.updateExpense(selected, value);
+      this.updateRecurringTransaction(selected, value);
       return;
     }
-    this.createExpense(value);
+    this.createRecurringTransaction(value);
   }
 
-  private createExpense(value: RecurringFormValue) {
-    const dto: CreateRecurringExpenseDto = { ...value, nextDueDate: this.toIsoDate(value.nextDueDate) };
+  private createRecurringTransaction(value: RecurringFormValue) {
+    const dto: CreateRecurringTransactionDto = {
+      ...value,
+      nextDueDate: this.toIsoDate(value.nextDueDate),
+    };
 
-    this.recurringExpenseService.createRecurringExpense(dto).subscribe({
+    this.recurringTransactionService.createRecurringTransaction(dto).subscribe({
       next: (created) => {
-        this.expenses.update((expenses) => this.sortByNextDueDate([...expenses, created]));
+        this.recurringTransactions.update((items) => this.sortByNextDueDate([...items, created]));
         this.hideDialog();
         this.messageService.add({
           severity: 'success',
@@ -170,13 +202,16 @@ export class Recurring implements OnInit {
     });
   }
 
-  private updateExpense(selected: RecurringExpense, value: RecurringFormValue) {
-    const dto: CreateRecurringExpenseDto = { ...value, nextDueDate: this.toIsoDate(value.nextDueDate) };
+  private updateRecurringTransaction(selected: RecurringTransaction, value: RecurringFormValue) {
+    const dto: CreateRecurringTransactionDto = {
+      ...value,
+      nextDueDate: this.toIsoDate(value.nextDueDate),
+    };
 
-    this.recurringExpenseService.updateRecurringExpense(selected.id, dto).subscribe({
+    this.recurringTransactionService.updateRecurringTransaction(selected.id, dto).subscribe({
       next: (updated) => {
-        this.expenses.update((expenses) =>
-          this.sortByNextDueDate(expenses.map((e) => (e.id === updated.id ? updated : e))),
+        this.recurringTransactions.update((items) =>
+          this.sortByNextDueDate(items.map((item) => (item.id === updated.id ? updated : item))),
         );
         this.hideDialog();
         this.messageService.add({
@@ -199,12 +234,13 @@ export class Recurring implements OnInit {
 
   hideDialog() {
     this.recurringDialog = false;
-    this.selectedExpense.set(null);
+    this.selectedRecurringTransaction.set(null);
+    this.presetType.set(null);
     this.errors.set({});
   }
 
-  private sortByNextDueDate(expenses: RecurringExpense[]): RecurringExpense[] {
-    return [...expenses].sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate));
+  private sortByNextDueDate(items: RecurringTransaction[]): RecurringTransaction[] {
+    return [...items].sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate));
   }
 
   private toIsoDate(date: Date): string {

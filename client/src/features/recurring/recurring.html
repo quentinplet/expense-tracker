@@ -5,77 +5,103 @@
         {{ 'recurring.list.title' | translate }}
       </h1>
       <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
-        {{ 'recurring.list.count' | translate: { count: expenses().length } }}
+        {{ 'recurring.list.count' | translate: { count: recurringTransactions().length } }}
       </p>
     </div>
 
     <p-button (click)="openNew()" [label]="'recurring.list.add' | translate" icon="pi pi-plus" />
   </div>
 
-  @if (expenses().length > 0) {
-    <div
-      class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
-    >
-      <ul class="m-0 flex list-none flex-col p-0">
-        @for (expense of expenses(); track expense.id) {
-          <li
-            class="flex items-center gap-4 border-b border-surface-100 px-5 py-4 last:border-b-0 dark:border-surface-800"
-            [class.opacity-50]="!expense.active"
+  @if (recurringTransactions().length > 0) {
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      @for (column of columns(); track column.type) {
+        <div
+          class="overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
+        >
+          <div
+            class="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-800"
           >
-            <app-category-badge [icon]="expense.categoryIcon" [color]="expense.categoryColor" />
-
-            <div class="min-w-0 flex-1">
-              <span class="block truncate font-medium text-surface-900 dark:text-surface-0">
-                {{ expense.label }}
-              </span>
-              <span class="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
-                {{
-                  { name: expense.categoryName, translationKey: expense.categoryTranslationKey }
-                    | categoryName
-                }}
-                <span class="text-surface-300 dark:text-surface-700">&middot;</span>
-                {{ 'recurring.frequency.' + expense.frequency.toLowerCase() | translate }}
-              </span>
-            </div>
-
-            <div class="text-right">
-              <span
-                class="block font-semibold tabular-nums"
-                [class]="expense.type === 'Income' ? 'text-green-500' : 'text-red-500'"
-              >
-                {{ expense.type === 'Income' ? '+' : '−'
-                }}{{ expense.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
-              </span>
-              <span class="block text-xs text-surface-500 dark:text-surface-400">
-                {{ 'recurring.list.nextDueDate' | translate }}
-                {{ expense.nextDueDate | date: 'mediumDate' : undefined : locale() }}
-              </span>
-            </div>
-
-            <p-toggleswitch
-              [ngModel]="expense.active"
-              (onChange)="toggleActive(expense)"
-              [attr.aria-label]="'recurring.form.active' | translate"
-            />
-
+            <h2
+              class="m-0 text-sm font-semibold tracking-wider text-surface-500 uppercase dark:text-surface-400"
+            >
+              {{ column.titleKey | translate }}
+            </h2>
             <p-button
-              (click)="editExpense(expense)"
-              icon="pi pi-pencil"
+              (click)="openNew(column.type)"
+              icon="pi pi-plus"
               [rounded]="true"
               [outlined]="true"
-              [attr.aria-label]="'common.update' | translate"
+              [attr.aria-label]="'recurring.list.add' | translate"
             />
-            <p-button
-              (click)="deleteExpense(expense)"
-              icon="pi pi-trash"
-              severity="danger"
-              [rounded]="true"
-              [outlined]="true"
-              [attr.aria-label]="'common.delete' | translate"
-            />
-          </li>
-        }
-      </ul>
+          </div>
+
+          @if (column.items.length > 0) {
+            <ul class="m-0 flex list-none flex-col p-0">
+              @for (item of column.items; track item.id) {
+                <li
+                  class="flex items-center gap-3 border-b border-surface-100 px-5 py-4 last:border-b-0 dark:border-surface-800"
+                  [class.opacity-50]="!item.active"
+                >
+                  <app-category-badge [icon]="item.categoryIcon" [color]="item.categoryColor" />
+
+                  <div class="min-w-0 flex-1">
+                    <span class="block truncate font-medium text-surface-900 dark:text-surface-0">
+                      {{ item.label }}
+                    </span>
+                    <span class="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                      {{
+                        { name: item.categoryName, translationKey: item.categoryTranslationKey }
+                          | categoryName
+                      }}
+                      <span class="text-surface-300 dark:text-surface-700">&middot;</span>
+                      {{ 'recurring.frequency.' + item.frequency.toLowerCase() | translate }}
+                    </span>
+                  </div>
+
+                  <div class="text-right">
+                    <span
+                      class="block font-semibold tabular-nums"
+                      [class]="item.type === 'Income' ? 'text-green-500' : 'text-red-500'"
+                    >
+                      {{ item.type === 'Income' ? '+' : '−'
+                      }}{{ item.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
+                    </span>
+                    <span class="block text-xs text-surface-500 dark:text-surface-400">
+                      {{ item.nextDueDate | date: 'mediumDate' : undefined : locale() }}
+                    </span>
+                  </div>
+
+                  <p-toggleswitch
+                    [ngModel]="item.active"
+                    (onChange)="toggleActive(item)"
+                    [attr.aria-label]="'recurring.form.active' | translate"
+                  />
+
+                  <p-button
+                    (click)="editRecurringTransaction(item)"
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [outlined]="true"
+                    [attr.aria-label]="'common.update' | translate"
+                  />
+                  <p-button
+                    (click)="deleteRecurringTransaction(item)"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    [rounded]="true"
+                    [outlined]="true"
+                    [attr.aria-label]="'common.delete' | translate"
+                  />
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="m-0 px-5 py-6 text-center text-sm text-surface-500 dark:text-surface-400">
+              {{ 'recurring.list.emptyColumn' | translate }}
+            </p>
+          }
+        </div>
+      }
     </div>
   } @else {
     <div
@@ -94,7 +120,8 @@
   <app-recurring-form-dialog
     [(visible)]="recurringDialog"
     [categories]="categories()"
-    [expense]="selectedExpense()"
+    [recurringTransaction]="selectedRecurringTransaction()"
+    [presetType]="presetType()"
     [errors]="errors()"
     (close)="hideDialog()"
     (save)="submit($event)"

@@ -7,7 +7,7 @@ public interface IUnitOfWork
     ICategoryRepository CategoryRepository { get; }
     ITransactionRepository TransactionRepository { get; }
     IBudgetRepository BudgetRepository { get; }
-    IRecurringExpenseRepository RecurringExpenseRepository { get; }
+    IRecurringTransactionRepository RecurringTransactionRepository { get; }
     Task<bool> Complete();
     bool HasChanges();
 }

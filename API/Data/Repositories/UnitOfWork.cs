@@ -9,12 +9,12 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     private ICategoryRepository? _categoryRepository;
     private ITransactionRepository? _transactionRepository;
     private IBudgetRepository? _budgetRepository;
-    private IRecurringExpenseRepository? _recurringExpenseRepository;
+    private IRecurringTransactionRepository? _recurringTransactionRepository;
 
     public ICategoryRepository CategoryRepository => _categoryRepository ??= new CategoryRepository(context);
     public ITransactionRepository TransactionRepository => _transactionRepository ??= new TransactionRepository(context);
     public IBudgetRepository BudgetRepository => _budgetRepository ??= new BudgetRepository(context);
-    public IRecurringExpenseRepository RecurringExpenseRepository => _recurringExpenseRepository ??= new RecurringExpenseRepository(context);
+    public IRecurringTransactionRepository RecurringTransactionRepository => _recurringTransactionRepository ??= new RecurringTransactionRepository(context);
 
     public async Task<bool> Complete()
     {

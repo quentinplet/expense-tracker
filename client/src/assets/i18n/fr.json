@@ -226,14 +226,14 @@
   },
   "recurring": {
     "list": {
-      "title": "Charges récurrentes",
-      "add": "Ajouter une charge",
-      "count": "{{count}} charges récurrentes",
-      "nextDueDate": "Prochaine échéance :",
-      "empty": "Aucune charge récurrente pour l'instant.",
-      "emptyHint": "Ajoutez-en une pour ne plus oublier un loyer ou un abonnement.",
+      "title": "Transactions récurrentes",
+      "add": "Ajouter une transaction récurrente",
+      "count": "{{count}} transactions récurrentes",
+      "empty": "Aucune transaction récurrente pour l'instant.",
+      "emptyHint": "Ajoutez-en une pour ne plus oublier un loyer, un abonnement ou un revenu régulier.",
+      "emptyColumn": "Aucune transaction récurrente ici.",
       "deleteConfirm": "Voulez-vous vraiment supprimer « {{label}} » ? Les transactions déjà générées ne seront pas supprimées.",
-      "deleted": "Charge récurrente supprimée",
+      "deleted": "Transaction récurrente supprimée",
       "deleteFailed": "La suppression a échoué.",
       "toggleFailed": "La mise à jour a échoué."
     },
@@ -244,13 +244,13 @@
       "yearly": "Annuelle"
     },
     "form": {
-      "createTitle": "Nouvelle charge récurrente",
-      "editTitle": "Modifier la charge récurrente",
+      "createTitle": "Nouvelle transaction récurrente",
+      "editTitle": "Modifier la transaction récurrente",
       "amount": "Montant",
       "amountPlaceholder": "0,00 €",
       "amountRequired": "Le montant doit être supérieur à 0.",
       "label": "Libellé",
-      "labelPlaceholder": "Loyer, abonnement…",
+      "labelPlaceholder": "Loyer, abonnement, salaire…",
       "labelRequired": "Le libellé est obligatoire.",
       "category": "Catégorie",
       "categoryPlaceholder": "Choisir une catégorie",
@@ -258,8 +258,8 @@
       "frequency": "Fréquence",
       "nextDueDate": "Prochaine échéance",
       "active": "Active",
-      "created": "Charge récurrente ajoutée",
-      "updated": "Charge récurrente modifiée",
+      "created": "Transaction récurrente ajoutée",
+      "updated": "Transaction récurrente modifiée",
       "createFailed": "La création a échoué.",
       "updateFailed": "La modification a échoué."
     }

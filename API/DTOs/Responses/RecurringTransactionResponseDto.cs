@@ -1,6 +1,6 @@
 namespace API.DTOs.Responses;
 
-public class RecurringExpenseResponseDto
+public class RecurringTransactionResponseDto
 {
     public Guid Id { get; set; }
     public string Label { get; set; } = null!;

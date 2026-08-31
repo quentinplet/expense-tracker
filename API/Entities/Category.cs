@@ -35,5 +35,5 @@ public class Category
 
     public ICollection<Transaction> Transactions { get; set; } = [];
     public ICollection<Budget> Budgets { get; set; } = [];
-    public ICollection<RecurringExpense> RecurringExpenses { get; set; } = [];
+    public ICollection<RecurringTransaction> RecurringTransactions { get; set; } = [];
 }

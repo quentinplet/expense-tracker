@@ -21,7 +21,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Categorie } from '@/types/categorie';
 import { TransactionType } from '@/types/transaction';
-import { Frequency, RecurringExpense } from '@/types/recurring-expense';
+import { Frequency, RecurringTransaction } from '@/types/recurring-transaction';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { AmountInput } from '@/shared/components/amount-input/amount-input';
@@ -69,8 +69,13 @@ export class RecurringFormDialog implements OnChanges {
   categories = input.required<Categorie[]>();
   errors = input.required<Record<string, string[]>>();
 
-  /** La charge à éditer, ou `null` pour une création. */
-  expense = input<RecurringExpense | null>(null);
+  /** La transaction récurrente à éditer, ou `null` pour une création. */
+  recurringTransaction = input<RecurringTransaction | null>(null);
+
+  /** Présélectionne le sens à l'ouverture d'une création — depuis le `+` de la
+   *  colonne Dépenses ou Revenus (§ recurring.ts). Sans effet en édition, ni si
+   *  `recurringTransaction` est fourni. */
+  presetType = input<TransactionType | null>(null);
 
   close = output<void>();
   save = output<RecurringFormValue>();
@@ -97,7 +102,7 @@ export class RecurringFormDialog implements OnChanges {
     active: this.fb.nonNullable.control(true),
   });
 
-  protected isEditing = computed(() => this.expense() !== null);
+  protected isEditing = computed(() => this.recurringTransaction() !== null);
 
   /** Le p-inputnumber et le p-datepicker prennent une locale explicite, sinon en-US. */
   protected locale = computed(() => this.languageService.current());
@@ -129,8 +134,9 @@ export class RecurringFormDialog implements OnChanges {
     }));
   });
 
-  /** Options du select, restreintes au sens de la charge (§ activeType) et
-   *  libellées par le pipe — même règle que transaction-modal-form.ts. */
+  /** Options du select, restreintes au sens de la transaction récurrente
+   *  (§ activeType) et libellées par le pipe — même règle que
+   *  transaction-modal-form.ts. */
   protected categoryOptions = computed(() => {
     this.translate.currentLang();
     return this.categories()
@@ -147,17 +153,17 @@ export class RecurringFormDialog implements OnChanges {
    *  (`ngOnChanges` clé sur `visible`, pas un `effect()`). */
   ngOnChanges(changes: SimpleChanges) {
     if (changes['visible'] && this.visible()) {
-      this.resetFrom(this.expense());
+      this.resetFrom(this.recurringTransaction());
     }
   }
 
-  private resetFrom(expense: RecurringExpense | null) {
+  private resetFrom(recurringTransaction: RecurringTransaction | null) {
     this.submitted.set(false);
 
-    if (!expense) {
+    if (!recurringTransaction) {
       this.form.reset({
         label: '',
-        type: 'Expense',
+        type: this.presetType() ?? 'Expense',
         amount: null,
         frequency: 'Monthly',
         categoryId: '',
@@ -168,13 +174,13 @@ export class RecurringFormDialog implements OnChanges {
     }
 
     this.form.reset({
-      label: expense.label,
-      type: expense.type,
-      amount: expense.amount,
-      frequency: expense.frequency,
-      categoryId: expense.categoryId,
-      nextDueDate: new Date(expense.nextDueDate),
-      active: expense.active,
+      label: recurringTransaction.label,
+      type: recurringTransaction.type,
+      amount: recurringTransaction.amount,
+      frequency: recurringTransaction.frequency,
+      categoryId: recurringTransaction.categoryId,
+      nextDueDate: new Date(recurringTransaction.nextDueDate),
+      active: recurringTransaction.active,
     });
   }
 
