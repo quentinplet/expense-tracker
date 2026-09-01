@@ -38,7 +38,7 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         {
             HttpOnly = true,
             Secure = true, // Set to true in production
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None, // front and API are on separate origins
             Expires = DateTime.UtcNow.AddDays(7)
         };
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
@@ -84,7 +84,7 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict
+            SameSite = SameSiteMode.None
         });
 
         return NoContent();

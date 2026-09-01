@@ -78,7 +78,12 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:4200", "https://localhost:4200"));
+
+var corsOrigins = new List<string> { "http://localhost:4200", "https://localhost:4200" };
+var prodOrigin = builder.Configuration["Cors:AllowedOrigin"];
+if (!string.IsNullOrEmpty(prodOrigin)) corsOrigins.Add(prodOrigin);
+
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(corsOrigins.ToArray()));
 
 app.UseAuthentication();
 app.UseAuthorization();
