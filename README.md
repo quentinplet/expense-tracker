@@ -16,6 +16,8 @@ budgets mensuels (par catégorie ou global) avec reconduction automatique, charg
 récurrentes générées en tâche de fond, dashboard avec graphiques, et interface
 bilingue français/anglais avec bascule instantanée.
 
+![Dashboard](docs/screenshots/dashboard.png)
+
 ---
 
 ## 🔗 Démo live
@@ -64,13 +66,13 @@ du scope dans [`context/project-overview.md`](context/project-overview.md).
 
 ## 🖼️ Captures d'écran
 
-|                          Dashboard                           |                           Transactions                           |
-| :----------------------------------------------------------: | :--------------------------------------------------------------: |
-| ![Dashboard](context/screenshots/dashboard-ui-desktop-3.png) | ![Transactions](context/screenshots/Transactions-ui-desktop.png) |
+|                     Transactions                     |                    Saisie rapide                     |
+| :---------------------------------------------------: | :---------------------------------------------------: |
+| ![Transactions](docs/screenshots/transactions.png) | ![Saisie rapide](docs/screenshots/quick-add.png) |
 
-|                        Budgets                         |                            Saisie rapide                            |
-| :----------------------------------------------------: | :-----------------------------------------------------------------: |
-| ![Budgets](context/screenshots/Budgets-ui-desktop.png) | ![Saisie rapide](context/screenshots/QuickAddDialog-ui-desktop.png) |
+|                Budgets                 |                  Catégories                  |
+| :-------------------------------------: | :-------------------------------------------: |
+| ![Budgets](docs/screenshots/budgets.png) | ![Catégories](docs/screenshots/categories.png) |
 
 ---
 
