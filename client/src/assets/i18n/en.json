@@ -267,6 +267,16 @@
       "updateFailed": "Update failed."
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markAllRead": "Mark all as read",
+    "recurringGenerated": "“{{label}}” generated automatically",
+    "budgetCategoryThreshold90": "“{{category}}” budget at 90%",
+    "budgetCategoryThreshold100": "“{{category}}” budget exceeded",
+    "budgetGlobalThreshold90": "Global budget at 90%",
+    "budgetGlobalThreshold100": "Global budget exceeded"
+  },
   "auth": {
     "login": {
       "title": "Sign in",

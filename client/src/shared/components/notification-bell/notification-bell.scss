@@ -1,0 +1,13 @@
+/**
+ * Porté par la CLASSE du popover (styleClass="notification-popover"), pas par
+ * `:host` : le p-popover est monté avec appendTo="body" (même piège de scroll
+ * que le p-menu du profil et le p-dialog de transaction, cf. leurs propres
+ * notes) — il n'est donc plus un descendant du host une fois ouvert.
+ */
+::ng-deep .notification-popover {
+  // Le contenu gère déjà ses propres marges section par section (en-tête,
+  // liste, item) ; le padding par défaut de PrimeNG doublerait ces espaces.
+  .p-popover-content {
+    padding: 0;
+  }
+}

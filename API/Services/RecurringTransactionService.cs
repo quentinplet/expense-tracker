@@ -3,7 +3,9 @@ using API.Interfaces;
 
 namespace API.Services;
 
-public class RecurringTransactionService(IUnitOfWork uow) : IRecurringTransactionService
+public class RecurringTransactionService(
+    IUnitOfWork uow, INotificationService notificationService, ILogger<RecurringTransactionService> logger)
+    : IRecurringTransactionService
 {
     /// Prémunit contre une boucle anormalement longue sur une donnée corrompue ou
     /// une transaction récurrente orpheline depuis des années — un cas qui ne
@@ -44,7 +46,7 @@ public class RecurringTransactionService(IUnitOfWork uow) : IRecurringTransactio
             {
                 if (alreadyGenerated.Contains(dueDate)) continue;
 
-                uow.TransactionRepository.AddTransaction(new Transaction
+                var transaction = new Transaction
                 {
                     Amount = recurringTransaction.Amount,
                     Type = recurringTransaction.Type,
@@ -53,8 +55,18 @@ public class RecurringTransactionService(IUnitOfWork uow) : IRecurringTransactio
                     CategoryId = recurringTransaction.CategoryId,
                     UserId = recurringTransaction.UserId,
                     RecurringTransactionId = recurringTransaction.Id,
-                });
+                };
+                uow.TransactionRepository.AddTransaction(transaction);
+
+                // Sauvegardée une par une (pas en lot à la fin) : la vérification
+                // de seuil ci-dessous recalcule Spent sur les transactions déjà en
+                // base, donc doit voir celle-ci persistée avant de passer à la
+                // suivante — sous peine de manquer un seuil franchi puis dépassé
+                // entre deux échéances rattrapées dans la même exécution.
+                await uow.Complete();
                 created++;
+
+                await NotifyGeneratedAsync(transaction, dueDate);
             }
 
             recurringTransaction.NextDueDate = cursor;
@@ -63,6 +75,30 @@ public class RecurringTransactionService(IUnitOfWork uow) : IRecurringTransactio
 
         if (due.Count > 0) await uow.Complete();
         return created;
+    }
+
+    /// Ne doit jamais faire échouer la génération : toute exception est
+    /// journalisée et avalée ici, jamais propagée (même philosophie défensive
+    /// que le catch du BackgroundService lui-même).
+    private async Task NotifyGeneratedAsync(Transaction transaction, DateOnly dueDate)
+    {
+        try
+        {
+            await notificationService.NotifyRecurringTransactionGeneratedAsync(transaction.UserId, transaction.Id);
+
+            // Seules les dépenses ont un budget à surveiller — une transaction
+            // récurrente Income générée notifie bien ci-dessus, mais ne déclenche
+            // jamais de vérification de seuil.
+            if (transaction.Type == TransactionType.Expense)
+            {
+                var month = dueDate.ToString("yyyy-MM");
+                await notificationService.CheckBudgetThresholdsAsync(transaction.UserId, transaction.CategoryId, month);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Notification failed for generated transaction {TransactionId}.", transaction.Id);
+        }
     }
 
     /// DateOnly.AddMonths/AddYears gèrent déjà le débordement de fin de mois et le

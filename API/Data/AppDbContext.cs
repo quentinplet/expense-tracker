@@ -14,6 +14,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Category> Categories { get; set; }
     public DbSet<Budget> Budgets { get; set; }
     public DbSet<RecurringTransaction> RecurringTransactions { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     public static readonly Guid MemberRoleId = new("11111111-1111-1111-1111-111111111111");
     public static readonly Guid AdminRoleId = new("22222222-2222-2222-2222-222222222222");
@@ -24,6 +25,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
         modelBuilder.HasPostgresEnum<Frequency>();
         modelBuilder.HasPostgresEnum<TransactionType>();
+        modelBuilder.HasPostgresEnum<NotificationType>();
 
         // Mapping explicite des propriétés (FORCE le type de colonne)
         modelBuilder.Entity<RecurringTransaction>()
@@ -95,6 +97,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
              .WithMany(c => c.RecurringTransactions)
              .HasForeignKey(r => r.CategoryId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Notification>(e =>
+        {
+            e.Property(n => n.Type).HasColumnType("notification_type");
+
+            // Requête de liste (GET /api/notifications) : les plus récentes d'un
+            // utilisateur, non lues d'abord à l'affichage.
+            e.HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+
+            // Cascade delete (pas SetNull comme Transaction.RecurringTransactionId) :
+            // une notification sur une ressource qui n'existe plus n'a pas de sens
+            // à afficher.
+            e.HasOne(n => n.Transaction)
+             .WithMany()
+             .HasForeignKey(n => n.TransactionId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(n => n.Budget)
+             .WithMany()
+             .HasForeignKey(n => n.BudgetId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<IdentityRole<Guid>>()

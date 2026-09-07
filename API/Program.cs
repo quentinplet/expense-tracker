@@ -26,6 +26,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
 dataSourceBuilder.MapEnum<Frequency>();
 dataSourceBuilder.MapEnum<TransactionType>();
+dataSourceBuilder.MapEnum<NotificationType>();
 
 var dataSource = dataSourceBuilder.Build();
 
@@ -34,6 +35,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     {
         o.MapEnum<TransactionType>();
         o.MapEnum<Frequency>();
+        o.MapEnum<NotificationType>();
     })
 );
 
@@ -43,6 +45,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IRecurringTransactionService, RecurringTransactionService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddHostedService<BudgetAutoRenewJob>();
 builder.Services.AddHostedService<RecurringTransactionGenerationJob>();

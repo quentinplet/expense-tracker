@@ -267,6 +267,16 @@
       "updateFailed": "La modification a échoué."
     }
   },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification",
+    "markAllRead": "Tout marquer comme lu",
+    "recurringGenerated": "« {{label}} » générée automatiquement",
+    "budgetCategoryThreshold90": "Budget « {{category}} » à 90 %",
+    "budgetCategoryThreshold100": "Budget « {{category}} » dépassé",
+    "budgetGlobalThreshold90": "Budget global à 90 %",
+    "budgetGlobalThreshold100": "Budget global dépassé"
+  },
   "auth": {
     "login": {
       "title": "Connexion",

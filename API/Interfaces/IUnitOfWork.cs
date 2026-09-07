@@ -8,6 +8,7 @@ public interface IUnitOfWork
     ITransactionRepository TransactionRepository { get; }
     IBudgetRepository BudgetRepository { get; }
     IRecurringTransactionRepository RecurringTransactionRepository { get; }
+    INotificationRepository NotificationRepository { get; }
     Task<bool> Complete();
     bool HasChanges();
 }

@@ -8,10 +8,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { LanguageSwitch } from '@/shared/language-switch/language-switch';
 import { ThemeService } from '@/core/services/theme-service';
+import { NotificationBell } from '@/shared/components/notification-bell/notification-bell';
 
 @Component({
   selector: 'app-navbar',
-  imports: [MenuModule, ProgressSpinnerModule, TranslatePipe, LanguageSwitch],
+  imports: [MenuModule, ProgressSpinnerModule, TranslatePipe, LanguageSwitch, NotificationBell],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })

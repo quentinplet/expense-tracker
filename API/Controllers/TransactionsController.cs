@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [Authorize]
-public class TransactionsController(IUnitOfWork uow) : BaseApiController
+public class TransactionsController(
+    IUnitOfWork uow, INotificationService notificationService, ILogger<TransactionsController> logger) : BaseApiController
 {
 
     [HttpGet]
@@ -61,6 +62,8 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         uow.TransactionRepository.AddTransaction(transaction);
         if (await uow.Complete())
         {
+            await CheckBudgetThresholdsAsync(transaction);
+
             // Recharger avec la catégorie incluse
             var created = await uow.TransactionRepository.GetTransactionByIdAsync(transaction.Id);
             if (created == null) return BadRequest("Failed to retrieve created transaction");
@@ -87,6 +90,11 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
 
         if (await uow.Complete())
         {
+            // Seul le nouvel état compte (nouvelle catégorie, nouveau montant) :
+            // l'ancienne catégorie ne peut voir son Spent que baisser suite à ce
+            // changement, jamais franchir un nouveau seuil à la hausse.
+            await CheckBudgetThresholdsAsync(transaction);
+
             // Recharger avec la catégorie incluse
             var updated = await uow.TransactionRepository.GetTransactionByIdAsync(transaction.Id);
             if (updated == null) return BadRequest("Failed to retrieve updated transaction");
@@ -123,6 +131,24 @@ public class TransactionsController(IUnitOfWork uow) : BaseApiController
         // le client en a besoin pour ne jamais deviner un compte.
         if (await uow.Complete()) return Ok(transactions.Count);
         return BadRequest("Failed to delete transactions");
+    }
+
+    /// Seules les dépenses ont un budget à surveiller. Ne doit jamais faire
+    /// échouer la création/édition d'une transaction : toute exception est
+    /// journalisée et avalée ici, jamais propagée.
+    private async Task CheckBudgetThresholdsAsync(Transaction transaction)
+    {
+        if (transaction.Type != TransactionType.Expense) return;
+
+        try
+        {
+            var month = transaction.Date.ToString("yyyy-MM");
+            await notificationService.CheckBudgetThresholdsAsync(transaction.UserId, transaction.CategoryId, month);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Budget threshold check failed for transaction {TransactionId}.", transaction.Id);
+        }
     }
 
 }
