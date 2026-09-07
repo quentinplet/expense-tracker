@@ -1,0 +1,85 @@
+<svg viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lueur douce derrière la composition -->
+  <circle cx="240" cy="240" r="190" fill="#ffffff" fill-opacity="0.10" />
+  <circle cx="240" cy="240" r="150" fill="#ffffff" fill-opacity="0.08" />
+
+  <!-- Petits éléments décoratifs -->
+  <circle cx="88" cy="120" r="6" fill="#ffffff" fill-opacity="0.5" />
+  <circle cx="404" cy="356" r="8" fill="#ffffff" fill-opacity="0.4" />
+  <path d="M420 110 h18 M429 101 v18" stroke="#ffffff" stroke-opacity="0.5" stroke-width="3" stroke-linecap="round" />
+  <path d="M64 340 h16 M72 332 v16" stroke="#ffffff" stroke-opacity="0.4" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Carte tableau de bord, légèrement inclinée -->
+  <g transform="rotate(-4 240 246)">
+    <rect x="110" y="126" width="260" height="240" rx="20" fill="#0f1225" fill-opacity="0.18" />
+    <rect x="100" y="116" width="260" height="240" rx="20" fill="#ffffff" />
+
+    <!-- Barre de titre -->
+    <circle cx="128" cy="144" r="5" fill="#f97316" />
+    <circle cx="146" cy="144" r="5" fill="#eab308" />
+    <circle cx="164" cy="144" r="5" fill="#22c55e" />
+    <rect x="290" y="139" width="50" height="10" rx="5" fill="#e7e8f5" />
+
+    <!-- Anneau de répartition -->
+    <circle cx="163" cy="230" r="38" stroke="#e7e8f5" stroke-width="14" />
+    <circle
+      cx="163"
+      cy="230"
+      r="38"
+      stroke="#6366f1"
+      stroke-width="14"
+      stroke-linecap="round"
+      stroke-dasharray="155 239"
+      transform="rotate(-90 163 230)"
+    />
+    <circle
+      cx="163"
+      cy="230"
+      r="38"
+      stroke="#f97316"
+      stroke-width="14"
+      stroke-linecap="round"
+      stroke-dasharray="60 239"
+      stroke-dashoffset="-155"
+      transform="rotate(-90 163 230)"
+    />
+
+    <!-- Mini graphique en barres -->
+    <rect x="255" y="255" width="16" height="45" rx="4" fill="#e7e8f5" />
+    <rect x="281" y="230" width="16" height="70" rx="4" fill="#c7c9f0" />
+    <rect x="307" y="205" width="16" height="95" rx="4" fill="#6366f1" />
+    <rect x="333" y="240" width="16" height="60" rx="4" fill="#f97316" />
+
+    <!-- Lignes de texte -->
+    <rect x="120" y="320" width="140" height="9" rx="4.5" fill="#eef0fb" />
+    <rect x="120" y="336" width="90" height="9" rx="4.5" fill="#eef0fb" />
+  </g>
+
+  <!-- Badge flottant : dépense validée -->
+  <g transform="rotate(6 372 158)">
+    <rect x="335" y="121" width="76" height="76" rx="18" fill="#0f1225" fill-opacity="0.14" />
+    <rect x="330" y="116" width="76" height="76" rx="18" fill="#ffffff" />
+    <circle cx="368" cy="154" r="22" fill="#eafff1" />
+    <path
+      d="M358 154l7 7 14-14"
+      stroke="#22c55e"
+      stroke-width="4"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+
+  <!-- Pièce flottante -->
+  <g transform="rotate(-8 118 356)">
+    <circle cx="118" cy="356" r="34" fill="#0f1225" fill-opacity="0.14" />
+    <circle cx="114" cy="352" r="34" fill="#fde68a" />
+    <circle cx="114" cy="352" r="24" fill="none" stroke="#f59e0b" stroke-width="3" />
+    <path
+      d="M108 344c-5 1-8 4-8 8s3 7 8 8m4-16c5 1 8 4 8 8s-3 7-8 8m-4-16v16"
+      stroke="#f59e0b"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </g>
+</svg>

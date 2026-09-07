@@ -278,6 +278,10 @@
     "budgetGlobalThreshold100": "Global budget exceeded"
   },
   "auth": {
+    "panel": {
+      "title": "Take control of your budget",
+      "tagline": "Every expense sorted, every month compared to the last."
+    },
     "login": {
       "title": "Sign in",
       "subtitle": "Continue to your dashboard",

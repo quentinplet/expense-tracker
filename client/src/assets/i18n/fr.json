@@ -278,6 +278,10 @@
     "budgetGlobalThreshold100": "Budget global dépassé"
   },
   "auth": {
+    "panel": {
+      "title": "Reprenez le contrôle de votre budget",
+      "tagline": "Chaque dépense classée, chaque mois comparé au précédent."
+    },
     "login": {
       "title": "Connexion",
       "subtitle": "Continuez vers votre tableau de bord",

@@ -46,6 +46,10 @@ export class Auth {
    *  même correctif dans settings.ts pour le détail. */
   serverError = signal<string | null>(null);
 
+  /** Même token que les autres formulaires (settings/category/transaction) :
+   *  Tailwind ne peut pas battre le thème PrimeNG injecté hors layer. */
+  protected readonly fieldTokens = { paddingY: '0.9rem' };
+
   private accountService = inject(AccountService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);

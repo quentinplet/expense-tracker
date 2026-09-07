@@ -5,11 +5,11 @@ export type Theme = 'dark' | 'light';
 const STORAGE_KEY = 'app.theme';
 
 /**
- * Le mode sombre est la valeur par défaut (§17). La classe `app-dark` sur <html>
- * est le sélecteur commun aux deux systèmes de style : le `@custom-variant dark`
- * de Tailwind et le `darkModeSelector` de PrimeNG. Sans ce point d'ancrage
- * partagé, les composants PrimeNG suivraient la préférence système pendant que
- * les utilitaires Tailwind suivraient la classe — et les deux se contrediraient.
+ * La classe `app-dark` sur <html> est le sélecteur commun aux deux systèmes de
+ * style : le `@custom-variant dark` de Tailwind et le `darkModeSelector` de
+ * PrimeNG. Sans ce point d'ancrage partagé, les composants PrimeNG suivraient
+ * la préférence système pendant que les utilitaires Tailwind suivraient la
+ * classe — et les deux se contrediraient.
  */
 export const DARK_CLASS = 'app-dark';
 
@@ -17,7 +17,7 @@ export const DARK_CLASS = 'app-dark';
   providedIn: 'root',
 })
 export class ThemeService {
-  readonly current = signal<Theme>('dark');
+  readonly current = signal<Theme>('light');
 
   init() {
     this.apply(this.resolveInitial());
@@ -46,6 +46,6 @@ export class ThemeService {
       // Ignoré : on retombe sur le défaut.
     }
 
-    return 'dark';
+    return 'light';
   }
 }
