@@ -292,18 +292,25 @@
       "submit": "Sign in",
       "back": "Back",
       "failed": "Invalid email or password.",
-      "switchToRegister": "Don't have an account? Sign up"
+      "switchToRegister": "Don't have an account? Sign up",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "passwordRequired": "Password is required."
     },
     "register": {
       "title": "Create an account",
       "subtitle": "Start tracking your budget",
       "firstName": "First name",
       "firstNamePlaceholder": "First name",
+      "firstNameRequired": "First name is required.",
       "lastName": "Last name",
       "lastNamePlaceholder": "Last name",
+      "lastNameRequired": "Last name is required.",
       "confirmPassword": "Confirm password",
       "confirmPasswordPlaceholder": "Confirm password",
+      "confirmPasswordRequired": "Please confirm your password.",
       "passwordMismatch": "Passwords do not match.",
+      "passwordMinLength": "Password must be at least 6 characters.",
       "submit": "Sign up",
       "switchToLogin": "Already have an account? Sign in"
     }

@@ -292,18 +292,25 @@
       "submit": "Se connecter",
       "back": "Retour",
       "failed": "Email ou mot de passe invalide.",
-      "switchToRegister": "Pas encore de compte ? Créer un compte"
+      "switchToRegister": "Pas encore de compte ? Créer un compte",
+      "emailRequired": "L'email est obligatoire.",
+      "emailInvalid": "L'adresse email n'est pas valide.",
+      "passwordRequired": "Le mot de passe est obligatoire."
     },
     "register": {
       "title": "Créer un compte",
       "subtitle": "Commencez à suivre votre budget",
       "firstName": "Prénom",
       "firstNamePlaceholder": "Prénom",
+      "firstNameRequired": "Le prénom est obligatoire.",
       "lastName": "Nom",
       "lastNamePlaceholder": "Nom",
+      "lastNameRequired": "Le nom est obligatoire.",
       "confirmPassword": "Confirmer le mot de passe",
       "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+      "confirmPasswordRequired": "Veuillez confirmer le mot de passe.",
       "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères.",
       "submit": "S'inscrire",
       "switchToLogin": "Déjà un compte ? Se connecter"
     }

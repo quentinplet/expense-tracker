@@ -2,27 +2,27 @@
   class="flex min-h-screen min-w-screen items-center justify-center bg-surface-50 p-4 dark:bg-surface-950 sm:p-8"
 >
   <div
-    class="relative flex w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900 md:min-h-[600px] md:flex-row"
+    class="relative flex w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900 md:min-h-170 md:flex-row"
   >
     <div class="flex w-full flex-col justify-center px-8 py-12 sm:px-12 md:w-1/2 md:px-14">
       <span
-        class="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-contrast"
+        class="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-contrast"
       >
-        <i class="pi pi-wallet text-lg"></i>
+        <i class="pi pi-wallet text-2xl"></i>
       </span>
 
-      <div class="mb-8">
-        <div class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
+      <div class="mb-10">
+        <div class="text-3xl font-semibold text-surface-900 dark:text-surface-0">
           {{ (mode() === 'login' ? 'auth.login.title' : 'auth.register.title') | translate }}
         </div>
-        <span class="text-sm text-surface-500 dark:text-surface-400">{{
+        <span class="text-base text-surface-500 dark:text-surface-400">{{
           (mode() === 'login' ? 'auth.login.subtitle' : 'auth.register.subtitle') | translate
         }}</span>
       </div>
 
       @if (mode() === 'login') {
         <form [formGroup]="loginForm" (ngSubmit)="submit()">
-          <label for="email1" class="mb-2 block text-sm font-semibold">{{
+          <label for="email1" class="mb-2 block text-base font-semibold">{{
             'auth.login.email' | translate
           }}</label>
           <input
@@ -30,27 +30,54 @@
             id="email1"
             type="text"
             [placeholder]="'auth.login.emailPlaceholder' | translate"
-            class="mb-5 w-full"
+            class="mb-2 w-full text-base"
             formControlName="email"
+            [invalid]="!!serverError() || (submitted() && loginForm.controls.email.invalid)"
             [dt]="fieldTokens"
             fluid
           />
+          @if (submitted() && loginForm.controls.email.errors?.['required']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.login.emailRequired' | translate
+            }}</small>
+          } @else if (submitted() && loginForm.controls.email.errors?.['email']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.login.emailInvalid' | translate
+            }}</small>
+          } @else {
+            <div class="mb-5"></div>
+          }
 
-          <label for="password1" class="mb-2 block text-sm font-semibold">{{
+          <label for="password1" class="mb-2 block text-base font-semibold">{{
             'auth.login.password' | translate
           }}</label>
           <p-password
-            id="password1"
+            inputId="password1"
             formControlName="password"
             [placeholder]="'auth.login.password' | translate"
             [toggleMask]="true"
-            styleClass="mb-3"
+            styleClass="mb-2"
             [fluid]="true"
             [feedback]="false"
+            [invalid]="!!serverError() || (submitted() && loginForm.controls.password.invalid)"
+            [style.--p-inputtext-padding-x]="fieldTokens.paddingX"
+            [style.--p-inputtext-padding-y]="fieldTokens.paddingY"
+            [style.line-height]="'1.5'"
           ></p-password>
+          @if (submitted() && loginForm.controls.password.errors?.['required']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.login.passwordRequired' | translate
+            }}</small>
+          } @else {
+            <div class="mb-5"></div>
+          }
+
+          @if (serverError()) {
+            <small class="mb-4 block text-sm text-red-500">{{ serverError() }}</small>
+          }
 
           <div class="mb-6 flex justify-end">
-            <a class="cursor-pointer text-sm font-medium text-primary no-underline">{{
+            <a class="cursor-pointer text-base font-medium text-primary no-underline">{{
               'auth.login.forgotPassword' | translate
             }}</a>
           </div>
@@ -58,12 +85,14 @@
           <div class="flex flex-col gap-3">
             <p-button
               type="submit"
+              size="large"
               [label]="'auth.login.submit' | translate"
               styleClass="w-full"
               [loading]="submiting()"
             ></p-button>
             <p-button
               severity="secondary"
+              size="small"
               text
               [label]="'auth.login.switchToRegister' | translate"
               styleClass="w-full"
@@ -75,7 +104,7 @@
         <form [formGroup]="registerForm" (ngSubmit)="submit()">
           <div class="mb-5 grid grid-cols-2 gap-4">
             <div>
-              <label for="firstName" class="mb-2 block text-sm font-semibold">{{
+              <label for="firstName" class="mb-2 block text-base font-semibold">{{
                 'auth.register.firstName' | translate
               }}</label>
               <input
@@ -83,9 +112,12 @@
                 id="firstName"
                 type="text"
                 [placeholder]="'auth.register.firstNamePlaceholder' | translate"
-                class="w-full"
+                class="w-full text-base"
                 formControlName="firstName"
-                [invalid]="!!errors()['FirstName']"
+                [invalid]="
+                  !!errors()['FirstName'] ||
+                  (submitted() && registerForm.controls.firstName.invalid)
+                "
                 [dt]="fieldTokens"
                 fluid
               />
@@ -93,10 +125,14 @@
                 <small class="mt-2 block text-sm text-red-500">{{
                   errors()['FirstName'][0]
                 }}</small>
+              } @else if (submitted() && registerForm.controls.firstName.invalid) {
+                <small class="mt-2 block text-sm text-red-500">{{
+                  'auth.register.firstNameRequired' | translate
+                }}</small>
               }
             </div>
             <div>
-              <label for="lastName" class="mb-2 block text-sm font-semibold">{{
+              <label for="lastName" class="mb-2 block text-base font-semibold">{{
                 'auth.register.lastName' | translate
               }}</label>
               <input
@@ -104,9 +140,12 @@
                 id="lastName"
                 type="text"
                 [placeholder]="'auth.register.lastNamePlaceholder' | translate"
-                class="w-full"
+                class="w-full text-base"
                 formControlName="lastName"
-                [invalid]="!!errors()['LastName']"
+                [invalid]="
+                  !!errors()['LastName'] ||
+                  (submitted() && registerForm.controls.lastName.invalid)
+                "
                 [dt]="fieldTokens"
                 fluid
               />
@@ -114,11 +153,15 @@
                 <small class="mt-2 block text-sm text-red-500">{{
                   errors()['LastName'][0]
                 }}</small>
+              } @else if (submitted() && registerForm.controls.lastName.invalid) {
+                <small class="mt-2 block text-sm text-red-500">{{
+                  'auth.register.lastNameRequired' | translate
+                }}</small>
               }
             </div>
           </div>
 
-          <label for="registerEmail" class="mb-2 block text-sm font-semibold">{{
+          <label for="registerEmail" class="mb-2 block text-base font-semibold">{{
             'auth.login.email' | translate
           }}</label>
           <input
@@ -126,9 +169,13 @@
             id="registerEmail"
             type="text"
             [placeholder]="'auth.login.emailPlaceholder' | translate"
-            class="mb-2 w-full"
+            class="mb-2 w-full text-base"
             formControlName="email"
-            [invalid]="!!errors()['Email'] || !!serverError()"
+            [invalid]="
+              !!errors()['Email'] ||
+              !!serverError() ||
+              (submitted() && registerForm.controls.email.invalid)
+            "
             [dt]="fieldTokens"
             fluid
           />
@@ -136,36 +183,58 @@
             <small class="mt-2 mb-4 block text-sm text-red-500">{{ errors()['Email'][0] }}</small>
           } @else if (serverError()) {
             <small class="mt-2 mb-4 block text-sm text-red-500">{{ serverError() }}</small>
+          } @else if (submitted() && registerForm.controls.email.errors?.['required']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.login.emailRequired' | translate
+            }}</small>
+          } @else if (submitted() && registerForm.controls.email.errors?.['email']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.login.emailInvalid' | translate
+            }}</small>
           } @else {
             <div class="mb-5"></div>
           }
 
-          <label for="registerPassword" class="mb-2 block text-sm font-semibold">{{
+          <label for="registerPassword" class="mb-2 block text-base font-semibold">{{
             'auth.login.password' | translate
           }}</label>
           <p-password
-            id="registerPassword"
+            inputId="registerPassword"
             formControlName="password"
             [placeholder]="'auth.login.password' | translate"
             [toggleMask]="true"
             styleClass="mb-2"
             [fluid]="true"
             [feedback]="true"
-            [invalid]="!!errors()['Password']"
+            [invalid]="
+              !!errors()['Password'] ||
+              (submitted() && registerForm.controls.password.invalid)
+            "
+            [style.--p-inputtext-padding-x]="fieldTokens.paddingX"
+            [style.--p-inputtext-padding-y]="fieldTokens.paddingY"
+            [style.line-height]="'1.5'"
           ></p-password>
           @if (errors()['Password']) {
             <small class="mt-2 mb-4 block text-sm text-red-500">{{
               errors()['Password'][0]
             }}</small>
+          } @else if (submitted() && registerForm.controls.password.errors?.['required']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.login.passwordRequired' | translate
+            }}</small>
+          } @else if (submitted() && registerForm.controls.password.errors?.['minlength']) {
+            <small class="mt-2 mb-4 block text-sm text-red-500">{{
+              'auth.register.passwordMinLength' | translate
+            }}</small>
           } @else {
             <div class="mb-5"></div>
           }
 
-          <label for="confirmPassword" class="mb-2 block text-sm font-semibold">{{
+          <label for="confirmPassword" class="mb-2 block text-base font-semibold">{{
             'auth.register.confirmPassword' | translate
           }}</label>
           <p-password
-            id="confirmPassword"
+            inputId="confirmPassword"
             formControlName="confirmPassword"
             [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
             [toggleMask]="true"
@@ -173,11 +242,19 @@
             [fluid]="true"
             [feedback]="false"
             [invalid]="
-              !!registerForm.errors?.['passwordMismatch'] &&
-              registerForm.controls.confirmPassword.touched
+              (submitted() && registerForm.controls.confirmPassword.errors?.['required']) ||
+              (!!registerForm.errors?.['passwordMismatch'] &&
+                registerForm.controls.confirmPassword.touched)
             "
+            [style.--p-inputtext-padding-x]="fieldTokens.paddingX"
+            [style.--p-inputtext-padding-y]="fieldTokens.paddingY"
+            [style.line-height]="'1.5'"
           ></p-password>
-          @if (
+          @if (submitted() && registerForm.controls.confirmPassword.errors?.['required']) {
+            <small class="mt-2 block text-sm text-red-500">{{
+              'auth.register.confirmPasswordRequired' | translate
+            }}</small>
+          } @else if (
             registerForm.errors?.['passwordMismatch'] &&
             registerForm.controls.confirmPassword.touched
           ) {
@@ -189,12 +266,14 @@
           <div class="mt-6 flex flex-col gap-3">
             <p-button
               type="submit"
+              size="large"
               [label]="'auth.register.submit' | translate"
               styleClass="w-full"
               [loading]="submiting()"
             ></p-button>
             <p-button
               severity="secondary"
+              size="small"
               text
               [label]="'auth.register.switchToLogin' | translate"
               styleClass="w-full"

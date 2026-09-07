@@ -39,6 +39,10 @@ export class Auth {
   mode = signal<'login' | 'register'>('login');
 
   submiting = signal(false);
+  /** N'affiche une erreur de validation client qu'après une tentative de
+   *  soumission — même convention que category-form-dialog.ts/settings.ts,
+   *  sinon les champs passent en rouge dès le premier `blur`. */
+  submitted = signal(false);
   errors = signal<Record<string, string[]>>({});
   /** Un email déjà pris (409) ou une erreur Identity non couverte par les
    *  Data Annotations arrive en texte brut (chaîne ou tableau), pas dans la
@@ -48,7 +52,7 @@ export class Auth {
 
   /** Même token que les autres formulaires (settings/category/transaction) :
    *  Tailwind ne peut pas battre le thème PrimeNG injecté hors layer. */
-  protected readonly fieldTokens = { paddingY: '0.9rem' };
+  protected readonly fieldTokens = { paddingY: '0.9rem', paddingX: '0.9rem' };
 
   private accountService = inject(AccountService);
   private router = inject(Router);
@@ -80,12 +84,14 @@ export class Auth {
 
   switchMode(mode: 'login' | 'register') {
     this.mode.set(mode);
+    this.submitted.set(false);
     this.errors.set({});
     this.serverError.set(null);
     void this.router.navigateByUrl(mode === 'login' ? '/login' : '/register');
   }
 
   submit() {
+    this.submitted.set(true);
     this.errors.set({});
     this.serverError.set(null);
 
@@ -117,6 +123,10 @@ export class Auth {
       },
       error: () => {
         this.submiting.set(false);
+        // Message générique volontaire (§11 : ne pas confirmer si c'est
+        // l'email ou le mot de passe qui est faux) — affiché en toast ET en
+        // ligne, comme les autres erreurs serveur de cette page.
+        this.serverError.set(this.translate.instant('auth.login.failed'));
         this.messageService.add({
           severity: 'error',
           summary: this.translate.instant('common.error'),
