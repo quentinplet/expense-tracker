@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { LoginCreds, User } from '../../types/user';
+import { LoginCreds, RegisterCreds, User } from '../../types/user';
 import { tap } from 'rxjs/internal/operators/tap';
 
 @Injectable({
@@ -14,9 +14,29 @@ export class AccountService {
   currentUser = signal<User | null>(null);
   private baseUrl = environment.apiUrl;
 
+  fullName = computed(() => {
+    const user = this.currentUser();
+    return user ? `${user.firstName} ${user.lastName}` : '';
+  });
+
   login(creds: LoginCreds) {
     return this.http
       .post<User>(this.baseUrl + 'account/login', creds, {
+        withCredentials: true,
+      })
+      .pipe(
+        tap((user) => {
+          if (user) {
+            this.setCurrentUser(user);
+            this.startTokenRefreshInterval();
+          }
+        }),
+      );
+  }
+
+  register(creds: RegisterCreds) {
+    return this.http
+      .post<User>(this.baseUrl + 'account/register', creds, {
         withCredentials: true,
       })
       .pipe(

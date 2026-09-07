@@ -49,7 +49,7 @@ export class Dashboard {
     const moment = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
     return {
       key: `dashboard.greeting.${moment}`,
-      name: this.accountService.currentUser()?.userName ?? '',
+      name: this.accountService.currentUser()?.firstName ?? '',
     };
   });
 

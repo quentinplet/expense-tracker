@@ -286,7 +286,64 @@
       "password": "Mot de passe",
       "forgotPassword": "Mot de passe oublié ?",
       "submit": "Se connecter",
-      "back": "Retour"
+      "back": "Retour",
+      "failed": "Email ou mot de passe invalide.",
+      "switchToRegister": "Pas encore de compte ? Créer un compte"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Commencez à suivre votre budget",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Nom",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmer le mot de passe",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "submit": "S'inscrire",
+      "switchToLogin": "Déjà un compte ? Se connecter"
+    }
+  },
+  "settings": {
+    "nav": {
+      "title": "Paramètres"
+    },
+    "security": {
+      "title": "Sécurité du compte",
+      "name": {
+        "title": "Nom",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "submit": "Enregistrer",
+        "updated": "Nom mis à jour",
+        "updateFailed": "La mise à jour a échoué."
+      },
+      "password": {
+        "title": "Mot de passe",
+        "current": "Mot de passe actuel",
+        "new": "Nouveau mot de passe",
+        "submit": "Changer le mot de passe",
+        "updated": "Mot de passe mis à jour",
+        "updateFailed": "La mise à jour a échoué."
+      },
+      "email": {
+        "title": "Adresse email",
+        "current": "Email actuel",
+        "new": "Nouvel email",
+        "password": "Mot de passe actuel",
+        "submit": "Changer l'email",
+        "updated": "Email mis à jour",
+        "updateFailed": "La mise à jour a échoué."
+      },
+      "danger": {
+        "title": "Supprimer le compte",
+        "hint": "La suppression du compte est définitive et immédiate : toutes vos données (transactions, budgets, catégories, transactions récurrentes) seront perdues.",
+        "confirmTitle": "Supprimer le compte ?",
+        "confirmMessage": "Cette action est irréversible. Voulez-vous vraiment continuer ?",
+        "password": "Mot de passe actuel",
+        "submit": "Supprimer définitivement",
+        "deleteFailed": "La suppression a échoué."
+      }
     }
   }
 }

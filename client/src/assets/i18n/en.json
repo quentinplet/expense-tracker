@@ -286,7 +286,64 @@
       "password": "Password",
       "forgotPassword": "Forgot password?",
       "submit": "Sign in",
-      "back": "Back"
+      "back": "Back",
+      "failed": "Invalid email or password.",
+      "switchToRegister": "Don't have an account? Sign up"
+    },
+    "register": {
+      "title": "Create an account",
+      "subtitle": "Start tracking your budget",
+      "firstName": "First name",
+      "firstNamePlaceholder": "First name",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Last name",
+      "confirmPassword": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "passwordMismatch": "Passwords do not match.",
+      "submit": "Sign up",
+      "switchToLogin": "Already have an account? Sign in"
+    }
+  },
+  "settings": {
+    "nav": {
+      "title": "Settings"
+    },
+    "security": {
+      "title": "Account security",
+      "name": {
+        "title": "Name",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "submit": "Save",
+        "updated": "Name updated",
+        "updateFailed": "The update failed."
+      },
+      "password": {
+        "title": "Password",
+        "current": "Current password",
+        "new": "New password",
+        "submit": "Change password",
+        "updated": "Password updated",
+        "updateFailed": "The update failed."
+      },
+      "email": {
+        "title": "Email address",
+        "current": "Current email",
+        "new": "New email",
+        "password": "Current password",
+        "submit": "Change email",
+        "updated": "Email updated",
+        "updateFailed": "The update failed."
+      },
+      "danger": {
+        "title": "Delete account",
+        "hint": "Deleting your account is immediate and permanent: all your data (transactions, budgets, categories, recurring transactions) will be lost.",
+        "confirmTitle": "Delete account?",
+        "confirmMessage": "This action cannot be undone. Do you really want to continue?",
+        "password": "Current password",
+        "submit": "Delete permanently",
+        "deleteFailed": "The deletion failed."
+      }
     }
   }
 }

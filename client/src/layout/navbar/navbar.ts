@@ -24,8 +24,9 @@ export class Navbar {
   private router = inject(Router);
 
   protected initials = computed(() => {
-    const name = this.accountService.currentUser()?.userName ?? '';
-    return name.slice(0, 2).toUpperCase();
+    const user = this.accountService.currentUser();
+    if (!user) return '';
+    return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
   });
 
   /**
@@ -38,7 +39,7 @@ export class Navbar {
       {
         label: this.translate.instant('profileMenu.profile'),
         icon: 'pi pi-user',
-        command: () => this.router.navigateByUrl('/profile'),
+        command: () => this.router.navigateByUrl('/settings'),
       },
       { separator: true },
       {

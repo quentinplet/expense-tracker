@@ -6,6 +6,7 @@ import { Transactions } from '@/features/transactions/transactions';
 import { Categories } from '@/features/categories/categories';
 import { Budgets } from '@/features/budgets/budgets';
 import { Recurring } from '@/features/recurring/recurring';
+import { Settings } from '@/features/settings/settings';
 import { AuthLayout } from '@/layout/auth-layout/auth-layout';
 import { MainLayout } from '@/layout/main-layout/main-layout';
 import { authGuard } from '@/core/guards/auth-guard';
@@ -18,8 +19,8 @@ export const routes: Routes = [
     path: '',
     component: AuthLayout,
     children: [
-      { path: 'login', component: Auth },
-      // { path: 'register', component: RegisterComponent },
+      { path: 'login', component: Auth, data: { isLogin: true } },
+      { path: 'register', component: Auth, data: { isLogin: false } },
       { path: '', redirectTo: 'login', pathMatch: 'full' },
     ],
   },
@@ -34,6 +35,7 @@ export const routes: Routes = [
       { path: 'categories', component: Categories },
       { path: 'budgets', component: Budgets },
       { path: 'recurring', component: Recurring },
+      { path: 'settings', component: Settings },
       {
         path: 'test-errors',
         component: TestErrors,

@@ -38,15 +38,17 @@ export class SidebarComponent implements OnInit {
     { labelKey: 'nav.budgets', icon: 'pi pi-chart-pie', route: '/budgets', available: true },
     { labelKey: 'nav.recurring', icon: 'pi pi-sync', route: '/recurring', available: true },
     { labelKey: 'nav.reports', icon: 'pi pi-chart-bar', route: '/reports', available: false },
-    { labelKey: 'nav.settings', icon: 'pi pi-cog', route: '/settings', available: false },
+    { labelKey: 'nav.settings', icon: 'pi pi-cog', route: '/settings', available: true },
   ];
 
   /** La sidebar montre un aperçu, pas la liste complète : au-delà, elle défile. */
   protected visibleCategories = computed(() => this.categories().slice(0, 6));
 
-  protected initials = computed(() =>
-    (this.accountService.currentUser()?.userName ?? '').slice(0, 2).toUpperCase(),
-  );
+  protected initials = computed(() => {
+    const user = this.accountService.currentUser();
+    if (!user) return '';
+    return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  });
 
   /**
    * Même menu que la navbar, et mêmes clés i18n : c'est la même action rendue à
@@ -59,7 +61,7 @@ export class SidebarComponent implements OnInit {
       {
         label: this.translate.instant('profileMenu.profile'),
         icon: 'pi pi-user',
-        command: () => this.router.navigateByUrl('/profile'),
+        command: () => this.router.navigateByUrl('/settings'),
       },
       { separator: true },
       {

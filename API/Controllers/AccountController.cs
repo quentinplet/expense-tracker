@@ -1,5 +1,7 @@
 using System;
+using API.Data;
 using API.DTOs;
+using API.DTOs.Requests;
 using API.Entities;
 using API.Extensions;
 using API.Interfaces;
@@ -9,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class AccountController(UserManager<AppUser> userManager, ITokenService tokenService) : BaseApiController
+public class AccountController(UserManager<AppUser> userManager, ITokenService tokenService, AppDbContext context) : BaseApiController
 {
     [HttpPost("login")] // api/account/login
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
@@ -22,26 +24,46 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
 
         if (!result) return Unauthorized("Invalid password");
 
-        await SetRefreshTokenCookie(user);
+        await this.IssueRefreshTokenCookie(userManager, tokenService, user);
         return await user.ToDto(tokenService);
     }
 
-    private async Task SetRefreshTokenCookie(AppUser user)
+    [HttpPost("register")] // api/account/register
+    public async Task<ActionResult<UserDto>> Register(RegisterRequestDto registerDto)
     {
-        var refreshToken = tokenService.GenerateRefreshToken();
-
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-        await userManager.UpdateAsync(user);
-
-        var cookieOptions = new CookieOptions
+        var user = new AppUser
         {
-            HttpOnly = true,
-            Secure = true, // Set to true in production
-            SameSite = SameSiteMode.None, // front and API are on separate origins
-            Expires = DateTime.UtcNow.AddDays(7)
+            UserName = registerDto.Email,
+            Email = registerDto.Email,
+            FirstName = registerDto.FirstName,
+            LastName = registerDto.LastName,
         };
-        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+
+        // La création de l'utilisateur (via UserManager, qui fait son propre
+        // SaveChanges interne) et l'insertion des catégories de départ doivent
+        // réussir ensemble : un compte sans ses catégories est un état incohérent
+        // qu'on ne veut jamais pouvoir observer.
+        using var transaction = await context.Database.BeginTransactionAsync();
+
+        var result = await userManager.CreateAsync(user, registerDto.Password);
+        if (!result.Succeeded)
+        {
+            if (result.Errors.Any(e => e.Code is "DuplicateEmail" or "DuplicateUserName"))
+                return Conflict("Email is already in use.");
+
+            return BadRequest(result.Errors.Select(e => e.Description));
+        }
+
+        await userManager.AddToRoleAsync(user, "Member");
+
+        var categories = await Seed.CreateStarterCategoriesAsync(user.Id);
+        context.Categories.AddRange(categories);
+        await context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
+        await this.IssueRefreshTokenCookie(userManager, tokenService, user);
+        return StatusCode(StatusCodes.Status201Created, await user.ToDto(tokenService));
     }
 
     [HttpPost("refresh-token")]
@@ -57,7 +79,7 @@ public class AccountController(UserManager<AppUser> userManager, ITokenService t
         if (user == null)
             return Unauthorized("Invalid or expired refresh token");
 
-        await SetRefreshTokenCookie(user);
+        await this.IssueRefreshTokenCookie(userManager, tokenService, user);
         return await user.ToDto(tokenService);
     }
 

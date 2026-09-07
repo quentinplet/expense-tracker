@@ -48,65 +48,184 @@
             </g>
           </svg>
           <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">
-            {{ mode() === 'login' ? 'Connexion' : 'Créer un compte' }}
+            {{ (mode() === 'login' ? 'auth.login.title' : 'auth.register.title') | translate }}
           </div>
-          <span class="text-muted-color font-medium">Continuez vers votre tableau de bord</span>
+          <span class="text-muted-color font-medium">{{
+            (mode() === 'login' ? 'auth.login.subtitle' : 'auth.register.subtitle') | translate
+          }}</span>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()">
-          <label
-            for="email1"
-            class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2"
-            >Email</label
-          >
-          <input
-            pInputText
-            id="email1"
-            type="text"
-            placeholder="Adresse email"
-            class="w-full md:w-120 mb-8"
-            formControlName="email"
-          />
-
-          <label
-            for="password1"
-            class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2"
-            >Mot de passe</label
-          >
-          <p-password
-            id="password1"
-            formControlName="password"
-            placeholder="Mot de passe"
-            [toggleMask]="true"
-            styleClass="mb-4"
-            [fluid]="true"
-            [feedback]="mode() === 'register'"
-          ></p-password>
-
-          <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-            <div class="flex items-center">
-              <!-- Optionally keep a "Se souvenir de moi" without ngModel if we don't have it in FormGroup, or add it to FormGroup if needed -> I will just omit the checkbox from the logic or bind to an independent UI var if imported. Since it crashed because checked doesn't exist, we can just remove the checkbox entirely as it's not in the FormGroup. -->
-            </div>
-            <a class="font-medium no-underline ml-2 text-right cursor-pointer text-primary"
-              >Mot de passe oublié ?</a
+        @if (mode() === 'login') {
+          <form [formGroup]="loginForm" (ngSubmit)="submit()">
+            <label
+              for="email1"
+              class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2"
+              >{{ 'auth.login.email' | translate }}</label
             >
-          </div>
+            <input
+              pInputText
+              id="email1"
+              type="text"
+              [placeholder]="'auth.login.emailPlaceholder' | translate"
+              class="w-full md:w-120 mb-8"
+              formControlName="email"
+            />
 
-          <div class="flex flex-col gap-4">
-            <p-button
-              type="submit"
-              [label]="mode() === 'login' ? 'Se connecter' : 'S\'inscrire'"
-              styleClass="w-full"
-              [loading]="submiting()"
-            ></p-button>
-            <p-button
-              severity="secondary"
-              label="Retour"
-              styleClass="w-full"
-              routerLink="/"
-            ></p-button>
-          </div>
-        </form>
+            <label
+              for="password1"
+              class="block text-surface-900 dark:text-surface-0 font-medium text-xl mb-2"
+              >{{ 'auth.login.password' | translate }}</label
+            >
+            <p-password
+              id="password1"
+              formControlName="password"
+              [placeholder]="'auth.login.password' | translate"
+              [toggleMask]="true"
+              styleClass="mb-4"
+              [fluid]="true"
+              [feedback]="false"
+            ></p-password>
+
+            <div class="flex items-center justify-end mt-2 mb-8 gap-8">
+              <a class="font-medium no-underline ml-2 text-right cursor-pointer text-primary"
+                >{{ 'auth.login.forgotPassword' | translate }}</a
+              >
+            </div>
+
+            <div class="flex flex-col gap-4">
+              <p-button
+                type="submit"
+                [label]="'auth.login.submit' | translate"
+                styleClass="w-full"
+                [loading]="submiting()"
+              ></p-button>
+              <p-button
+                severity="secondary"
+                [label]="'auth.login.switchToRegister' | translate"
+                styleClass="w-full"
+                (onClick)="switchMode('register')"
+              ></p-button>
+            </div>
+          </form>
+        } @else {
+          <form [formGroup]="registerForm" (ngSubmit)="submit()">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <label for="firstName" class="block text-surface-900 dark:text-surface-0 font-medium mb-2">{{
+                  'auth.register.firstName' | translate
+                }}</label>
+                <input
+                  pInputText
+                  id="firstName"
+                  type="text"
+                  [placeholder]="'auth.register.firstNamePlaceholder' | translate"
+                  class="w-full"
+                  formControlName="firstName"
+                  [invalid]="!!errors()['FirstName']"
+                />
+                @if (errors()['FirstName']) {
+                  <small class="mt-2 block text-sm text-red-500">{{ errors()['FirstName'][0] }}</small>
+                }
+              </div>
+              <div>
+                <label for="lastName" class="block text-surface-900 dark:text-surface-0 font-medium mb-2">{{
+                  'auth.register.lastName' | translate
+                }}</label>
+                <input
+                  pInputText
+                  id="lastName"
+                  type="text"
+                  [placeholder]="'auth.register.lastNamePlaceholder' | translate"
+                  class="w-full"
+                  formControlName="lastName"
+                  [invalid]="!!errors()['LastName']"
+                />
+                @if (errors()['LastName']) {
+                  <small class="mt-2 block text-sm text-red-500">{{ errors()['LastName'][0] }}</small>
+                }
+              </div>
+            </div>
+
+            <label
+              for="registerEmail"
+              class="block text-surface-900 dark:text-surface-0 font-medium mb-2"
+              >{{ 'auth.login.email' | translate }}</label
+            >
+            <input
+              pInputText
+              id="registerEmail"
+              type="text"
+              [placeholder]="'auth.login.emailPlaceholder' | translate"
+              class="w-full mb-2"
+              formControlName="email"
+              [invalid]="!!errors()['Email'] || !!serverError()"
+            />
+            @if (errors()['Email']) {
+              <small class="mt-2 mb-4 block text-sm text-red-500">{{ errors()['Email'][0] }}</small>
+            } @else if (serverError()) {
+              <small class="mt-2 mb-4 block text-sm text-red-500">{{ serverError() }}</small>
+            } @else {
+              <div class="mb-6"></div>
+            }
+
+            <label
+              for="registerPassword"
+              class="block text-surface-900 dark:text-surface-0 font-medium mb-2"
+              >{{ 'auth.login.password' | translate }}</label
+            >
+            <p-password
+              id="registerPassword"
+              formControlName="password"
+              [placeholder]="'auth.login.password' | translate"
+              [toggleMask]="true"
+              styleClass="mb-2"
+              [fluid]="true"
+              [feedback]="true"
+              [invalid]="!!errors()['Password']"
+            ></p-password>
+            @if (errors()['Password']) {
+              <small class="mt-2 mb-4 block text-sm text-red-500">{{ errors()['Password'][0] }}</small>
+            } @else {
+              <div class="mb-6"></div>
+            }
+
+            <label
+              for="confirmPassword"
+              class="block text-surface-900 dark:text-surface-0 font-medium mb-2"
+              >{{ 'auth.register.confirmPassword' | translate }}</label
+            >
+            <p-password
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              [placeholder]="'auth.register.confirmPasswordPlaceholder' | translate"
+              [toggleMask]="true"
+              styleClass="mb-2"
+              [fluid]="true"
+              [feedback]="false"
+              [invalid]="registerForm.errors?.['passwordMismatch'] && registerForm.controls.confirmPassword.touched"
+            ></p-password>
+            @if (registerForm.errors?.['passwordMismatch'] && registerForm.controls.confirmPassword.touched) {
+              <small class="mt-2 block text-sm text-red-500">{{
+                'auth.register.passwordMismatch' | translate
+              }}</small>
+            }
+
+            <div class="flex flex-col gap-4 mt-8">
+              <p-button
+                type="submit"
+                [label]="'auth.register.submit' | translate"
+                styleClass="w-full"
+                [loading]="submiting()"
+              ></p-button>
+              <p-button
+                severity="secondary"
+                [label]="'auth.register.switchToLogin' | translate"
+                styleClass="w-full"
+                (onClick)="switchMode('login')"
+              ></p-button>
+            </div>
+          </form>
+        }
       </div>
     </div>
   </div>

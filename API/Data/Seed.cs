@@ -17,7 +17,9 @@ public class Seed
         {
             new() {
                 UserName = "john",
-                Email = "john@test.com"
+                Email = "john@test.com",
+                FirstName = "John",
+                LastName = "Doe"
             },
         };
 
@@ -35,12 +37,40 @@ public class Seed
         var admin = new AppUser
         {
             UserName = "admin",
-            Email = "admin@test.com"
+            Email = "admin@test.com",
+            FirstName = "Admin",
+            LastName = "User"
         };
 
         await userManager.CreateAsync(admin, "Pa$$w0rd");
         await userManager.AddToRolesAsync(admin, ["Member", "Admin"]);
     }
+
+    /// Jeu de départ (14 catégories, dont les 2 verrouillées "Other") pour un
+    /// utilisateur donné — utilisé par le seed au démarrage et par l'inscription
+    /// (AccountController.Register), seul point d'entrée réel désormais.
+    public static async Task<List<Category>> CreateStarterCategoriesAsync(Guid userId)
+    {
+        var seedData = await File.ReadAllTextAsync("Data/SeedData.json");
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var data = JsonSerializer.Deserialize<SeedDataDto>(seedData, options);
+
+        return data == null ? [] : BuildStarterCategories(data.Categories, userId);
+    }
+
+    private static List<Category> BuildStarterCategories(List<CategorySeedDto> items, Guid userId) =>
+        items.Select(c => new Category
+        {
+            Id = Guid.NewGuid(),
+            Name = c.Name,
+            Enabled = c.Enabled,
+            Type = c.TransactionTypeId == 2 ? TransactionType.Income : TransactionType.Expense,
+            Icon = c.Icon,
+            Color = c.Color,
+            TranslationKey = c.TranslationKey,
+            IsLocked = c.IsLocked,
+            UserId = userId
+        }).ToList();
 
     public static async Task SeedData(AppDbContext context)
     {
@@ -58,20 +88,7 @@ public class Seed
         {
             if (await context.Categories.AnyAsync(c => c.UserId == user.Id)) continue;
 
-            var personalCategories = data.Categories.Select(c => new Category
-            {
-                Id = Guid.NewGuid(),
-                Name = c.Name,
-                Enabled = c.Enabled,
-                Type = c.TransactionTypeId == 2 ? TransactionType.Income : TransactionType.Expense,
-                Icon = c.Icon,
-                Color = c.Color,
-                TranslationKey = c.TranslationKey,
-                IsLocked = c.IsLocked,
-                UserId = user.Id
-            }).ToList();
-
-            context.Categories.AddRange(personalCategories);
+            context.Categories.AddRange(BuildStarterCategories(data.Categories, user.Id));
         }
         await context.SaveChangesAsync();
 

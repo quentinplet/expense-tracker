@@ -76,7 +76,7 @@
       </span>
       <span class="min-w-0 flex-1">
         <span class="block truncate text-sm font-semibold text-surface-900 dark:text-surface-0">
-          {{ accountService.currentUser()?.userName }}
+          {{ accountService.fullName() }}
         </span>
         <span class="block truncate text-xs text-surface-500 dark:text-surface-400">
           {{ accountService.currentUser()?.email }}
