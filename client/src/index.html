@@ -10,8 +10,116 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /**
+       * Angular ne rend <app-root> qu'une fois TOUS les app initializers résolus
+       * (voir app.config.ts) — dont la restauration de session (refreshToken), qui
+       * peut prendre plusieurs secondes au premier appel si l'API/la base sont en
+       * veille (paliers gratuits Azure/Neon, cf. CLAUDE.md). Sans cet écran, la
+       * page reste blanche tout ce temps. Pur HTML/CSS inline : doit s'afficher
+       * avant qu'aucune feuille de style Angular n'ait eu le temps de charger.
+       * Retiré par app.config.ts une fois l'initialisation terminée.
+       */
+      #initial-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: #f6f7f9;
+        font-family:
+          'Space Grotesk',
+          system-ui,
+          sans-serif;
+      }
+
+      #initial-splash .badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 0.75rem;
+        background: #6366f1;
+      }
+
+      #initial-splash .badge svg {
+        width: 1.75rem;
+        height: 1.75rem;
+        stroke: #ffffff;
+      }
+
+      #initial-splash .name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #12161f;
+      }
+
+      #initial-splash .loading {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      #initial-splash .spinner {
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        border: 2px solid #d9dbe3;
+        border-top-color: #6366f1;
+        animation: initial-splash-spin 0.7s linear infinite;
+      }
+
+      #initial-splash .message {
+        font-size: 0.875rem;
+        color: #626b84;
+      }
+
+      @keyframes initial-splash-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="initial-splash">
+      <span class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 7H4a1 1 0 0 0-1 1v9a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+          <path d="M16 12h.01" />
+          <path d="M3 7V5a2 2 0 0 1 2-2h10" />
+        </svg>
+      </span>
+      <span class="name">Expense Tracker</span>
+      <span class="loading">
+        <span class="spinner"></span>
+        <span class="message" id="initial-splash-message">Loading…</span>
+      </span>
+    </div>
+    <script>
+      // Même résolution que LanguageService.resolveInitial() (§10) : localStorage
+      // -> langue du navigateur si fr/en -> en. Dupliqué ici volontairement — ce
+      // script tourne avant qu'Angular (donc ngx-translate) n'existe.
+      (function () {
+        try {
+          var stored = localStorage.getItem('app.lang');
+          var lang = stored === 'fr' || stored === 'en' ? stored : null;
+          if (!lang) {
+            var browser = (navigator.language || '').split('-')[0];
+            lang = browser === 'fr' || browser === 'en' ? browser : 'en';
+          }
+          if (lang === 'fr') {
+            document.getElementById('initial-splash-message').textContent = 'Chargement…';
+          }
+        } catch (e) {
+          // localStorage indisponible (navigation privée) : le message reste en anglais.
+        }
+      })();
+    </script>
     <app-root></app-root>
   </body>
 </html>
