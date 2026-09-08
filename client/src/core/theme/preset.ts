@@ -26,6 +26,21 @@ export const ExpenseTrackerPreset = definePreset(Aura, {
 
     colorScheme: {
       /**
+       * Aura livre `color: {surface.700}` / `placeholderColor: {surface.500}` pour
+       * un champ de saisie : deux gris de milieu de gamme, trop proches l'un de
+       * l'autre pour distinguer une vraie valeur d'un texte d'exemple au premier
+       * coup d'œil. `900` aligne la vraie valeur sur le texte du reste de l'app
+       * (ex. `text-surface-900` des titres) ; `400`, nettement plus clair, élargit
+       * l'écart avec le placeholder plutôt que de le resserrer.
+       */
+      light: {
+        formField: {
+          color: '{surface.900}',
+          placeholderColor: '{surface.400}',
+        },
+      },
+
+      /**
        * Aura dérive sa primaire sombre de `{primary.400}` avec une couleur de
        * contraste sombre : on obtenait un indigo pâle sur texte quasi noir, alors
        * que les maquettes montrent un indigo saturé sur texte blanc.
@@ -38,6 +53,16 @@ export const ExpenseTrackerPreset = definePreset(Aura, {
           contrastColor: '#ffffff',
           hoverColor: '{indigo.400}',
           activeColor: '{indigo.600}',
+        },
+
+        /**
+         * Même écart à créer qu'en clair, mais dans l'autre sens : la vraie valeur
+         * (`{surface.0}`, blanc) est déjà correcte par défaut. C'est le placeholder
+         * qui doit s'assombrir d'un cran (`400` → `500` de la rampe sur mesure
+         * ci-dessous) pour ne pas se lire presque aussi clair que du texte réel.
+         */
+        formField: {
+          placeholderColor: '{surface.500}',
         },
 
         /**

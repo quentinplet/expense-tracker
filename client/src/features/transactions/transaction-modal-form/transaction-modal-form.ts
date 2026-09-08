@@ -79,16 +79,19 @@ export class TransactionModalForm implements OnChanges {
   private amountInput = viewChild<AmountInput>('amountInput');
 
   /**
-   * Le montant est nullable pour que le champ s'ouvre vide : à 0 le p-inputnumber
-   * insérait les chiffres frappés dans le zéro affiché, et saisir « 68 » donnait
-   * 680,00 €. Il reste toujours positif, le sens étant porté par `type` (§3.C).
+   * Démarre à 0, pas `null` : un champ vide affiche « 0,00 € » en placeholder, grisé
+   * comme un texte d'exemple — trompeur alors que le montant est bien à saisir. Le
+   * `(onFocus)` de `AmountInput` (sélection du texte, déjà en place pour Budgets)
+   * couvre le risque qui justifiait `null` à l'origine : sans lui, `p-inputnumber`
+   * insère les chiffres frappés dans le zéro affiché (« 68 » → 680,00 €). Il reste
+   * toujours positif, le sens étant porté par `type` (§3.C).
    */
   protected form = this.fb.group({
     label: this.fb.nonNullable.control('', Validators.required),
     note: this.fb.nonNullable.control(''),
     type: this.fb.nonNullable.control<TransactionType>('Expense', Validators.required),
     categoryId: this.fb.nonNullable.control('', Validators.required),
-    amount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    amount: this.fb.control<number | null>(0, [Validators.required, Validators.min(0.01)]),
     date: this.fb.nonNullable.control(new Date(), Validators.required),
   });
 
@@ -163,7 +166,7 @@ export class TransactionModalForm implements OnChanges {
         note: '',
         type: 'Expense',
         categoryId: '',
-        amount: null,
+        amount: 0,
         date: new Date(),
       });
       return;
