@@ -1,36 +1,20 @@
-/**
- * `assets/styles.scss` colore en rouge tout `.ng-invalid.ng-touched` : il suffisait de
- * cliquer à côté d'un champ vide pour voir sa bordure virer sans avoir rien soumis.
- * Même correctif que transaction-modal-form.scss/category-form-dialog.scss : on
- * neutralise la règle ici et on laisse `[invalid]` porter l'état, piloté par le signal
- * `submitted` — la bordure rouge n'apparaît donc qu'après une tentative de soumission.
- * Pas d'`appendTo="body"` sur cette page (ce n'est pas un dialogue), donc `:host` reste
- * un ancêtre réel de tout le contenu et `:host ::ng-deep` suffit.
- *
- * `:not(:focus)` est indispensable : cette règle est plus spécifique que le `:focus`
- * de PrimeNG. Sans l'exclusion, un champ déjà visité — donc `ng-touched` — ne montrait
- * plus sa bordure de focus au second clic.
- */
 :host ::ng-deep {
+  .p-inputtext.ng-invalid.ng-touched:focus,
+  .p-inputtext.ng-invalid.ng-dirty:focus,
+  p-password.ng-invalid.ng-touched .p-inputtext:focus,
+  p-password.ng-invalid.ng-dirty .p-inputtext:focus {
+    border-color: var(--p-inputtext-focus-border-color);
+  }
+
   .p-inputtext.ng-invalid.ng-touched:not(:focus),
-  .p-password-input.ng-invalid.ng-touched:not(:focus) {
+  .p-inputtext.ng-invalid.ng-dirty:not(:focus),
+  p-password.ng-invalid.ng-touched .p-inputtext:not(:focus),
+  p-password.ng-invalid.ng-dirty .p-inputtext:not(:focus) {
     border-color: var(--p-inputtext-border-color);
   }
 
   .p-inputtext.p-invalid,
-  .p-password-input.p-invalid,
-  .p-inputtext.ng-invalid.ng-touched.p-invalid,
-  .p-password-input.ng-invalid.ng-touched.p-invalid {
-    border-color: var(--p-inputtext-invalid-border-color);
-  }
-
-  /**
-   * Aura colore aussi le PLACEHOLDER en rouge sur un champ invalide. Un texte
-   * d'exemple n'est pas une erreur : il reste gris, seuls la bordure et le message
-   * sous le champ portent l'état.
-   */
-  .p-inputtext::placeholder,
-  .p-password-input::placeholder {
-    color: var(--p-inputtext-placeholder-color);
+  .p-password-input.p-invalid {
+    border-color: var(--p-inputtext-invalid-border-color) !important;
   }
 }

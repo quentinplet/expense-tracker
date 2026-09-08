@@ -15,6 +15,15 @@ body {
   border-color: var(--p-inputtext-invalid-border-color);
 }
 
+// A placeholder is example text, not an error — it never turns red, in any state.
+// !important: PrimeNG ships its own more specific ::placeholder rules for invalid
+// fields (e.g. `.ng-invalid.ng-dirty::placeholder`) that would otherwise win.
+.p-inputtext::placeholder,
+.p-textarea::placeholder,
+p-password .p-inputtext::placeholder {
+  color: var(--p-inputtext-placeholder-color) !important;
+}
+
 .invalid-feedback {
   color: var(--p-red-500);
   font-size: 0.875rem;

@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
@@ -64,6 +65,31 @@ export class Auth {
   constructor() {
     const isLogin = this.route.snapshot.data['isLogin'] ?? true;
     this.mode.set(isLogin ? 'login' : 'register');
+
+    // Les erreurs de validation client se recalculent déjà seules via les
+    // signaux (submitted() && control.invalid). Celles renvoyées par le
+    // serveur (errors/serverError) ne le font pas : sans ça, un email déjà
+    // pris resterait affiché en rouge même après correction du champ.
+    this.loginForm.controls.email.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.serverError.set(null));
+    this.loginForm.controls.password.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.serverError.set(null));
+
+    this.registerForm.controls.firstName.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.clearFieldError('FirstName'));
+    this.registerForm.controls.lastName.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.clearFieldError('LastName'));
+    this.registerForm.controls.email.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.clearFieldError('Email');
+      this.serverError.set(null);
+    });
+    this.registerForm.controls.password.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.clearFieldError('Password'));
   }
 
   loginForm = this.fb.nonNullable.group({
@@ -150,6 +176,13 @@ export class Auth {
         this.serverError.set(this.extractServerMessage(error));
       },
     });
+  }
+
+  private clearFieldError(field: string) {
+    if (!(field in this.errors())) return;
+    const rest = { ...this.errors() };
+    delete rest[field];
+    this.errors.set(rest);
   }
 
   private extractServerMessage(error: unknown): string | null {
