@@ -37,21 +37,36 @@
       [month]="currentMonth()"
     />
 
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
+    <!-- items-start : le graphique a une hauteur de contenu fixe (224px, § trend-chart.html) ;
+         l'étirer à la hauteur de Quick actions faisait déborder les mois de l'axe. -->
+    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-3">
       <div class="lg:col-span-2">
-        <app-category-donut
-          [monthBreakdown]="dashboard.breakdown"
-          [allTimeBreakdown]="dashboard.breakdownAllTime"
-          [monthExpenses]="dashboard.totals.expenses"
-          [allTimeExpenses]="dashboard.allTimeExpenses"
-        />
-      </div>
-      <div class="lg:col-span-3">
         <app-trend-chart [dailyTrend]="dashboard.dailyTrend" [trend]="dashboard.trend" />
       </div>
+      <app-quick-actions />
+    </div>
+
+    <!-- Sans items-start ici : les deux cartes s'étirent à la même hauteur (comportement
+         par défaut d'une grille CSS), contrairement à la paire Recent/Recurring plus
+         bas où une hauteur imposée aurait laissé un grand vide. -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <app-category-donut
+        [monthBreakdown]="dashboard.breakdown"
+        [allTimeBreakdown]="dashboard.breakdownAllTime"
+        [monthExpenses]="dashboard.totals.expenses"
+        [allTimeExpenses]="dashboard.allTimeExpenses"
+      />
+      <app-budgets-summary [budgets]="budgets()" [month]="currentMonth()" class="block h-full" />
     </div>
 
     <!-- Les récentes ignorent volontairement la période sélectionnée. -->
-    <app-recent-transactions [transactions]="dashboard.recentTransactions" />
+    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-5">
+      <div class="lg:col-span-3">
+        <app-recent-transactions [transactions]="dashboard.recentTransactions" />
+      </div>
+      <div class="lg:col-span-2">
+        <app-recurring-summary [recurringTransactions]="recurringTransactions()" />
+      </div>
+    </div>
   }
 </div>

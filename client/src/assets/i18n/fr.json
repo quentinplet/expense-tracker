@@ -148,6 +148,22 @@
     "scope": {
       "month": "Mois",
       "all": "Toutes périodes"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "addTransaction": "Ajouter une transaction",
+      "manageBudgets": "Gérer les budgets",
+      "manageRecurring": "Gérer les récurrentes"
+    },
+    "budgets": {
+      "title": "Budgets",
+      "empty": "Aucun budget suivi ce mois-ci",
+      "emptyHint": "Définir un budget"
+    },
+    "recurring": {
+      "title": "Charges récurrentes",
+      "empty": "Aucune charge récurrente active",
+      "emptyHint": "Ajouter une charge récurrente"
     }
   },
   "category": {

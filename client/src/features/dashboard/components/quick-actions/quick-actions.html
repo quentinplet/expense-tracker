@@ -1,0 +1,31 @@
+<div
+  class="h-full rounded-2xl border border-surface-200 bg-surface-0 p-5 dark:border-surface-800 dark:bg-surface-900"
+>
+  <!-- Un <div>, ni <h2> ni <p> : _typography.scss (Sakai) fixe, hors @layer,
+       font-size: 2rem sur h1-h6 ET margin: 0 0 1rem 0 sur p — les deux battent
+       toujours les classes Tailwind (`m-0` y compris). (§ signalé à l'owner). -->
+  <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
+    {{ 'dashboard.quickActions.title' | translate }}
+  </div>
+
+  <div class="mt-4 grid grid-cols-2 gap-2.5">
+    @for (action of actions; track action.labelKey) {
+      <a
+        [routerLink]="action.link"
+        [queryParams]="action.queryParams"
+        class="flex flex-col items-center justify-center gap-2 rounded-xl border border-surface-200 px-3 py-5 text-center no-underline transition-colors hover:border-surface-300 dark:border-surface-800 dark:hover:border-surface-700"
+      >
+        <span
+          aria-hidden="true"
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white"
+          [style.background-color]="action.accent"
+        >
+          <i class="pi text-base" [class]="action.icon"></i>
+        </span>
+        <span class="text-xs font-medium text-surface-700 dark:text-surface-300">
+          {{ action.labelKey | translate }}
+        </span>
+      </a>
+    }
+  </div>
+</div>

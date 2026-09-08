@@ -148,6 +148,22 @@
     "scope": {
       "month": "Month",
       "all": "All time"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "addTransaction": "Add a transaction",
+      "manageBudgets": "Manage budgets",
+      "manageRecurring": "Manage recurring"
+    },
+    "budgets": {
+      "title": "Budgets",
+      "empty": "No budget tracked this month",
+      "emptyHint": "Set up a budget"
+    },
+    "recurring": {
+      "title": "Recurring transactions",
+      "empty": "No active recurring transaction",
+      "emptyHint": "Add a recurring transaction"
     }
   },
   "category": {
