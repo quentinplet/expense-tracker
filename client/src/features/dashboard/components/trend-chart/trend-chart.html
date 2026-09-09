@@ -55,8 +55,11 @@
 
   <!-- Boîte à hauteur constante : l'état vide occupe exactement la place du graphique,
        donc la carte ne change pas de taille en basculant de portée — et la carte
-       voisine, qui partage la même ligne de grille, ne bouge pas non plus. -->
-  <div class="mt-4 h-56">
+       voisine, qui partage la même ligne de grille, ne bouge pas non plus.
+       h-[224px], pas h-56 : la racine de l'app est à font-size 14px (Sakai), donc
+       14rem (h-56) vaut 196px et non 224px — un écart de 28px avec le height="224px"
+       du canvas Chart.js juste en dessous, qui débordait de la carte. -->
+  <div class="mt-4 h-[224px]">
     <!-- Toujours le graphique, même sans aucune donnée : à zéro partout, Chart.js
          trace juste une ligne plate — un vrai graphique vide, pas un texte à la place. -->
     <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="224px" />

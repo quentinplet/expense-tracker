@@ -1,7 +1,10 @@
 <aside
   class="flex h-full w-64 flex-col border-r border-surface-200 bg-surface-0 dark:border-surface-800 dark:bg-surface-900"
 >
-  <a routerLink="/dashboard" class="flex h-16 shrink-0 items-center gap-3 px-5 no-underline">
+  <a
+    routerLink="/dashboard"
+    class="flex h-16 shrink-0 items-center gap-3 border-b border-surface-200 px-5 no-underline dark:border-surface-800"
+  >
     <span
       class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-contrast"
     >
@@ -12,8 +15,8 @@
     </span>
   </a>
 
-  <nav class="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
-    <ul class="m-0 flex list-none flex-col gap-1 p-0">
+  <nav class="min-h-0 flex-1 overflow-y-auto px-3 pt-4 pb-3">
+    <ul class="m-0 flex list-none flex-col gap-4 p-0">
       @for (item of menuItems; track item.route) {
         <li>
           @if (item.available) {
@@ -37,29 +40,6 @@
         </li>
       }
     </ul>
-
-    @if (visibleCategories().length) {
-      <p
-        class="mt-6 mb-2 px-3 text-xs font-semibold tracking-wider text-surface-400 uppercase dark:text-surface-500"
-      >
-        {{ 'nav.categories' | translate }}
-      </p>
-      <ul class="m-0 flex list-none flex-col p-0">
-        @for (category of visibleCategories(); track category.id) {
-          <li
-            class="flex items-center gap-3 px-3 py-1.5 text-sm text-surface-600 dark:text-surface-300"
-          >
-            <!-- Couleur en variable inline : Category.color est une donnée éditable,
-                 jamais une classe générée (§18). -->
-            <span
-              class="h-2 w-2 shrink-0 rounded-full"
-              [style.background-color]="category.color || 'var(--p-surface-400)'"
-            ></span>
-            <span class="truncate">{{ category | categoryName }}</span>
-          </li>
-        }
-      </ul>
-    }
   </nav>
 
   <div class="shrink-0 border-t border-surface-200 p-3 dark:border-surface-800">

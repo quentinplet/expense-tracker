@@ -47,4 +47,17 @@ public class NotificationsController(IUnitOfWork uow, INotificationService notif
         await uow.Complete();
         return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var userId = User.GetMemberId();
+        var notification = await uow.NotificationRepository.GetByIdAsync(id);
+        if (notification == null) return NotFound();
+        if (notification.UserId != userId) return Forbid();
+
+        uow.NotificationRepository.Delete(notification);
+        if (await uow.Complete()) return NoContent();
+        return BadRequest("Failed to delete notification");
+    }
 }

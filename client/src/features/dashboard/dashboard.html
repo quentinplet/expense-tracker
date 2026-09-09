@@ -37,21 +37,40 @@
       [month]="currentMonth()"
     />
 
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
+    <!-- Sans items-start : les deux cartes s'étirent à la même hauteur. Sûr depuis que
+         la boîte du graphique est en h-[224px] fixe (§ trend-chart.html) — un flex-grow
+         par défaut à 0 ne l'étire jamais, l'espace en trop reste sous le graphique. -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <div class="lg:col-span-2">
-        <app-category-donut
-          [monthBreakdown]="dashboard.breakdown"
-          [allTimeBreakdown]="dashboard.breakdownAllTime"
-          [monthExpenses]="dashboard.totals.expenses"
-          [allTimeExpenses]="dashboard.allTimeExpenses"
-        />
-      </div>
-      <div class="lg:col-span-3">
         <app-trend-chart [dailyTrend]="dashboard.dailyTrend" [trend]="dashboard.trend" />
       </div>
+      <app-quick-actions class="h-full" />
+    </div>
+
+    <!-- items-start : la liste des budgets grandit avec le nombre de budgets suivis
+         ce mois-ci (jusqu'à 5 lignes) ; sans ça, elle tirait aussi Breakdown vers le
+         bas alors que l'anneau, lui, a une taille fixe — du vide sans utilité. -->
+    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+      <app-category-donut
+        [monthBreakdown]="dashboard.breakdown"
+        [allTimeBreakdown]="dashboard.breakdownAllTime"
+        [monthExpenses]="dashboard.totals.expenses"
+        [allTimeExpenses]="dashboard.allTimeExpenses"
+      />
+      <app-budgets-summary [budgets]="budgets()" [month]="currentMonth()" />
     </div>
 
     <!-- Les récentes ignorent volontairement la période sélectionnée. -->
-    <app-recent-transactions [transactions]="dashboard.recentTransactions" />
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
+      <div class="lg:col-span-3">
+        <app-recent-transactions [transactions]="dashboard.recentTransactions" class="block h-full" />
+      </div>
+      <div class="lg:col-span-2">
+        <app-recurring-summary
+          [recurringTransactions]="recurringTransactions()"
+          class="block h-full"
+        />
+      </div>
+    </div>
   }
 </div>

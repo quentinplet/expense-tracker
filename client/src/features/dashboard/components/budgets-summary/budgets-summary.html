@@ -1,0 +1,84 @@
+<div
+  class="h-full rounded-2xl border border-surface-200 bg-surface-0 p-5 dark:border-surface-800 dark:bg-surface-900"
+>
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="m-0 text-base font-semibold text-surface-900 dark:text-surface-0">
+      {{ 'dashboard.budgets.title' | translate }}
+    </h2>
+    <a
+      routerLink="/budgets"
+      [queryParams]="{ month: month() }"
+      class="text-sm font-medium text-primary no-underline hover:underline"
+    >
+      {{ 'common.seeAll' | translate }} →
+    </a>
+  </div>
+
+  @if (hasAny()) {
+    <div class="mt-4 grid grid-cols-1 gap-3" [class.sm:grid-cols-2]="manyBudgets()">
+      @if (globalRow(); as row) {
+        <ng-container [ngTemplateOutlet]="cardTpl" [ngTemplateOutletContext]="{ $implicit: row }" />
+      }
+      @for (row of categoryRows(); track row.budget.id) {
+        <ng-container [ngTemplateOutlet]="cardTpl" [ngTemplateOutletContext]="{ $implicit: row }" />
+      }
+    </div>
+  } @else {
+    <div class="py-10 text-center">
+      <p class="m-0 text-sm text-surface-500 dark:text-surface-400">
+        {{ 'dashboard.budgets.empty' | translate }}
+      </p>
+      <a routerLink="/budgets" class="mt-1 text-sm font-medium text-primary no-underline hover:underline">
+        {{ 'dashboard.budgets.emptyHint' | translate }}
+      </a>
+    </div>
+  }
+</div>
+
+<ng-template #cardTpl let-row>
+  <div
+    class="rounded-xl border p-3"
+    [class]="
+      row.status === 'over'
+        ? 'border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40'
+        : 'border-surface-200 dark:border-surface-800'
+    "
+  >
+    <div class="flex items-center gap-2">
+      @if (row.isGlobal) {
+        <app-category-badge icon="pi-wallet" [color]="badgeColor(row)" size="sm" />
+        <span class="min-w-0 flex-1 truncate text-sm font-medium text-surface-900 dark:text-surface-0">
+          {{ 'budgets.card.global' | translate }}
+        </span>
+      } @else {
+        <app-category-badge [icon]="row.budget.categoryIcon" [color]="row.budget.categoryColor" size="sm" />
+        <span class="min-w-0 flex-1 truncate text-sm font-medium text-surface-900 dark:text-surface-0">
+          {{
+            { name: row.budget.categoryName, translationKey: row.budget.categoryTranslationKey }
+              | categoryName
+          }}
+        </span>
+      }
+    </div>
+
+    <div class="mt-2 flex items-baseline gap-1">
+      <span
+        class="text-base font-bold"
+        [class]="row.status === 'over' ? 'text-red-600 dark:text-red-400' : 'text-surface-900 dark:text-surface-0'"
+      >
+        {{ row.budget.spent | currency: 'EUR' : 'symbol' : '1.0-0' : locale() }}
+      </span>
+      <span class="text-xs text-surface-500 dark:text-surface-400">
+        / {{ row.budget.amountLimit | currency: 'EUR' : 'symbol' : '1.0-0' : locale() }}
+      </span>
+    </div>
+
+    <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800">
+      <div
+        class="h-full rounded-full"
+        [style.width.%]="row.percentage"
+        [style.background-color]="barColor(row)"
+      ></div>
+    </div>
+  </div>
+</ng-template>

@@ -1,5 +1,6 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { FormsModule } from '@angular/forms';
@@ -89,6 +90,8 @@ export class Transactions implements OnInit {
   private translate = inject(TranslateService);
   private languageService = inject(LanguageService);
   private categoryNamePipe = inject(CategoryNamePipe);
+  private route = inject(ActivatedRoute);
+  private location = inject(Location);
 
   /**
    * Reconstruit à chaque changement de langue : les options d'un p-select sont des
@@ -187,6 +190,17 @@ export class Transactions implements OnInit {
     } as TableLazyLoadEvent);
     this.loadCategories();
     this.configureDebounce();
+
+    // Ouverture depuis l'action rapide du dashboard (§ QuickActions) : le
+    // paramètre est retiré aussitôt, sinon un rechargement ou un retour arrière
+    // rouvrirait le dialogue tout seul. `Location.replaceState` plutôt que
+    // `Router.navigate` : ce dernier déclenche une seconde navigation pendant que
+    // l'API View Transitions anime encore la première (`withViewTransitions()`,
+    // app.config.ts), ce qui produit un `AbortError` bruyant en console.
+    if (this.route.snapshot.queryParamMap.has('new')) {
+      this.openNew();
+      this.location.replaceState(this.location.path().split('?')[0]);
+    }
   }
 
   private configureDebounce() {

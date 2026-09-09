@@ -8,7 +8,6 @@
     "budgets": "Budgets",
     "recurring": "Récurrent",
     "reports": "Rapports",
-    "settings": "Paramètres",
     "categories": "Catégories"
   },
   "topbar": {
@@ -120,7 +119,7 @@
       "noPrevious": "Pas de comparaison"
     },
     "breakdown": {
-      "title": "Répartition par catégorie",
+      "title": "Dépenses par catégorie",
       "empty": "Aucune dépense ce mois-ci",
       "other": "Autres",
       "thisMonth": "sur le mois",
@@ -148,6 +147,22 @@
     "scope": {
       "month": "Mois",
       "all": "Toutes périodes"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "addTransaction": "Ajouter une transaction",
+      "manageBudgets": "Gérer les budgets",
+      "manageRecurring": "Gérer les charges récurrentes"
+    },
+    "budgets": {
+      "title": "Budgets",
+      "empty": "Aucun budget suivi ce mois-ci",
+      "emptyHint": "Définir un budget"
+    },
+    "recurring": {
+      "title": "Charges récurrentes",
+      "empty": "Aucune charge récurrente active",
+      "emptyHint": "Ajouter une charge récurrente"
     }
   },
   "category": {
@@ -271,6 +286,7 @@
     "title": "Notifications",
     "empty": "Aucune notification",
     "markAllRead": "Tout marquer comme lu",
+    "dismiss": "Effacer la notification",
     "recurringGenerated": "« {{label}} » générée automatiquement",
     "budgetCategoryThreshold90": "Budget « {{category}} » à 90 %",
     "budgetCategoryThreshold100": "Budget « {{category}} » dépassé",

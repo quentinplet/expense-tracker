@@ -21,4 +21,5 @@ public interface INotificationRepository
 
     void Add(Notification notification);
     void Update(Notification notification);
+    void Delete(Notification notification);
 }

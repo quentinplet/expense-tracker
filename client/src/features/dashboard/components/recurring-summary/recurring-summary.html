@@ -1,0 +1,60 @@
+<div
+  class="h-full rounded-2xl border border-surface-200 bg-surface-0 p-5 dark:border-surface-800 dark:bg-surface-900"
+>
+  <div class="flex items-center justify-between gap-3">
+    <h2 class="m-0 text-base font-semibold text-surface-900 dark:text-surface-0">
+      {{ 'dashboard.recurring.title' | translate }}
+    </h2>
+    <a
+      routerLink="/recurring"
+      class="text-sm font-medium text-primary no-underline hover:underline"
+    >
+      {{ 'common.seeAll' | translate }} →
+    </a>
+  </div>
+
+  @if (upcoming().length) {
+    <ul class="m-0 mt-4 list-none p-0">
+      @for (item of upcoming(); track item.id) {
+        <li class="flex items-center gap-3 border-b border-surface-200 py-3 dark:border-surface-800">
+          <app-category-badge [icon]="item.categoryIcon" [color]="item.categoryColor" size="sm" />
+
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-semibold text-surface-900 dark:text-surface-0">
+              {{ item.label }}
+            </span>
+            <span class="block truncate text-xs text-surface-500 dark:text-surface-400">
+              {{ categoryOf(item) | categoryName }} ·
+              {{ 'recurring.frequency.' + item.frequency.toLowerCase() | translate }}
+            </span>
+          </span>
+
+          <span class="shrink-0 text-right">
+            <span
+              class="block text-sm font-semibold tabular-nums"
+              [class]="item.type === 'Income' ? 'text-green-500' : 'text-red-500'"
+            >
+              {{ item.type === 'Income' ? '+' : '−'
+              }}{{ item.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
+            </span>
+            <span class="block text-xs text-surface-500 dark:text-surface-400">
+              {{ item.nextDueDate | date: 'mediumDate' : undefined : locale() }}
+            </span>
+          </span>
+        </li>
+      }
+    </ul>
+  } @else {
+    <div class="py-10 text-center">
+      <p class="m-0 text-sm text-surface-500 dark:text-surface-400">
+        {{ 'dashboard.recurring.empty' | translate }}
+      </p>
+      <a
+        routerLink="/recurring"
+        class="mt-1 text-sm font-medium text-primary no-underline hover:underline"
+      >
+        {{ 'dashboard.recurring.emptyHint' | translate }}
+      </a>
+    </div>
+  }
+</div>

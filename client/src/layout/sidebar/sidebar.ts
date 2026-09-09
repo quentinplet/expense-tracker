@@ -1,13 +1,9 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { AccountService } from '@/core/services/account-service';
-import { CategorieService } from '@/core/services/categorie-service';
-import { Categorie } from '@/types/categorie';
-import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
-import { signal } from '@angular/core';
 
 type NavItem = {
   labelKey: string;
@@ -20,16 +16,13 @@ type NavItem = {
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, TranslatePipe, CategoryNamePipe, MenuModule],
+  imports: [RouterLink, RouterLinkActive, TranslatePipe, MenuModule],
   templateUrl: './sidebar.html',
 })
-export class SidebarComponent implements OnInit {
-  private categorieService = inject(CategorieService);
+export class SidebarComponent {
   protected accountService = inject(AccountService);
   private translate = inject(TranslateService);
   private router = inject(Router);
-
-  protected categories = signal<Categorie[]>([]);
 
   protected readonly menuItems: NavItem[] = [
     { labelKey: 'nav.dashboard', icon: 'pi pi-th-large', route: '/dashboard', available: true },
@@ -38,11 +31,7 @@ export class SidebarComponent implements OnInit {
     { labelKey: 'nav.budgets', icon: 'pi pi-chart-pie', route: '/budgets', available: true },
     { labelKey: 'nav.recurring', icon: 'pi pi-sync', route: '/recurring', available: true },
     { labelKey: 'nav.reports', icon: 'pi pi-chart-bar', route: '/reports', available: false },
-    { labelKey: 'nav.settings', icon: 'pi pi-cog', route: '/settings', available: true },
   ];
-
-  /** La sidebar montre un aperçu, pas la liste complète : au-delà, elle défile. */
-  protected visibleCategories = computed(() => this.categories().slice(0, 6));
 
   protected initials = computed(() => {
     const user = this.accountService.currentUser();
@@ -71,10 +60,4 @@ export class SidebarComponent implements OnInit {
       },
     ];
   });
-
-  ngOnInit() {
-    this.categorieService.getCategories().subscribe({
-      next: (categories) => this.categories.set(categories),
-    });
-  }
 }

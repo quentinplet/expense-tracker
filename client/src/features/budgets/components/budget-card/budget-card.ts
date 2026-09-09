@@ -78,8 +78,14 @@ export class BudgetCard {
    * `color-mix` fait l'interpolation directement en CSS, même recette que le badge
    * de catégorie (§18). Indépendant de la catégorie : la barre porte la sévérité
    * (dépensé vs plafond), le badge porte l'identité.
+   *
+   * Courbe, pas un mélange linéaire : un mix 1:1 dès 50 % faisait virer la barre au
+   * jaune/orange bien avant que le budget ne soit réellement menacé. Exposant 3 sur
+   * le ratio (pas le pourcentage affiché) : le vert domine jusque tard, le rouge monte
+   * en flèche à l'approche de la limite (§ dashboard budgets-summary.ts, même formule).
    */
-  protected barColor = computed(
-    () => `color-mix(in oklch, var(--p-red-500) ${this.percentage()}%, var(--p-green-500))`,
-  );
+  protected barColor = computed(() => {
+    const redRatio = Math.pow(this.percentage() / 100, 3) * 100;
+    return `color-mix(in oklch, var(--p-red-500) ${redRatio}%, var(--p-green-500))`;
+  });
 }
