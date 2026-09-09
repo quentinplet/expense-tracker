@@ -24,10 +24,12 @@ export class RecurringSummary {
   protected locale = computed(() => this.languageService.current());
 
   /** Déjà triées par NextDueDate croissant côté serveur (§ RecurringTransactionService) —
-   *  filtrer les actives préserve cet ordre, pas besoin de re-trier. */
+   *  filtrer préserve cet ordre, pas besoin de re-trier. Dépenses uniquement : le titre
+   *  « Charges récurrentes » ne désigne que des sorties d'argent — un revenu récurrent
+   *  (salaire...) n'a pas sa place ici. */
   protected upcoming = computed(() =>
     this.recurringTransactions()
-      .filter((r) => r.active)
+      .filter((r) => r.active && r.type === 'Expense')
       .slice(0, PREVIEW_COUNT),
   );
 

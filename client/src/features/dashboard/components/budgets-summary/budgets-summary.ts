@@ -20,8 +20,9 @@ type BudgetRow = {
 
 const GLOBAL_ACCENT = 'var(--p-primary-500)';
 
-/** Nombre de lignes catégorie affichées, les plus urgentes d'abord — un aperçu, pas la
- *  liste complète (confirmé : lien « voir tout » vers /budgets pour le reste). */
+/** Nombre total de cartes affichées (budget global inclus), les plus urgentes d'abord —
+ *  un aperçu, pas la liste complète (confirmé : lien « voir tout » vers /budgets pour
+ *  le reste). */
 const PREVIEW_COUNT = 4;
 
 @Component({
@@ -44,16 +45,25 @@ export class BudgetsSummary {
   });
 
   /** Les plus proches (ou déjà au-delà) du plafond en premier : c'est l'information
-   *  la plus utile dans un aperçu forcément tronqué. */
-  protected categoryRows = computed<BudgetRow[]>(() =>
-    this.budgets()
+   *  la plus utile dans un aperçu forcément tronqué. Le budget global occupe une des
+   *  PREVIEW_COUNT cartes quand il existe — les lignes catégorie se partagent le
+   *  reste, pas PREVIEW_COUNT en plus de lui. */
+  protected categoryRows = computed<BudgetRow[]>(() => {
+    const remaining = PREVIEW_COUNT - (this.globalRow() ? 1 : 0);
+    return this.budgets()
       .filter((b) => b.categoryId !== null)
       .map((b) => toRow(b, false))
       .sort((a, b) => b.percentage - a.percentage)
-      .slice(0, PREVIEW_COUNT),
-  );
+      .slice(0, remaining);
+  });
 
   protected hasAny = computed(() => this.globalRow() !== null || this.categoryRows().length > 0);
+
+  /** Au-delà de 2 lignes, la liste bascule sur 2 colonnes — sinon la carte s'allonge
+   *  sans limite et tire ses voisines de grille vers le bas avec elle. */
+  protected manyBudgets = computed(
+    () => (this.globalRow() ? 1 : 0) + this.categoryRows().length > 2,
+  );
 
   protected badgeColor(row: BudgetRow) {
     return row.isGlobal ? GLOBAL_ACCENT : (row.budget.categoryColor ?? 'var(--p-surface-400)');

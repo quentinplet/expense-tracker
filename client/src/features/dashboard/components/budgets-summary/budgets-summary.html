@@ -15,7 +15,7 @@
   </div>
 
   @if (hasAny()) {
-    <div class="mt-4 flex flex-col gap-3">
+    <div class="mt-4 grid grid-cols-1 gap-3" [class.sm:grid-cols-2]="manyBudgets()">
       @if (globalRow(); as row) {
         <ng-container [ngTemplateOutlet]="cardTpl" [ngTemplateOutletContext]="{ $implicit: row }" />
       }

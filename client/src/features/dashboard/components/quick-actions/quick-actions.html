@@ -1,5 +1,5 @@
 <div
-  class="h-full rounded-2xl border border-surface-200 bg-surface-0 p-5 dark:border-surface-800 dark:bg-surface-900"
+  class="flex h-full flex-col rounded-2xl border border-surface-200 bg-surface-0 p-5 dark:border-surface-800 dark:bg-surface-900"
 >
   <!-- Un <div>, ni <h2> ni <p> : _typography.scss (Sakai) fixe, hors @layer,
        font-size: 2rem sur h1-h6 ET margin: 0 0 1rem 0 sur p — les deux battent
@@ -8,7 +8,11 @@
     {{ 'dashboard.quickActions.title' | translate }}
   </div>
 
-  <div class="mt-4 grid grid-cols-2 gap-2.5">
+  <!-- flex-1 + items-center : le titre reste ancré en haut, comme sur les autres
+       cartes (Trend, Budgets...) — seules les tuiles se centrent dans l'espace
+       restant, laissé libre par l'étirement à la hauteur de Trend. -->
+  <div class="mt-4 flex flex-1 items-center">
+    <div class="grid w-full grid-cols-2 gap-2.5">
     @for (action of actions; track action.labelKey) {
       <a
         [routerLink]="action.link"
@@ -27,5 +31,6 @@
         </span>
       </a>
     }
+    </div>
   </div>
 </div>
