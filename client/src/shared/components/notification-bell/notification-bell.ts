@@ -61,6 +61,14 @@ export class NotificationBell implements OnInit, OnDestroy {
     this.notificationService.markAllAsRead();
   }
 
+  /** stopPropagation : le bouton d'effacement est imbriqué dans le bouton de la
+   *  ligne (§ notification-bell.html) — sans ça, l'effacement déclencherait aussi
+   *  onSelect() juste au-dessus (marquer comme lu + naviguer). */
+  onDismiss(notification: Notification, event: Event): void {
+    event.stopPropagation();
+    this.notificationService.delete(notification.id);
+  }
+
   /**
    * Résolution de la clé i18n par Type (et par budgetIsGlobal pour les
    * seuils), en un seul endroit — même règle que CategoryNamePipe pour les

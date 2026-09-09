@@ -286,6 +286,7 @@
     "title": "Notifications",
     "empty": "Aucune notification",
     "markAllRead": "Tout marquer comme lu",
+    "dismiss": "Effacer la notification",
     "recurringGenerated": "« {{label}} » générée automatiquement",
     "budgetCategoryThreshold90": "Budget « {{category}} » à 90 %",
     "budgetCategoryThreshold100": "Budget « {{category}} » dépassé",

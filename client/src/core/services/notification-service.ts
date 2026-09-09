@@ -61,4 +61,12 @@ export class NotificationService {
         next: () => this.refresh(),
       });
   }
+
+  delete(id: string): void {
+    this.http
+      .delete<void>(`${this.baseUrl}notifications/${id}`, { context: withSkipLoading() })
+      .subscribe({
+        next: () => this.refresh(),
+      });
+  }
 }

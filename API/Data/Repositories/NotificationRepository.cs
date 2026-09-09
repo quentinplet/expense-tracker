@@ -49,4 +49,9 @@ public class NotificationRepository(AppDbContext context) : INotificationReposit
     {
         context.Notifications.Update(notification);
     }
+
+    public void Delete(Notification notification)
+    {
+        context.Notifications.Remove(notification);
+    }
 }
