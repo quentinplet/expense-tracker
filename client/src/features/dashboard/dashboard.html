@@ -61,12 +61,15 @@
     </div>
 
     <!-- Les récentes ignorent volontairement la période sélectionnée. -->
-    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-5">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
       <div class="lg:col-span-3">
-        <app-recent-transactions [transactions]="dashboard.recentTransactions" />
+        <app-recent-transactions [transactions]="dashboard.recentTransactions" class="block h-full" />
       </div>
       <div class="lg:col-span-2">
-        <app-recurring-summary [recurringTransactions]="recurringTransactions()" />
+        <app-recurring-summary
+          [recurringTransactions]="recurringTransactions()"
+          class="block h-full"
+        />
       </div>
     </div>
   }
