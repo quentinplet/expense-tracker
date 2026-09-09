@@ -1,5 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { PrimeNG } from 'primeng/config';
+import { PRIMENG_TRANSLATIONS } from '@/core/i18n/primeng-translations';
 
 export const SUPPORTED_LANGUAGES = ['fr', 'en'] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
@@ -15,6 +17,7 @@ function isSupported(value: string | null | undefined): value is Language {
 })
 export class LanguageService {
   private translate = inject(TranslateService);
+  private primeng = inject(PrimeNG);
 
   /// Lue par l'intercepteur pour l'en-tête Accept-Language, et par les composants qui
   /// doivent se reconstruire au changement de langue — les options Chart.js, par exemple.
@@ -35,6 +38,9 @@ export class LanguageService {
   use(lang: Language) {
     this.current.set(lang);
     this.translate.use(lang);
+    // ngx-translate ne couvre pas les chaînes propres à PrimeNG (datepicker, filtres
+    // de table...) : PrimeNG.setTranslation() est le seul canal qu'il expose pour ça.
+    this.primeng.setTranslation(PRIMENG_TRANSLATIONS[lang]);
     document.documentElement.lang = lang;
 
     try {
