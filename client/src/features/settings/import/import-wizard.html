@@ -1,0 +1,105 @@
+<div class="w-full max-w-4xl mx-auto">
+  <div class="mb-6">
+    <h1 class="m-0 text-3xl font-bold text-surface-900 dark:text-surface-0">
+      {{ 'import.wizard.title' | translate }}
+    </h1>
+    <p class="mt-1 mb-0 text-sm text-surface-500 dark:text-surface-400">
+      {{ 'import.wizard.subtitle' | translate }}
+    </p>
+  </div>
+
+  <!-- Repères d'étape, non cliquables : le mapping ne s'affiche que si nécessaire,
+       le parcours n'est pas strictement linéaire. -->
+  <div class="mb-6 flex items-center gap-2 text-sm font-medium text-surface-500 dark:text-surface-400">
+    <span [class.text-primary-600]="step() === 'upload'" [class.dark:text-primary-400]="step() === 'upload'">
+      {{ 'import.wizard.stepUpload' | translate }}
+    </span>
+    <i class="pi pi-angle-right text-xs"></i>
+    <span
+      [class.text-primary-600]="step() === 'mapping' || step() === 'preview'"
+      [class.dark:text-primary-400]="step() === 'mapping' || step() === 'preview'"
+    >
+      {{ 'import.wizard.stepPreview' | translate }}
+    </span>
+    <i class="pi pi-angle-right text-xs"></i>
+    <span [class.text-primary-600]="step() === 'result'" [class.dark:text-primary-400]="step() === 'result'">
+      {{ 'import.wizard.stepResult' | translate }}
+    </span>
+  </div>
+
+  <div class="mb-5 overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 p-6 dark:border-surface-800 dark:bg-surface-900">
+    @switch (step()) {
+      @case ('upload') {
+        <p-fileupload
+          mode="basic"
+          [auto]="false"
+          accept=".csv,text/csv"
+          [maxFileSize]="5000000"
+          [chooseLabel]="'import.wizard.chooseFile' | translate"
+          chooseIcon="pi pi-upload"
+          (onSelect)="onFileSelect($event)"
+        />
+        <p class="mt-3 mb-0 text-xs text-surface-500 dark:text-surface-400">
+          {{ 'import.wizard.hint' | translate }}
+        </p>
+      }
+      @case ('mapping') {
+        @if (preview(); as p) {
+          <app-import-column-mapper
+            [columns]="p.detectedColumns"
+            [suggested]="p.suggestedMapping"
+            [loading]="loading()"
+            (submitMapping)="onMappingSubmit($event)"
+            (back)="startOver()"
+          />
+        }
+      }
+      @case ('preview') {
+        @if (preview(); as p) {
+          <app-import-preview-table
+            [preview]="p"
+            [categories]="categories()"
+            [loading]="loading()"
+            (confirm)="onConfirm($event)"
+            (back)="startOver()"
+          />
+        }
+      }
+      @case ('result') {
+        @if (result(); as r) {
+          <div class="flex flex-col items-center gap-3 py-6 text-center">
+            <i class="pi pi-check-circle text-5xl text-green-500"></i>
+            <h2 class="m-0 text-xl font-semibold text-surface-900 dark:text-surface-0">
+              {{ 'import.wizard.resultTitle' | translate }}
+            </h2>
+            <p class="m-0 text-sm text-surface-600 dark:text-surface-300">
+              {{ 'import.wizard.resultInserted' | translate: { count: r.insertedCount } }}
+              @if (r.skippedDuplicateCount > 0) {
+                <br />
+                {{ 'import.wizard.resultSkipped' | translate: { count: r.skippedDuplicateCount } }}
+              }
+            </p>
+            <div class="mt-2 flex gap-3">
+              <p-button
+                [label]="'import.wizard.viewTransactions' | translate"
+                (click)="goToTransactions()"
+              />
+              <p-button
+                [label]="'import.wizard.importAnother' | translate"
+                severity="secondary"
+                outlined
+                (click)="startOver()"
+              />
+            </div>
+          </div>
+        }
+      }
+    }
+
+    @if (serverError()) {
+      <p class="mt-4 mb-0 text-sm text-red-500">{{ serverError() }}</p>
+    }
+  </div>
+
+  <app-import-history [refreshTrigger]="historyVersion()" />
+</div>

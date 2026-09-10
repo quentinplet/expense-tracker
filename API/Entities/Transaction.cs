@@ -33,5 +33,15 @@ public class Transaction
     public Guid? RecurringTransactionId { get; set; }
     public RecurringTransaction? RecurringTransaction { get; set; }
 
+    /// Renseigné si cette transaction vient d'un import CSV. Supprimée en cascade
+    /// si le batch est annulé (contrairement à RecurringTransactionId ci-dessus).
+    public Guid? ImportBatchId { get; set; }
+    public ImportBatch? ImportBatch { get; set; }
+
+    /// SHA-256 de (date, montant, libellé brut) — import CSV seulement. Sert au
+    /// dédoublonnage ; unique par utilisateur (pas d'entité Account dans ce projet,
+    /// donc pas de portée par compte comme documenté à l'origine).
+    public string? DedupHash { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

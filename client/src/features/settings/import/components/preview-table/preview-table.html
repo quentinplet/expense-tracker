@@ -1,0 +1,129 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex flex-wrap gap-2 text-sm">
+      <p-tag [value]="preview().totalRows + ' ' + ('import.preview.rows' | translate)" severity="secondary" />
+      @if (preview().duplicateCount > 0) {
+        <p-tag [value]="preview().duplicateCount + ' ' + ('import.preview.duplicates' | translate)" severity="warn" />
+      }
+      @if (preview().conflictCount > 0) {
+        <p-tag [value]="preview().conflictCount + ' ' + ('import.preview.conflicts' | translate)" severity="info" />
+      }
+      @if (preview().invalidCount > 0) {
+        <p-tag [value]="preview().invalidCount + ' ' + ('import.preview.invalid' | translate)" severity="danger" />
+      }
+    </div>
+    <p class="m-0 text-sm text-surface-500 dark:text-surface-400">
+      {{ 'import.preview.selectedCount' | translate: { count: selectedCount() } }}
+    </p>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-surface-200 dark:border-surface-800">
+    <p-table [value]="rows()" [scrollable]="true" scrollHeight="28rem">
+      <ng-template #header>
+        <tr>
+          <th class="w-12">
+            <p-checkbox [binary]="true" [ngModel]="allValidSelected()" (ngModelChange)="toggleSelectAll($event)" />
+          </th>
+          <th>{{ 'import.preview.columns.date' | translate }}</th>
+          <th>{{ 'import.preview.columns.label' | translate }}</th>
+          <th>{{ 'import.preview.columns.category' | translate }}</th>
+          <th class="text-end">{{ 'import.preview.columns.amount' | translate }}</th>
+          <th>{{ 'import.preview.columns.status' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-row let-i="rowIndex">
+        <tr [class.opacity-50]="!row.source.isValid">
+          <td>
+            <p-checkbox
+              [binary]="true"
+              [disabled]="!row.source.isValid"
+              [ngModel]="row.selected"
+              (ngModelChange)="toggleRow(i, $event)"
+            />
+          </td>
+          <td class="whitespace-nowrap">
+            {{ row.source.date ? (row.source.date | date: 'mediumDate' : undefined : locale()) : '—' }}
+          </td>
+          <td>
+            @if (row.source.isValid) {
+              <input
+                pInputText
+                type="text"
+                [ngModel]="row.label"
+                (ngModelChange)="updateLabel(i, $event)"
+                fluid
+              />
+            } @else {
+              <span class="text-sm text-surface-500 dark:text-surface-400">{{ row.source.suggestedLabel }}</span>
+            }
+          </td>
+          <td class="min-w-48">
+            @if (row.source.isValid) {
+              <p-select
+                [options]="categoryOptionsFor(row.source.type)"
+                optionLabel="label"
+                optionValue="id"
+                [ngModel]="row.categoryId"
+                (ngModelChange)="updateCategory(i, $event)"
+                appendTo="body"
+                fluid
+              >
+                <ng-template #selectedItem let-option>
+                  @if (option) {
+                    <span class="flex items-center gap-2">
+                      <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+                      {{ option.label }}
+                    </span>
+                  }
+                </ng-template>
+                <ng-template #item let-option>
+                  <span class="flex items-center gap-2">
+                    <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+                    {{ option.label }}
+                  </span>
+                </ng-template>
+              </p-select>
+            }
+          </td>
+          <td class="text-end whitespace-nowrap font-semibold">
+            @if (row.source.amount != null) {
+              <span [class]="row.source.type === 'Income' ? 'text-green-500' : 'text-red-500'">
+                {{ row.source.type === 'Income' ? '+' : '−'
+                }}{{ row.source.amount | currency: 'EUR' : 'symbol' : '1.2-2' : locale() }}
+              </span>
+            } @else {
+              —
+            }
+          </td>
+          <td>
+            @if (!row.source.isValid) {
+              <p-tag severity="danger" [value]="'import.preview.errors.' + row.source.parseError | translate" />
+            } @else if (row.source.isDuplicate) {
+              <p-tag severity="warn" [value]="'import.preview.duplicate' | translate" />
+            } @else if (row.source.hasRecurringConflict) {
+              <p-tag severity="info" [value]="'import.preview.conflict' | translate" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="flex justify-between">
+    <p-button
+      type="button"
+      [label]="'import.wizard.startOver' | translate"
+      severity="secondary"
+      outlined
+      (click)="back.emit()"
+    />
+    <p-button
+      type="button"
+      [label]="'import.preview.confirm' | translate"
+      icon="pi pi-check"
+      [disabled]="!canConfirm()"
+      [loading]="loading()"
+      (click)="onConfirm()"
+    />
+  </div>
+</div>

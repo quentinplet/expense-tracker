@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { FormsModule } from '@angular/forms';
@@ -52,6 +52,7 @@ import { CategoryBadge } from '@/shared/components/category-badge/category-badge
     DatePicker,
     TooltipModule,
     CategoryBadge,
+    RouterLink,
   ],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',

@@ -21,6 +21,17 @@ public interface ITransactionRepository
     /// de RecurringTransactionGenerationJob).
     Task<HashSet<DateOnly>> GetGeneratedDatesAsync(Guid recurringTransactionId, DateOnly from, DateOnly toInclusive);
 
+    /// DedupHash déjà présents pour cet utilisateur parmi ceux fournis — une seule
+    /// requête pour tout le fichier importé (prévisualisation et confirmation),
+    /// jamais une par ligne (§ Import CSV, dédoublonnage).
+    Task<HashSet<string>> GetExistingDedupHashesAsync(Guid userId, IEnumerable<string> hashes);
+
+    /// Transactions générées par une transaction récurrente, sur une fenêtre de
+    /// dates — sert à la détection de conflit à l'import CSV (§ Import CSV,
+    /// conflit avec les transactions récurrentes). Une seule requête pour tout le
+    /// fichier, le rapprochement montant/date se fait ensuite en mémoire.
+    Task<List<Entities.Transaction>> GetRecurringGeneratedInRangeAsync(Guid userId, DateOnly from, DateOnly to);
+
     void AddTransaction(Entities.Transaction transaction);
     void UpdateTransaction(Entities.Transaction transaction);
     void DeleteTransaction(Entities.Transaction transaction);

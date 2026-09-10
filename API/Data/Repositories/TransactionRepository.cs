@@ -122,6 +122,24 @@ public class TransactionRepository(AppDbContext context) : ITransactionRepositor
         return [.. dates];
     }
 
+    public async Task<HashSet<string>> GetExistingDedupHashesAsync(Guid userId, IEnumerable<string> hashes)
+    {
+        var hashList = hashes.ToList();
+        var existing = await context.Transactions
+            .Where(t => t.UserId == userId && t.DedupHash != null && hashList.Contains(t.DedupHash))
+            .Select(t => t.DedupHash!)
+            .ToListAsync();
+
+        return [.. existing];
+    }
+
+    public async Task<List<Transaction>> GetRecurringGeneratedInRangeAsync(Guid userId, DateOnly from, DateOnly to)
+    {
+        return await context.Transactions
+            .Where(t => t.UserId == userId && t.RecurringTransactionId != null && t.Date >= from && t.Date <= to)
+            .ToListAsync();
+    }
+
     public void AddTransaction(Transaction transaction)
     {
         context.Transactions.Add(transaction);

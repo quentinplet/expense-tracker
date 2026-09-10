@@ -13,16 +13,12 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <!-- Import CSV : visible pour tenir la maquette, inerte tant que le backend
-           n'existe pas. Le title explique pourquoi il ne répond pas. -->
       <p-button
         [label]="'transaction.list.importCsv' | translate"
         icon="pi pi-download"
         severity="secondary"
         outlined
-        [disabled]="true"
-        [pTooltip]="'transaction.list.importCsvSoon' | translate"
-        tooltipPosition="bottom"
+        routerLink="/settings/import"
       />
       <p-button (click)="openNew()" [label]="'transaction.list.add' | translate" icon="pi pi-plus" />
     </div>

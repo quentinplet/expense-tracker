@@ -55,8 +55,7 @@
       "deleteMany": "Are you sure you want to delete the selected transactions?",
       "deleted": "Transaction deleted",
       "deletedMany": "Transactions deleted",
-      "deleteFailed": "Deletion failed.",
-      "importCsvSoon": "Coming soon"
+      "deleteFailed": "Deletion failed."
     },
     "columns": {
       "label": "Label",
@@ -371,6 +370,73 @@
         "submit": "Delete permanently",
         "deleteFailed": "The deletion failed."
       }
+    }
+  },
+  "import": {
+    "wizard": {
+      "title": "Import CSV",
+      "subtitle": "Import a CSV export from your bank to add transactions in one go.",
+      "stepUpload": "1. File",
+      "stepPreview": "2. Preview",
+      "stepResult": "3. Result",
+      "chooseFile": "Choose a CSV file",
+      "hint": "Accepted formats: bank CSV export (\";\" or \",\" separator), 5 MB maximum.",
+      "resultTitle": "Import complete",
+      "resultInserted": "{{count}} transaction(s) added.",
+      "resultSkipped": "{{count}} row(s) skipped as already imported.",
+      "viewTransactions": "View transactions",
+      "importAnother": "Import another file",
+      "startOver": "Start over",
+      "confirmFailed": "The import failed."
+    },
+    "mapping": {
+      "hint": "Automatic detection could not find every required column — specify them below.",
+      "dateColumn": "Date column",
+      "labelColumn": "Label column",
+      "selectColumn": "Choose a column",
+      "amountMode": "Amount",
+      "amountModeSigned": "A single signed column",
+      "amountModeDebitCredit": "Separate Debit / Credit",
+      "amountColumn": "Amount column",
+      "debitColumn": "Debit column",
+      "creditColumn": "Credit column",
+      "dateFormat": "Date format",
+      "cultureName": "Culture (e.g. fr-FR)",
+      "submit": "Preview"
+    },
+    "preview": {
+      "rows": "rows",
+      "duplicates": "duplicates",
+      "conflicts": "conflicts",
+      "invalid": "invalid",
+      "selectedCount": "{{count}} row(s) selected",
+      "columns": {
+        "date": "Date",
+        "label": "Label",
+        "category": "Category",
+        "amount": "Amount",
+        "status": "Status"
+      },
+      "duplicate": "Duplicate",
+      "conflict": "Recurring transaction",
+      "confirm": "Confirm import",
+      "errors": {
+        "unmappedDate": "Date column not resolved",
+        "invalidDate": "Invalid date",
+        "unmappedLabel": "Label column not resolved",
+        "missingLabel": "Missing label",
+        "unmappedAmount": "Amount column not resolved",
+        "invalidAmount": "Invalid amount"
+      }
+    },
+    "history": {
+      "title": "Previous imports",
+      "empty": "No imports yet.",
+      "rowCount": "{{count}} row(s)",
+      "cancel": "Cancel",
+      "cancelConfirm": "Cancel the \"{{fileName}}\" import? Its imported transactions will be deleted.",
+      "cancelled": "Import cancelled.",
+      "cancelFailed": "The cancellation failed."
     }
   }
 }

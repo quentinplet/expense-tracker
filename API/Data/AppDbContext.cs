@@ -15,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<Budget> Budgets { get; set; }
     public DbSet<RecurringTransaction> RecurringTransactions { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<ImportBatch> ImportBatches { get; set; }
 
     public static readonly Guid MemberRoleId = new("11111111-1111-1111-1111-111111111111");
     public static readonly Guid AdminRoleId = new("22222222-2222-2222-2222-222222222222");
@@ -26,6 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         modelBuilder.HasPostgresEnum<Frequency>();
         modelBuilder.HasPostgresEnum<TransactionType>();
         modelBuilder.HasPostgresEnum<NotificationType>();
+        modelBuilder.HasPostgresEnum<ImportStatus>();
 
         // Mapping explicite des propriétés (FORCE le type de colonne)
         modelBuilder.Entity<RecurringTransaction>()
@@ -57,6 +59,24 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
              .WithMany(r => r.Transactions)
              .HasForeignKey(t => t.RecurringTransactionId)
              .OnDelete(DeleteBehavior.SetNull);
+
+            // Cascade (pas SetNull comme ci-dessus) : sans son batch, une transaction
+            // importée n'a plus de sens à conserver — annuler un import doit faire
+            // disparaître ses transactions.
+            e.HasOne(t => t.ImportBatch)
+             .WithMany(b => b.Transactions)
+             .HasForeignKey(t => t.ImportBatchId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.Property(t => t.DedupHash).HasMaxLength(64);
+
+            // Unique par utilisateur (pas de compte dans ce projet, voir §22 Q3 doc
+            // feature Import CSV) — filet de sécurité en cas de confirmations
+            // concurrentes sur le même fichier ; la vérification applicative
+            // (ImportService) reste la voie normale.
+            e.HasIndex(t => new { t.UserId, t.DedupHash })
+             .IsUnique()
+             .HasFilter("\"DedupHash\" IS NOT NULL");
         });
 
         modelBuilder.Entity<Category>(e =>
@@ -119,6 +139,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
              .WithMany()
              .HasForeignKey(n => n.BudgetId)
              .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ImportBatch>(e =>
+        {
+            e.Property(b => b.FileName).HasMaxLength(255).IsRequired();
+            e.Property(b => b.Status).HasColumnType("import_status");
+
+            // Historique trié par ImportedAt décroissant (GET /api/import/batches).
+            e.HasIndex(b => new { b.UserId, b.ImportedAt });
         });
 
         modelBuilder.Entity<IdentityRole<Guid>>()

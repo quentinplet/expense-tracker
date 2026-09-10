@@ -55,8 +55,7 @@
       "deleteMany": "Voulez-vous vraiment supprimer les transactions sélectionnées ?",
       "deleted": "Transaction supprimée",
       "deletedMany": "Transactions supprimées",
-      "deleteFailed": "La suppression a échoué.",
-      "importCsvSoon": "Bientôt disponible"
+      "deleteFailed": "La suppression a échoué."
     },
     "columns": {
       "label": "Libellé",
@@ -371,6 +370,73 @@
         "submit": "Supprimer définitivement",
         "deleteFailed": "La suppression a échoué."
       }
+    }
+  },
+  "import": {
+    "wizard": {
+      "title": "Import CSV",
+      "subtitle": "Importez un export CSV de votre banque pour ajouter des transactions en une fois.",
+      "stepUpload": "1. Fichier",
+      "stepPreview": "2. Prévisualisation",
+      "stepResult": "3. Résultat",
+      "chooseFile": "Choisir un fichier CSV",
+      "hint": "Formats acceptés : export CSV bancaire (séparateur « ; » ou « , »), 5 Mo maximum.",
+      "resultTitle": "Import terminé",
+      "resultInserted": "{{count}} transaction(s) ajoutée(s).",
+      "resultSkipped": "{{count}} ligne(s) ignorée(s) car déjà importée(s).",
+      "viewTransactions": "Voir les transactions",
+      "importAnother": "Importer un autre fichier",
+      "startOver": "Recommencer",
+      "confirmFailed": "L'import a échoué."
+    },
+    "mapping": {
+      "hint": "La détection automatique n'a pas trouvé toutes les colonnes nécessaires — précisez-les ci-dessous.",
+      "dateColumn": "Colonne date",
+      "labelColumn": "Colonne libellé",
+      "selectColumn": "Choisir une colonne",
+      "amountMode": "Montant",
+      "amountModeSigned": "Une colonne signée",
+      "amountModeDebitCredit": "Débit / Crédit séparés",
+      "amountColumn": "Colonne montant",
+      "debitColumn": "Colonne débit",
+      "creditColumn": "Colonne crédit",
+      "dateFormat": "Format de date",
+      "cultureName": "Culture (ex. fr-FR)",
+      "submit": "Prévisualiser"
+    },
+    "preview": {
+      "rows": "lignes",
+      "duplicates": "doublons",
+      "conflicts": "conflits",
+      "invalid": "invalides",
+      "selectedCount": "{{count}} ligne(s) sélectionnée(s)",
+      "columns": {
+        "date": "Date",
+        "label": "Libellé",
+        "category": "Catégorie",
+        "amount": "Montant",
+        "status": "Statut"
+      },
+      "duplicate": "Doublon",
+      "conflict": "Charge récurrente",
+      "confirm": "Confirmer l'import",
+      "errors": {
+        "unmappedDate": "Colonne date non résolue",
+        "invalidDate": "Date invalide",
+        "unmappedLabel": "Colonne libellé non résolue",
+        "missingLabel": "Libellé manquant",
+        "unmappedAmount": "Colonne montant non résolue",
+        "invalidAmount": "Montant invalide"
+      }
+    },
+    "history": {
+      "title": "Imports précédents",
+      "empty": "Aucun import pour l'instant.",
+      "rowCount": "{{count}} ligne(s)",
+      "cancel": "Annuler",
+      "cancelConfirm": "Annuler l'import « {{fileName}} » ? Les transactions importées seront supprimées.",
+      "cancelled": "Import annulé.",
+      "cancelFailed": "L'annulation a échoué."
     }
   }
 }
