@@ -155,6 +155,15 @@
       "icon": "pi-shield",
       "color": "#64748B",
       "translationKey": "category.system.insurance"
+    },
+    {
+      "id": 17,
+      "name": "Savings",
+      "enabled": true,
+      "transactionTypeId": 1,
+      "icon": "pi-wallet",
+      "color": "#0EA5E9",
+      "translationKey": "category.system.savings"
     }
   ],
   "transactions": [
