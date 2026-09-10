@@ -57,7 +57,11 @@
         [monthExpenses]="dashboard.totals.expenses"
         [allTimeExpenses]="dashboard.allTimeExpenses"
       />
-      <app-budgets-summary [budgets]="budgets()" [month]="currentMonth()" />
+      <app-budgets-summary
+        [budgets]="budgets()"
+        [month]="currentMonth()"
+        [class.self-stretch]="budgetsEmpty()"
+      />
     </div>
 
     <!-- Les récentes ignorent volontairement la période sélectionnée. -->
