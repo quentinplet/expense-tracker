@@ -82,6 +82,12 @@ export class PreviewTable implements OnChanges {
   protected locale = computed(() => this.languageService.current());
   protected rows = signal<WorkingRow[]>([]);
 
+  /** Champ plus haut via les tokens de PrimeNG, pas un utilitaire Tailwind : le
+   *  thème PrimeNG s'injecte hors `@layer`, donc une règle Tailwind (`h-*`,
+   *  `py-*`) ne le bat jamais (même contournement que transaction-modal-form.ts
+   *  et category-form-dialog.ts). */
+  protected readonly fieldTokens = { paddingY: '1rem' };
+
   protected readonly newCategoryOptionId = NEW_CATEGORY_OPTION_ID;
   protected categoryFormVisible = signal(false);
   protected categoryFormErrors = signal<Record<string, string[]>>({});

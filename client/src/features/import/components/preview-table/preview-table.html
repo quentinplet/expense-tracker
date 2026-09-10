@@ -44,7 +44,7 @@
           <td class="whitespace-nowrap">
             {{ row.source.date ? (row.source.date | date: 'mediumDate' : undefined : locale()) : '—' }}
           </td>
-          <td class="max-w-56">
+          <td class="min-w-96 max-w-xl">
             @if (row.source.isValid) {
               <input
                 pInputText
@@ -52,6 +52,7 @@
                 [ngModel]="row.label"
                 (ngModelChange)="updateLabel(i, $event)"
                 [maxlength]="200"
+                [dt]="fieldTokens"
                 class="w-full truncate"
                 fluid
               />
@@ -70,6 +71,7 @@
                 [ngModel]="row.categoryId"
                 (ngModelChange)="onCategorySelectChange(i, $event)"
                 appendTo="body"
+                [dt]="fieldTokens"
                 fluid
               >
                 <ng-template #selectedItem let-option>
