@@ -256,7 +256,15 @@
                 <p class="mt-1 mb-4 text-sm text-surface-500 dark:text-surface-400">
                   {{ 'transaction.list.emptyHint' | translate }}
                 </p>
-                <p-button (click)="openNew()" [label]="'transaction.list.add' | translate" icon="pi pi-plus" />
+                <div class="flex items-center gap-3">
+                  <p-button
+                    [label]="'transaction.list.importCsv' | translate"
+                    icon="pi pi-download"
+                    outlined
+                    routerLink="/import"
+                  />
+                  <p-button (click)="openNew()" [label]="'transaction.list.add' | translate" icon="pi pi-plus" />
+                </div>
               }
             </div>
           </td>

@@ -47,7 +47,7 @@
       "add": "Ajouter une transaction",
       "count": "{{count}} transactions au total",
       "empty": "Aucune transaction",
-      "emptyHint": "Ajoutez votre première transaction pour commencer.",
+      "emptyHint": "Ajoutez votre première transaction ou importez un relevé CSV pour commencer.",
       "emptyFiltered": "Aucune transaction ne correspond à ces filtres.",
       "importCsv": "Importer CSV",
       "showing": "Affichage {{first}}–{{last}} sur {{total}}",

@@ -47,7 +47,7 @@
       "add": "Add a transaction",
       "count": "{{count}} transactions in total",
       "empty": "No transaction",
-      "emptyHint": "Add your first transaction to get started.",
+      "emptyHint": "Add your first transaction or import a CSV statement to get started.",
       "emptyFiltered": "No transaction matches these filters.",
       "importCsv": "Import CSV",
       "showing": "Showing {{first}}–{{last}} of {{total}}",
