@@ -18,7 +18,7 @@
   </div>
 
   <div class="overflow-hidden rounded-xl border border-surface-200 dark:border-surface-800">
-    <p-table [value]="rows()" [scrollable]="true" scrollHeight="28rem">
+    <p-table [value]="rows()" [rowTrackBy]="trackByRowNumber" [scrollable]="true" scrollHeight="28rem">
       <ng-template #header>
         <tr>
           <th class="w-12">

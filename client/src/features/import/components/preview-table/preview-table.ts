@@ -94,6 +94,17 @@ export class PreviewTable implements OnChanges {
     return this.categories().find((c) => c.type === type && c.isLocked)?.id ?? null;
   }
 
+  /**
+   * `p-table` sans `rowTrackBy` compare l'objet ligne par identité (le défaut
+   * PrimeNG, `(index, item) => item`) — or `updateLabel`/`updateCategory`/
+   * `toggleRow` remplacent `rows()` par un nouveau tableau à chaque frappe,
+   * donc chaque ligne change d'identité. Angular détruisait et recréait le
+   * `<input>` du libellé à chaque caractère tapé, perdant le focus après la
+   * première touche. `rowNumber` (le numéro de ligne du CSV source) est
+   * stable pour la durée de la prévisualisation.
+   */
+  protected trackByRowNumber = (_: number, row: WorkingRow) => row.source.rowNumber;
+
   protected selectedCount = computed(() => this.rows().filter((r) => r.selected).length);
   protected canConfirm = computed(() => this.selectedCount() > 0 && !this.loading());
 
