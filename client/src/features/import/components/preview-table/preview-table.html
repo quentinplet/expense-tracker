@@ -44,17 +44,21 @@
           <td class="whitespace-nowrap">
             {{ row.source.date ? (row.source.date | date: 'mediumDate' : undefined : locale()) : '—' }}
           </td>
-          <td>
+          <td class="max-w-56">
             @if (row.source.isValid) {
               <input
                 pInputText
                 type="text"
                 [ngModel]="row.label"
                 (ngModelChange)="updateLabel(i, $event)"
+                [maxlength]="200"
+                class="w-full truncate"
                 fluid
               />
             } @else {
-              <span class="text-sm text-surface-500 dark:text-surface-400">{{ row.source.suggestedLabel }}</span>
+              <span class="block truncate text-sm text-surface-500 dark:text-surface-400">{{
+                row.source.suggestedLabel
+              }}</span>
             }
           </td>
           <td class="min-w-48">
