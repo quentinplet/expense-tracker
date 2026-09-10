@@ -10,8 +10,13 @@
 
   <!-- Repères d'étape, non cliquables : le mapping ne s'affiche que si nécessaire,
        le parcours n'est pas strictement linéaire. -->
-  <div class="mb-6 flex items-center gap-2 text-sm font-medium text-surface-500 dark:text-surface-400">
-    <span [class.text-primary-600]="step() === 'upload'" [class.dark:text-primary-400]="step() === 'upload'">
+  <div
+    class="mb-6 flex items-center gap-2 text-sm font-medium text-surface-500 dark:text-surface-400"
+  >
+    <span
+      [class.text-primary-600]="step() === 'upload'"
+      [class.dark:text-primary-400]="step() === 'upload'"
+    >
       {{ 'import.wizard.stepUpload' | translate }}
     </span>
     <i class="pi pi-angle-right text-xs"></i>
@@ -22,12 +27,17 @@
       {{ 'import.wizard.stepPreview' | translate }}
     </span>
     <i class="pi pi-angle-right text-xs"></i>
-    <span [class.text-primary-600]="step() === 'result'" [class.dark:text-primary-400]="step() === 'result'">
+    <span
+      [class.text-primary-600]="step() === 'result'"
+      [class.dark:text-primary-400]="step() === 'result'"
+    >
       {{ 'import.wizard.stepResult' | translate }}
     </span>
   </div>
 
-  <div class="mb-5 overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 p-6 dark:border-surface-800 dark:bg-surface-900">
+  <div
+    class="mb-5 overflow-hidden rounded-2xl border border-surface-200 bg-surface-0 p-6 dark:border-surface-800 dark:bg-surface-900"
+  >
     @switch (step()) {
       @case ('upload') {
         <p-fileupload
@@ -39,9 +49,9 @@
           chooseIcon="pi pi-upload"
           (onSelect)="onFileSelect($event)"
         />
-        <p class="mt-3 mb-0 text-xs text-surface-500 dark:text-surface-400">
+        <div class="mt-3 mb-0 text-xs text-surface-500 dark:text-surface-400">
           {{ 'import.wizard.hint' | translate }}
-        </p>
+        </div>
       }
       @case ('mapping') {
         @if (preview(); as p) {
