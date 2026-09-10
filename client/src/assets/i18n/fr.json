@@ -151,7 +151,8 @@
       "title": "Actions rapides",
       "addTransaction": "Ajouter une transaction",
       "manageBudgets": "Gérer les budgets",
-      "manageRecurring": "Gérer les charges récurrentes"
+      "manageRecurring": "Gérer les charges récurrentes",
+      "importCsv": "Importer un CSV"
     },
     "budgets": {
       "title": "Budgets",

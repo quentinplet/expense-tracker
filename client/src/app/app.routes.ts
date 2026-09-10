@@ -7,7 +7,7 @@ import { Categories } from '@/features/categories/categories';
 import { Budgets } from '@/features/budgets/budgets';
 import { Recurring } from '@/features/recurring/recurring';
 import { Settings } from '@/features/settings/settings';
-import { ImportWizard } from '@/features/settings/import/import-wizard';
+import { ImportWizard } from '@/features/import/import-wizard';
 import { AuthLayout } from '@/layout/auth-layout/auth-layout';
 import { MainLayout } from '@/layout/main-layout/main-layout';
 import { authGuard } from '@/core/guards/auth-guard';
@@ -37,7 +37,7 @@ export const routes: Routes = [
       { path: 'budgets', component: Budgets },
       { path: 'recurring', component: Recurring },
       { path: 'settings', component: Settings },
-      { path: 'settings/import', component: ImportWizard },
+      { path: 'import', component: ImportWizard },
       {
         path: 'test-errors',
         component: TestErrors,

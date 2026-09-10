@@ -151,7 +151,8 @@
       "title": "Quick actions",
       "addTransaction": "Add a transaction",
       "manageBudgets": "Manage budgets",
-      "manageRecurring": "Manage recurring"
+      "manageRecurring": "Manage recurring",
+      "importCsv": "Import CSV"
     },
     "budgets": {
       "title": "Budgets",

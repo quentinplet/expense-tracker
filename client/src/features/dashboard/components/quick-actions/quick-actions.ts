@@ -22,6 +22,12 @@ const ACTIONS: QuickAction[] = [
     queryParams: { new: '1' },
   },
   {
+    labelKey: 'dashboard.quickActions.importCsv',
+    icon: 'pi-download',
+    accent: '#f97316',
+    link: '/import',
+  },
+  {
     labelKey: 'dashboard.quickActions.manageBudgets',
     icon: 'pi-wallet',
     accent: '#8b5cf6',
