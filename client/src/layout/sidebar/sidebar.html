@@ -23,7 +23,7 @@
             <a
               [routerLink]="item.route"
               routerLinkActive="!bg-primary/10 !text-primary"
-              class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-surface-600 no-underline transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
+              class="flex items-center gap-3 rounded-lg px-3 py-3.5 text-sm font-medium text-surface-600 no-underline transition-colors hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
             >
               <i [class]="item.icon"></i>
               <span>{{ item.labelKey | translate }}</span>
@@ -31,7 +31,7 @@
           } @else {
             <span
               aria-disabled="true"
-              class="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-surface-400 opacity-60 dark:text-surface-500"
+              class="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-3.5 text-sm font-medium text-surface-400 opacity-60 dark:text-surface-500"
             >
               <i [class]="item.icon"></i>
               <span>{{ item.labelKey | translate }}</span>
