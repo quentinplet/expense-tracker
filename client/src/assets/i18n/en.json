@@ -420,6 +420,7 @@
       },
       "duplicate": "Duplicate",
       "conflict": "Recurring transaction",
+      "ready": "Ready",
       "confirm": "Confirm import",
       "errors": {
         "unmappedDate": "Date column not resolved",

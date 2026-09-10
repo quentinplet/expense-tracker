@@ -102,6 +102,8 @@
               <p-tag severity="warn" [value]="'import.preview.duplicate' | translate" />
             } @else if (row.source.hasRecurringConflict) {
               <p-tag severity="info" [value]="'import.preview.conflict' | translate" />
+            } @else {
+              <p-tag severity="success" [value]="'import.preview.ready' | translate" />
             }
           </td>
         </tr>

@@ -420,6 +420,7 @@
       },
       "duplicate": "Doublon",
       "conflict": "Charge récurrente",
+      "ready": "Prêt",
       "confirm": "Confirmer l'import",
       "errors": {
         "unmappedDate": "Colonne date non résolue",
