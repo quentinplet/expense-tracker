@@ -71,6 +71,11 @@ export class CategoryFormDialog implements OnChanges {
   /** La catégorie à éditer, ou `null` pour une création. */
   category = input<Categorie | null>(null);
 
+  /** Sens présélectionné à la création — ex. celui de la transaction en cours
+   *  de saisie, quand ce dialogue s'ouvre depuis le sélecteur de catégorie
+   *  d'un autre formulaire plutôt que depuis l'écran Catégories. */
+  initialType = input<TransactionType>('Expense');
+
   close = output<void>();
   save = output<CategoryFormValue>();
 
@@ -132,7 +137,7 @@ export class CategoryFormDialog implements OnChanges {
         name: '',
         icon: CATEGORY_ICONS[0],
         color: CATEGORY_COLORS[0],
-        type: 'Expense',
+        type: this.initialType(),
       });
       return;
     }

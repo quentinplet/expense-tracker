@@ -237,4 +237,13 @@ export class Budgets {
     this.presetGlobalOnCreate.set(false);
     this.errors.set({});
   }
+
+  /** Catégorie créée depuis le sélecteur du dialogue de budget (même mise à
+   *  jour locale que `Transactions.onCategoryCreated`). Ignore une catégorie
+   *  Revenu créée par erreur depuis ce contexte — `expenseCategories` n'en
+   *  attend jamais. */
+  onCategoryCreated(category: Categorie) {
+    if (category.type !== 'Expense') return;
+    this.expenseCategories.update((categories) => [...categories, category]);
+  }
 }

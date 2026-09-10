@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,12 +18,14 @@ import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
 import { TransactionType } from '@/types/transaction';
 import { ImportConfirmRow, ImportPreview, ImportPreviewRow } from '@/types/import';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 import { LanguageService } from '@/core/services/language-service';
+import { CategoryFormDialog, CategoryFormValue } from '@/features/categories/category-form-dialog/category-form-dialog';
 
 type WorkingRow = {
   source: ImportPreviewRow;
@@ -30,6 +33,10 @@ type WorkingRow = {
   label: string;
   categoryId: string | null;
 };
+
+/** Même sentinelle et même logique que `TransactionModalForm` : une ligne
+ *  factice en fin de select, jamais une vraie catégorie. */
+const NEW_CATEGORY_OPTION_ID = '__new-category__';
 
 /**
  * Tableau éditable, pas une liste en lecture seule (§ Key Gotchas frontend, doc
@@ -49,6 +56,7 @@ type WorkingRow = {
     Tag,
     TranslatePipe,
     CategoryBadge,
+    CategoryFormDialog,
   ],
   templateUrl: './preview-table.html',
   providers: [CategoryNamePipe],
@@ -61,12 +69,27 @@ export class PreviewTable implements OnChanges {
   confirm = output<ImportConfirmRow[]>();
   back = output<void>();
 
+  /** Remonte au parent, seul propriétaire de `categories` — même pattern que
+   *  `TransactionModalForm.categoryCreated`. */
+  categoryCreated = output<Categorie>();
+
   private translate = inject(TranslateService);
   private categoryNamePipe = inject(CategoryNamePipe);
   private languageService = inject(LanguageService);
+  private categorieService = inject(CategorieService);
+  private messageService = inject(MessageService);
 
   protected locale = computed(() => this.languageService.current());
   protected rows = signal<WorkingRow[]>([]);
+
+  protected readonly newCategoryOptionId = NEW_CATEGORY_OPTION_ID;
+  protected categoryFormVisible = signal(false);
+  protected categoryFormErrors = signal<Record<string, string[]>>({});
+  protected categoryFormInitialType = signal<TransactionType>('Expense');
+
+  /** Ligne d'où « Ajouter une catégorie » a été ouvert — pour y appliquer la
+   *  catégorie créée à la fermeture du dialogue. */
+  private pendingRowIndex: number | null = null;
 
   /**
    * Reconstruit à chaque nouvelle prévisualisation (nouveau fichier, ou mapping
@@ -115,14 +138,25 @@ export class PreviewTable implements OnChanges {
 
   protected categoryOptionsFor(type: TransactionType | null) {
     this.translate.currentLang();
-    return this.categories()
+    const options = this.categories()
       .filter((c) => c.type === type)
       .map((c) => ({
         id: c.id,
         label: this.categoryNamePipe.transform(c),
-        color: c.color,
-        icon: c.icon,
+        color: c.color as string | null,
+        icon: c.icon as string | null,
+        isAction: false,
       }));
+
+    options.push({
+      id: NEW_CATEGORY_OPTION_ID,
+      label: this.translate.instant('transaction.form.addCategory'),
+      color: null,
+      icon: null,
+      isAction: true,
+    });
+
+    return options;
   }
 
   protected toggleSelectAll(checked: boolean) {
@@ -139,6 +173,64 @@ export class PreviewTable implements OnChanges {
 
   protected updateCategory(index: number, categoryId: string) {
     this.rows.update((rows) => rows.map((r, i) => (i === index ? { ...r, categoryId } : r)));
+  }
+
+  /**
+   * PrimeNG met à jour l'affichage du select de façon optimiste dès le clic,
+   * avant même que `[ngModel]` ne repousse quoi que ce soit — donc ne rien
+   * faire laisserait le select affiché sur « Ajouter une catégorie » tant que
+   * `row.categoryId` ne change pas *réellement* (Angular ne rappelle
+   * `writeValue` que si la valeur liée diffère de la précédente). Vide plutôt
+   * que restaurer l'ancienne sélection, même logique que
+   * `TransactionModalForm.onCategorySelectChange` : si l'utilisateur annule,
+   * il ne perd rien qu'un reclic.
+   */
+  protected onCategorySelectChange(index: number, categoryId: string) {
+    if (categoryId !== NEW_CATEGORY_OPTION_ID) {
+      this.updateCategory(index, categoryId);
+      return;
+    }
+
+    this.updateCategory(index, '');
+    this.pendingRowIndex = index;
+    this.categoryFormInitialType.set(this.rows()[index].source.type ?? 'Expense');
+    this.categoryFormErrors.set({});
+    this.categoryFormVisible.set(true);
+  }
+
+  protected onCategoryFormClose() {
+    this.pendingRowIndex = null;
+    this.categoryFormVisible.set(false);
+  }
+
+  protected onCategoryFormSave(value: CategoryFormValue) {
+    this.categorieService.createCategory(value).subscribe({
+      next: (created) => {
+        // Émis avant `updateCategory` : le parent met à jour `categories` de
+        // façon synchrone, donc `categoryOptionsFor()` porte déjà la nouvelle
+        // catégorie au moment où le select doit résoudre l'id sélectionné.
+        this.categoryCreated.emit(created);
+        if (this.pendingRowIndex !== null) {
+          this.updateCategory(this.pendingRowIndex, created.id);
+        }
+        this.pendingRowIndex = null;
+        this.categoryFormVisible.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('common.success'),
+          detail: this.translate.instant('category.form.created'),
+          life: 3000,
+        });
+      },
+      error: (error) => {
+        this.categoryFormErrors.set(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('common.error'),
+          detail: this.translate.instant('category.form.createFailed'),
+        });
+      },
+    });
   }
 
   onConfirm() {

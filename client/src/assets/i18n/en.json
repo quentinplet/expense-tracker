@@ -82,6 +82,7 @@
       "amount": "Amount",
       "amountPlaceholder": "€0.00",
       "category": "Category",
+      "addCategory": "Add a category",
       "date": "Date",
       "label": "Label",
       "labelPlaceholder": "e.g. Petrol A20",

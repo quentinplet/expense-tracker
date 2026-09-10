@@ -12,12 +12,14 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatest, distinctUntilChanged, map, of, startWith, switchMap } from 'rxjs';
+import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
-import { Select } from 'primeng/select';
+import { Select, SelectChangeEvent } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
 import { Budget } from '@/types/budget';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
@@ -25,11 +27,16 @@ import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { AmountInput } from '@/shared/components/amount-input/amount-input';
 import { BudgetService } from '@/core/services/budget-service';
 import { MonthKey, monthKeyToDate, shiftMonth, toMonthKey } from '@/features/dashboard/month';
+import { CategoryFormDialog, CategoryFormValue } from '@/features/categories/category-form-dialog/category-form-dialog';
 
 /** Valeur bornée du select : ne coïncide avec aucun Guid de catégorie, et n'est
  *  jamais `null` — `null` reste réservé à « rien encore choisi » pour que
  *  `Validators.required` continue de fonctionner (voir onSubmit). */
 const GLOBAL_OPTION_ID = '__global__';
+
+/** Même sentinelle et même logique que `TransactionModalForm` : une ligne
+ *  factice en fin de select, jamais une vraie catégorie. */
+const NEW_CATEGORY_OPTION_ID = '__new-category__';
 
 export type BudgetFormValue = {
   /** Null == budget global. */
@@ -53,6 +60,7 @@ export type BudgetFormValue = {
     TranslatePipe,
     CategoryBadge,
     AmountInput,
+    CategoryFormDialog,
   ],
   templateUrl: './budget-form-dialog.html',
   styleUrl: './budget-form-dialog.scss',
@@ -84,10 +92,19 @@ export class BudgetFormDialog implements OnChanges {
   close = output<void>();
   save = output<BudgetFormValue>();
 
+  /** Remonte au parent, seul propriétaire de `categories` — même pattern que
+   *  `TransactionModalForm.categoryCreated`. */
+  categoryCreated = output<Categorie>();
+
   private fb = inject(FormBuilder);
   private translate = inject(TranslateService);
   private categoryNamePipe = inject(CategoryNamePipe);
   private budgetService = inject(BudgetService);
+  private categorieService = inject(CategorieService);
+  private messageService = inject(MessageService);
+
+  protected categoryFormVisible = signal(false);
+  protected categoryFormErrors = signal<Record<string, string[]>>({});
 
   protected form = this.fb.group({
     categoryId: this.fb.nonNullable.control('', Validators.required),
@@ -201,14 +218,19 @@ export class BudgetFormDialog implements OnChanges {
 
   /** Options du select de création : le global en tête, puis les catégories de
    *  dépense — l'un et l'autre exclus s'ils sont déjà budgétés sur le mois choisi
-   *  (§ liveTakenSelections). */
+   *  (§ liveTakenSelections). La dernière ligne est factice, voir
+   *  `onCategorySelectChange`. */
   protected categoryOptions = computed(() => {
     this.translate.currentLang();
     const taken = new Set(this.liveTakenSelections() ?? this.takenSelections());
 
-    const options: { id: string; label: string; icon?: string; color?: string }[] = [];
+    const options: { id: string; label: string; icon?: string; color?: string; isAction: boolean }[] = [];
     if (!taken.has(null)) {
-      options.push({ id: GLOBAL_OPTION_ID, label: this.translate.instant('budgets.form.global') });
+      options.push({
+        id: GLOBAL_OPTION_ID,
+        label: this.translate.instant('budgets.form.global'),
+        isAction: false,
+      });
     }
     options.push(
       ...this.categories()
@@ -218,8 +240,14 @@ export class BudgetFormDialog implements OnChanges {
           label: this.categoryNamePipe.transform(c),
           icon: c.icon ?? undefined,
           color: c.color ?? undefined,
+          isAction: false,
         })),
     );
+    options.push({
+      id: NEW_CATEGORY_OPTION_ID,
+      label: this.translate.instant('transaction.form.addCategory'),
+      isAction: true,
+    });
     return options;
   });
 
@@ -256,6 +284,50 @@ export class BudgetFormDialog implements OnChanges {
 
   onClose() {
     this.close.emit();
+  }
+
+  /** L'option « Ajouter une catégorie » ne doit jamais rester sélectionnée — même
+   *  logique que `TransactionModalForm.onCategorySelectChange`. */
+  onCategorySelectChange(event: SelectChangeEvent) {
+    if (event.value !== NEW_CATEGORY_OPTION_ID) return;
+
+    this.form.controls.categoryId.setValue('');
+    this.categoryFormErrors.set({});
+    this.categoryFormVisible.set(true);
+  }
+
+  onCategoryFormClose() {
+    this.categoryFormVisible.set(false);
+  }
+
+  onCategoryFormSave(value: CategoryFormValue) {
+    this.categorieService.createCategory(value).subscribe({
+      next: (created) => {
+        // Émis avant `setValue` : le parent met à jour `expenseCategories` de façon
+        // synchrone, donc `categoryOptions()` porte déjà la nouvelle catégorie au
+        // moment où le select doit résoudre l'id sélectionné. Les budgets ne
+        // portent que sur des catégories de dépense — le parent ignore le reste.
+        this.categoryCreated.emit(created);
+        if (created.type === 'Expense') {
+          this.form.controls.categoryId.setValue(created.id);
+        }
+        this.categoryFormVisible.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('common.success'),
+          detail: this.translate.instant('category.form.created'),
+          life: 3000,
+        });
+      },
+      error: (error) => {
+        this.categoryFormErrors.set(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('common.error'),
+          detail: this.translate.instant('category.form.createFailed'),
+        });
+      },
+    });
   }
 
   onSubmit() {

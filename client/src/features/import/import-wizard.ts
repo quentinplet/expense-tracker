@@ -50,6 +50,12 @@ export class ImportWizard implements OnInit {
     this.categorieService.getCategories().subscribe((categories) => this.categories.set(categories));
   }
 
+  /** Catégorie créée depuis le sélecteur de la prévisualisation (même mise à
+   *  jour locale que `Transactions.onCategoryCreated`). */
+  onCategoryCreated(category: Categorie) {
+    this.categories.update((categories) => [...categories, category]);
+  }
+
   onFileSelect(event: FileSelectEvent) {
     const file = (event.files as File[])[0];
     if (!file) return;

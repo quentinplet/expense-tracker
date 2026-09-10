@@ -12,19 +12,27 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { Select } from 'primeng/select';
+import { Select, SelectChangeEvent } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
 import { Transaction, TransactionType } from '@/types/transaction';
 import { CategoryNamePipe } from '@/shared/pipes/category-name-pipe';
 import { CategoryBadge } from '@/shared/components/category-badge/category-badge';
 import { AmountInput } from '@/shared/components/amount-input/amount-input';
 import { LanguageService } from '@/core/services/language-service';
+import { CategoryFormDialog, CategoryFormValue } from '@/features/categories/category-form-dialog/category-form-dialog';
+
+/** Valeur factice utilisée comme id d'option pour la ligne « Ajouter une
+ *  catégorie » du sélecteur — jamais envoyée au serveur : interceptée dans
+ *  `onCategorySelectChange` avant que la soumission ne puisse la voir. */
+const NEW_CATEGORY_OPTION_ID = '__new-category__';
 
 /**
  * Ce que le dialogue remonte : la saisie telle que le formulaire la porte, `date` en
@@ -53,6 +61,7 @@ export type TransactionFormValue = {
     TranslatePipe,
     CategoryBadge,
     AmountInput,
+    CategoryFormDialog,
   ],
   templateUrl: './transaction-modal-form.html',
   styleUrl: './transaction-modal-form.scss',
@@ -71,12 +80,23 @@ export class TransactionModalForm implements OnChanges {
   close = output<void>();
   save = output<TransactionFormValue>();
 
+  /** Remonte au parent, seul propriétaire de `categories` (§ pattern déjà en
+   *  place : ce dialogue ne fait que le lire) — le parent l'ajoute à sa
+   *  propre liste, exactement comme `Categories.createCategory()`. */
+  categoryCreated = output<Categorie>();
+
   private fb = inject(FormBuilder);
   private languageService = inject(LanguageService);
   private translate = inject(TranslateService);
   private categoryNamePipe = inject(CategoryNamePipe);
+  private categorieService = inject(CategorieService);
+  private messageService = inject(MessageService);
 
   private amountInput = viewChild<AmountInput>('amountInput');
+
+  protected readonly newCategoryOptionId = NEW_CATEGORY_OPTION_ID;
+  protected categoryFormVisible = signal(false);
+  protected categoryFormErrors = signal<Record<string, string[]>>({});
 
   /**
    * Démarre à 0, pas `null` : un champ vide affiche « 0,00 € » en placeholder, grisé
@@ -185,17 +205,32 @@ export class TransactionModalForm implements OnChanges {
   /**
    * Options du select, restreintes au sens courant et libellées par le pipe — la règle
    * « clé de traduction si système, nom sinon » ne vit qu'à un endroit (§10).
+   *
+   * La dernière ligne est une option factice, pas une vraie catégorie : elle ouvre le
+   * dialogue de création par-dessus celui-ci plutôt que de sélectionner quoi que ce
+   * soit (voir `onCategorySelectChange`).
    */
   protected categoryOptions = computed(() => {
     this.translate.currentLang();
-    return this.categories()
+    const options = this.categories()
       .filter((categorie) => categorie.type === this.activeType())
       .map((categorie) => ({
         id: categorie.id,
         label: this.categoryNamePipe.transform(categorie),
-        color: categorie.color,
-        icon: categorie.icon,
+        color: categorie.color as string | null,
+        icon: categorie.icon as string | null,
+        isAction: false,
       }));
+
+    options.push({
+      id: NEW_CATEGORY_OPTION_ID,
+      label: this.translate.instant('transaction.form.addCategory'),
+      color: null,
+      icon: null,
+      isAction: true,
+    });
+
+    return options;
   });
 
   selectType(type: TransactionType) {
@@ -203,6 +238,51 @@ export class TransactionModalForm implements OnChanges {
 
     // La catégorie retenue appartient à l'autre sens : on la réinitialise.
     this.form.patchValue({ type, categoryId: '' });
+  }
+
+  /**
+   * L'option « Ajouter une catégorie » ne doit jamais rester sélectionnée — on la
+   * remplace par une chaîne vide (comme au premier chargement) plutôt que de
+   * restaurer la sélection précédente, pour rester simple : si l'utilisateur
+   * annule le dialogue de création, il ne perd rien qu'un reclic.
+   */
+  onCategorySelectChange(event: SelectChangeEvent) {
+    if (event.value !== NEW_CATEGORY_OPTION_ID) return;
+
+    this.form.controls.categoryId.setValue('');
+    this.categoryFormErrors.set({});
+    this.categoryFormVisible.set(true);
+  }
+
+  onCategoryFormClose() {
+    this.categoryFormVisible.set(false);
+  }
+
+  onCategoryFormSave(value: CategoryFormValue) {
+    this.categorieService.createCategory(value).subscribe({
+      next: (created) => {
+        // Émis avant `setValue` : le parent met à jour `categories` de façon
+        // synchrone, donc `categoryOptions()` porte déjà la nouvelle catégorie
+        // au moment où le select doit résoudre l'id sélectionné.
+        this.categoryCreated.emit(created);
+        this.form.controls.categoryId.setValue(created.id);
+        this.categoryFormVisible.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('common.success'),
+          detail: this.translate.instant('category.form.created'),
+          life: 3000,
+        });
+      },
+      error: (error) => {
+        this.categoryFormErrors.set(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('common.error'),
+          detail: this.translate.instant('category.form.createFailed'),
+        });
+      },
+    });
   }
 
   /**

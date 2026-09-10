@@ -518,6 +518,12 @@ export class Transactions implements OnInit {
     this.errors.set({});
   }
 
+  /** Catégorie créée depuis le sélecteur du dialogue de transaction (§ Categories,
+   *  même mise à jour locale que `createCategory()`). */
+  onCategoryCreated(category: Categorie) {
+    this.categories.update((categories) => [...categories, category]);
+  }
+
   private reloadCurrentPage() {
     const page = this.transactionParams.pageNumber;
     const pageSize = this.transactionParams.pageSize;

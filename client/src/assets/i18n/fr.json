@@ -82,6 +82,7 @@
       "amount": "Montant",
       "amountPlaceholder": "0,00 €",
       "category": "Catégorie",
+      "addCategory": "Ajouter une catégorie",
       "date": "Date",
       "label": "Libellé",
       "labelPlaceholder": "Ex. Plein A20",

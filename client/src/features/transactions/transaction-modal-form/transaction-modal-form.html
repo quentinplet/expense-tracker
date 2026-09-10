@@ -112,6 +112,7 @@
             [invalid]="showErrors() && form.controls.categoryId.invalid"
             appendTo="body"
             [dt]="fieldTokens"
+            (onChange)="onCategorySelectChange($event)"
             fluid
           >
             <ng-template #selectedItem let-option>
@@ -123,10 +124,17 @@
               }
             </ng-template>
             <ng-template #item let-option>
-              <span class="flex items-center gap-2">
-                <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
-                {{ option.label }}
-              </span>
+              @if (option.isAction) {
+                <span class="flex items-center gap-2 font-medium text-primary">
+                  <i class="pi pi-plus text-xs"></i>
+                  {{ option.label }}
+                </span>
+              } @else {
+                <span class="flex items-center gap-2">
+                  <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+                  {{ option.label }}
+                </span>
+              }
             </ng-template>
           </p-select>
           @if (showErrors() && form.controls.categoryId.invalid) {
@@ -243,3 +251,14 @@
     </div>
   </ng-template>
 </p-dialog>
+
+<!-- Ouvert par-dessus ce dialogue depuis l'option « Ajouter une catégorie » du
+     sélecteur — évite d'abandonner la transaction en cours pour aller sur
+     /categories. Sens présélectionné sur celui de la transaction. -->
+<app-category-form-dialog
+  [(visible)]="categoryFormVisible"
+  [errors]="categoryFormErrors()"
+  [initialType]="activeType()"
+  (close)="onCategoryFormClose()"
+  (save)="onCategoryFormSave($event)"
+/>
