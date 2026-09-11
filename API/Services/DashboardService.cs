@@ -35,8 +35,17 @@ public class DashboardService(IDashboardRepository repository) : IDashboardServi
         var dailyTotals = await repository.GetDailyTotalsAsync(userId, anchor, next);
         var overall = await repository.GetOverallTotalsAsync(userId);
 
+        // Douze derniers mois glissants, ancrés sur le mois courant réel — comme
+        // BuildTrend, indépendant du mois affiché par le picker. `YearExpenses` est
+        // la somme de cette même répartition, pas overall.Expenses (qui reste
+        // volontairement sans borne, réservé à CumulativeNet).
+        var currentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var yearFrom = currentMonth.AddMonths(-(TrendMonths - 1));
+        var yearToExclusive = currentMonth.AddMonths(1);
+
         var breakdown = await repository.GetExpenseBreakdownAsync(userId, anchor, next);
-        var breakdownAllTime = await repository.GetExpenseBreakdownAsync(userId, null, null);
+        var breakdownYear = await repository.GetExpenseBreakdownAsync(userId, yearFrom, yearToExclusive);
+        var yearExpenses = breakdownYear.Sum(c => c.Total);
 
         // Décorrélé de la période : « récentes » veut dire récentes.
         var recent = await repository.GetRecentAsync(userId, RecentCount);
@@ -48,8 +57,8 @@ public class DashboardService(IDashboardRepository repository) : IDashboardServi
             Totals: totals,
             CumulativeNet: overall.Income - overall.Expenses,
             Breakdown: BuildBreakdown(breakdown, totals.Expenses),
-            BreakdownAllTime: BuildBreakdown(breakdownAllTime, overall.Expenses),
-            AllTimeExpenses: overall.Expenses,
+            BreakdownYear: BuildBreakdown(breakdownYear, yearExpenses),
+            YearExpenses: yearExpenses,
             DailyTrend: BuildDailyTrend(dailyTotals, anchor, next),
             Trend: BuildTrend(monthlyTotals),
             RecentTransactions: [.. recent.Select(t => t.ToTransactionResponseDto())]);

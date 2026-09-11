@@ -123,8 +123,8 @@
       "empty": "No expense this month",
       "other": "Other",
       "thisMonth": "this month",
-      "allTime": "all time",
-      "emptyAll": "No expense recorded yet"
+      "year": "this year",
+      "emptyYear": "No expense in the last twelve months"
     },
     "trend": {
       "title": "Trend",
@@ -146,7 +146,7 @@
     },
     "scope": {
       "month": "Month",
-      "all": "All time"
+      "all": "Year"
     },
     "quickActions": {
       "title": "Quick actions",

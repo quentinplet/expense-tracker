@@ -53,9 +53,9 @@
     <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
       <app-category-donut
         [monthBreakdown]="dashboard.breakdown"
-        [allTimeBreakdown]="dashboard.breakdownAllTime"
+        [yearBreakdown]="dashboard.breakdownYear"
         [monthExpenses]="dashboard.totals.expenses"
-        [allTimeExpenses]="dashboard.allTimeExpenses"
+        [yearExpenses]="dashboard.yearExpenses"
       />
       <app-budgets-summary
         [budgets]="budgets()"

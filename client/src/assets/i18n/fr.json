@@ -123,8 +123,8 @@
       "empty": "Aucune dépense ce mois-ci",
       "other": "Autres",
       "thisMonth": "sur le mois",
-      "allTime": "toutes périodes",
-      "emptyAll": "Aucune dépense enregistrée"
+      "year": "sur l'année",
+      "emptyYear": "Aucune dépense sur les douze derniers mois"
     },
     "trend": {
       "title": "Évolution",
@@ -146,7 +146,7 @@
     },
     "scope": {
       "month": "Mois",
-      "all": "Toutes périodes"
+      "all": "Année"
     },
     "quickActions": {
       "title": "Actions rapides",

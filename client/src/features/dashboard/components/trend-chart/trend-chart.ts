@@ -9,6 +9,23 @@ import { dayKeyToDate, monthKeyToDate, Scope } from '../../month';
 const INCOME_COLOR = '#22c55e';
 const EXPENSE_COLOR = '#ef4444';
 
+/** Même convention que ThemeService/LanguageService : `app.<nom>`. */
+const SCOPE_STORAGE_KEY = 'app.dashboardTrendScope';
+
+/** Le tableau `trend` couvre déjà tout l'historique borné (12 à 120 mois) : la
+ *  portée « Année » se contente d'en garder les douze derniers points. */
+const ROLLING_YEAR_MONTHS = 12;
+
+function readStoredScope(fallback: Scope): Scope {
+  try {
+    const stored = localStorage.getItem(SCOPE_STORAGE_KEY);
+    if (stored === 'month' || stored === 'all') return stored;
+  } catch {
+    // Stockage indisponible (navigation privée…) : on retombe sur le défaut.
+  }
+  return fallback;
+}
+
 @Component({
   selector: 'app-trend-chart',
   imports: [UIChart, TranslatePipe],
@@ -29,20 +46,30 @@ export class TrendChart {
   /**
    * Réglage local au widget, et non porté par l'URL : c'est un confort de lecture,
    * pas un état qu'on partage ou sur lequel on revient avec le bouton précédent.
+   * Persisté en localStorage (par navigateur, pas par lien) pour survivre à un
+   * rechargement — voir `setScope`.
    *
    * La portée change la granularité, pas seulement la fenêtre : « Mois » montre les
-   * jours du mois affiché, « Tout » les mois de tout l'historique jusqu'au mois
-   * courant — sans se laisser tronquer quand le picker recule.
-   *
-   * L'historique est la vue par défaut : la tendance est ce qu'on vient chercher
-   * dans une courbe, le détail du mois se lit déjà dans le donut et les totaux.
+   * jours du mois affiché, « Année » les douze derniers mois glissants jusqu'au
+   * mois courant — sans se laisser tronquer quand le picker recule.
    */
-  protected scope = signal<Scope>('all');
+  protected scope = signal<Scope>(readStoredScope('month'));
+
+  protected setScope(value: Scope): void {
+    this.scope.set(value);
+    try {
+      localStorage.setItem(SCOPE_STORAGE_KEY, value);
+    } catch {
+      // Stockage indisponible : le choix vaut pour la session en cours.
+    }
+  }
 
   /** Étiquette et valeurs, la granularité étant déjà résolue. */
   protected points = computed<{ label: Date; expenses: number; income: number }[]>(() =>
     this.scope() === 'all'
-      ? this.trend().map((p) => ({ ...p, label: monthKeyToDate(p.month) }))
+      ? this.trend()
+          .slice(-ROLLING_YEAR_MONTHS)
+          .map((p) => ({ ...p, label: monthKeyToDate(p.month) }))
       : this.dailyTrend().map((p) => ({ ...p, label: dayKeyToDate(p.date) })),
   );
 

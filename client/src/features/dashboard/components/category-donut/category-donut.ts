@@ -10,6 +10,19 @@ import { Scope } from '../../month';
 const MAX_SLICES = 6;
 const OTHER_COLOR = '#6b7280';
 
+/** Même convention que ThemeService/LanguageService : `app.<nom>`. */
+const SCOPE_STORAGE_KEY = 'app.dashboardCategoryScope';
+
+function readStoredScope(fallback: Scope): Scope {
+  try {
+    const stored = localStorage.getItem(SCOPE_STORAGE_KEY);
+    if (stored === 'month' || stored === 'all') return stored;
+  } catch {
+    // Stockage indisponible (navigation privée…) : on retombe sur le défaut.
+  }
+  return fallback;
+}
+
 type Slice = {
   key: string;
   label: string;
@@ -29,20 +42,31 @@ export class CategoryDonut {
   private languageService = inject(LanguageService);
 
   monthBreakdown = input.required<CategoryBreakdown[]>();
-  allTimeBreakdown = input.required<CategoryBreakdown[]>();
+  yearBreakdown = input.required<CategoryBreakdown[]>();
   monthExpenses = input.required<number>();
-  allTimeExpenses = input.required<number>();
+  yearExpenses = input.required<number>();
 
   /**
    * Réglage local au widget, et non porté par l'URL : c'est un confort de lecture,
    * pas un état qu'on partage ou sur lequel on revient avec le bouton précédent.
+   * Persisté en localStorage (par navigateur, pas par lien) pour survivre à un
+   * rechargement — voir `setScope`.
    */
-  protected scope = signal<Scope>('month');
+  protected scope = signal<Scope>(readStoredScope('month'));
+
+  protected setScope(value: Scope): void {
+    this.scope.set(value);
+    try {
+      localStorage.setItem(SCOPE_STORAGE_KEY, value);
+    } catch {
+      // Stockage indisponible : le choix vaut pour la session en cours.
+    }
+  }
 
   protected locale = computed(() => this.languageService.current());
 
   protected total = computed(() =>
-    this.scope() === 'all' ? this.allTimeExpenses() : this.monthExpenses(),
+    this.scope() === 'all' ? this.yearExpenses() : this.monthExpenses(),
   );
 
   /**
@@ -54,7 +78,7 @@ export class CategoryDonut {
     // Lecture de la langue : les libellés doivent suivre un changement à chaud.
     this.translate.currentLang();
 
-    const items = this.scope() === 'all' ? this.allTimeBreakdown() : this.monthBreakdown();
+    const items = this.scope() === 'all' ? this.yearBreakdown() : this.monthBreakdown();
     const head = items.slice(0, MAX_SLICES);
     const tail = items.slice(MAX_SLICES);
 

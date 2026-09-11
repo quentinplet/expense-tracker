@@ -15,7 +15,7 @@
     >
       <button
         type="button"
-        (click)="scope.set('month')"
+        (click)="setScope('month')"
         [attr.aria-pressed]="scope() === 'month'"
         class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
         [class]="
@@ -28,7 +28,7 @@
       </button>
       <button
         type="button"
-        (click)="scope.set('all')"
+        (click)="setScope('all')"
         [attr.aria-pressed]="scope() === 'all'"
         class="cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
         [class]="
@@ -64,7 +64,7 @@
           <span class="text-xs text-surface-500 dark:text-surface-400">
             {{
               (scope() === 'all'
-                ? 'dashboard.breakdown.allTime'
+                ? 'dashboard.breakdown.year'
                 : 'dashboard.breakdown.thisMonth'
               ) | translate
             }}
@@ -103,7 +103,7 @@
           class="m-0 flex flex-1 items-center justify-center text-sm text-surface-500 dark:text-surface-400 sm:h-44"
         >
           {{
-            (scope() === 'all' ? 'dashboard.breakdown.emptyAll' : 'dashboard.breakdown.empty')
+            (scope() === 'all' ? 'dashboard.breakdown.emptyYear' : 'dashboard.breakdown.empty')
               | translate
           }}
         </p>

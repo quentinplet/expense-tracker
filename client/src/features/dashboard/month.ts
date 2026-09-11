@@ -7,8 +7,9 @@
 export type MonthKey = string;
 
 /**
- * Portée d'un widget : le mois affiché, ou tout l'historique. C'est un réglage local
- * à chaque graphique — la période globale, elle, reste toujours un mois.
+ * Portée d'un widget : le mois affiché, ou les douze derniers mois glissants
+ * (« Année », valeur `'all'` conservée en interne). C'est un réglage local à
+ * chaque graphique — la période globale, elle, reste toujours un mois.
  */
 export type Scope = 'month' | 'all';
 

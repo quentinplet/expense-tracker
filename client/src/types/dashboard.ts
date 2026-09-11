@@ -40,11 +40,12 @@ export type DashboardResponse = {
   totals: MonthTotals;
   /** Σ revenus − Σ dépenses sur tout l'historique. Ce n'est pas un solde. */
   cumulativeNet: number;
-  /** Répartition du mois affiché ; `breakdownAllTime` couvre tout l'historique.
-   *  Les deux voyagent ensemble pour que la bascule du donut soit instantanée. */
+  /** Répartition du mois affiché ; `breakdownYear` couvre les douze derniers mois
+   *  glissants. Les deux voyagent ensemble pour que la bascule du donut soit
+   *  instantanée. */
   breakdown: CategoryBreakdown[];
-  breakdownAllTime: CategoryBreakdown[];
-  allTimeExpenses: number;
+  breakdownYear: CategoryBreakdown[];
+  yearExpenses: number;
   /** Un point par jour du mois affiché ; `trend` porte la vue mensuelle sur tout
    *  l'historique. La courbe choisit l'une ou l'autre selon sa portée. */
   dailyTrend: DailyPoint[];

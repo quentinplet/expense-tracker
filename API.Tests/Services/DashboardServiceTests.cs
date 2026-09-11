@@ -107,21 +107,29 @@ public class DashboardServiceTests
     }
 
     [Fact]
-    public async Task GetDashboardDataAsync_BreakdownAllTime_SharesUseAllTimeExpensesAsDenominator()
+    public async Task GetDashboardDataAsync_BreakdownYear_CoversRollingTwelveMonthsWithYearExpensesAsDenominator()
     {
-        // §BuildBreakdown : appelé une seconde fois pour BreakdownAllTime, avec
-        // overall.Expenses comme dénominateur — indépendant des dépenses de la
-        // période affichée.
+        // §BuildBreakdown : appelé une seconde fois pour BreakdownYear, sur les
+        // douze derniers mois glissants ancrés sur le mois courant réel — jamais
+        // sur le mois affiché. YearExpenses est la somme de cette même
+        // répartition, pas overall.Expenses (qui reste réservé à CumulativeNet).
+        var currentMonth = new DateOnly(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var yearFrom = currentMonth.AddMonths(-11);
+        var yearToExclusive = currentMonth.AddMonths(1);
+
         var repo = CreateRepoWithDefaults();
-        repo.Setup(r => r.GetOverallTotalsAsync(_userId)).ReturnsAsync(new OverallTotalsProjection(0, 400));
-        repo.Setup(r => r.GetExpenseBreakdownAsync(_userId, null, null))
-            .ReturnsAsync([new CategoryTotalProjection(Guid.NewGuid(), "Groceries", null, "#111", "pi-cart", 100)]);
+        repo.Setup(r => r.GetExpenseBreakdownAsync(_userId, yearFrom, yearToExclusive))
+            .ReturnsAsync(
+            [
+                new CategoryTotalProjection(Guid.NewGuid(), "Groceries", null, "#111", "pi-cart", 100),
+                new CategoryTotalProjection(Guid.NewGuid(), "Housing", null, "#222", "pi-home", 300),
+            ]);
         var sut = new DashboardService(repo.Object);
 
         var result = await sut.GetDashboardDataAsync(_userId, MakeRequest("2026-09"));
 
-        Assert.Equal(400, result.AllTimeExpenses);
-        Assert.Equal(0.25m, result.BreakdownAllTime.Single().Share);
+        Assert.Equal(400, result.YearExpenses);
+        Assert.Equal(0.25m, result.BreakdownYear[0].Share);
     }
 
     [Fact]
