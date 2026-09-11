@@ -1,6 +1,7 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
+import { environment } from '@/environments/environment';
 import { MessageService } from 'primeng/api';
 import { catchError } from 'rxjs';
 
@@ -35,10 +36,15 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
             break;
           case 401:
-            toast.add({
-              severity: 'error',
-              summary: 'Unauthorized',
-            });
+            // Chaque appelant (login, refresh-token…) affiche déjà son propre
+            // message adapté à son cas ; ce toast générique ne sert qu'au
+            // diagnostic en dev, jamais montré à l'utilisateur en prod.
+            if (!environment.production) {
+              toast.add({
+                severity: 'error',
+                summary: 'Unauthorized',
+              });
+            }
             break;
           case 409:
             toast.add({
