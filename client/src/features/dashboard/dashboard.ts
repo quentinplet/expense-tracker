@@ -110,13 +110,6 @@ export class Dashboard {
     { initialValue: [] as Budget[] },
   );
 
-  /** La carte Budgets grandit avec le nombre de budgets suivis (`items-start` sur la
-   *  grille, § dashboard.html) — mais sans budget, son état vide reste minuscule à
-   *  côté de l'anneau Breakdown. Étirer seulement ce cas-là plutôt que de retirer
-   *  `items-start` globalement, ce qui referait tirer Breakdown vers le bas dès qu'il
-   *  y a plusieurs budgets. */
-  protected budgetsEmpty = computed(() => this.budgets().length === 0);
-
   /** Décorrélées de la période affichée, comme les transactions récentes : une
    *  charge récurrente n'appartient pas à un mois précis. */
   protected recurringTransactions = toSignal(

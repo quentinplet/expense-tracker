@@ -47,21 +47,17 @@
       <app-quick-actions class="h-full" />
     </div>
 
-    <!-- items-start : la liste des budgets grandit avec le nombre de budgets suivis
-         ce mois-ci (jusqu'à 5 lignes) ; sans ça, elle tirait aussi Breakdown vers le
-         bas alors que l'anneau, lui, a une taille fixe — du vide sans utilité. -->
-    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+    <!-- Sans items-start : les deux cartes s'étirent à la même hauteur, quel que
+         soit le nombre de budgets suivis ce mois-ci — Budgets ne doit jamais
+         dicter sa propre hauteur, elle suit toujours Dépenses par catégorie. -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <app-category-donut
         [monthBreakdown]="dashboard.breakdown"
         [yearBreakdown]="dashboard.breakdownYear"
         [monthExpenses]="dashboard.totals.expenses"
         [yearExpenses]="dashboard.yearExpenses"
       />
-      <app-budgets-summary
-        [budgets]="budgets()"
-        [month]="currentMonth()"
-        [class.self-stretch]="budgetsEmpty()"
-      />
+      <app-budgets-summary [budgets]="budgets()" [month]="currentMonth()" />
     </div>
 
     <!-- Les récentes ignorent volontairement la période sélectionnée. -->
