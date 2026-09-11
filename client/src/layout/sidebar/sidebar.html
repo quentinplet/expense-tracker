@@ -3,15 +3,20 @@
 >
   <a
     routerLink="/dashboard"
-    class="flex h-16 shrink-0 items-center gap-3 border-b border-surface-200 px-5 no-underline dark:border-surface-800"
+    class="flex shrink-0 items-center gap-3 border-b border-surface-200 px-5 py-3 no-underline dark:border-surface-800"
   >
     <span
-      class="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-contrast"
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-contrast"
     >
       <i class="pi pi-wallet"></i>
     </span>
-    <span class="text-base font-bold text-surface-900 dark:text-surface-0">
-      {{ 'app.name' | translate }}
+    <span class="flex min-w-0 flex-col">
+      <span class="truncate text-base font-bold text-surface-900 dark:text-surface-0">
+        {{ 'app.name' | translate }}
+      </span>
+      <span class="truncate text-xs text-surface-500 dark:text-surface-400">
+        {{ 'app.tagline' | translate }}
+      </span>
     </span>
   </a>
 

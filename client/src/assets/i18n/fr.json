@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "Expense Tracker"
+    "name": "Trézo",
+    "tagline": "Suivi de budget personnel"
   },
   "nav": {
     "dashboard": "Tableau de bord",
