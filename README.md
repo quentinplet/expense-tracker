@@ -1,4 +1,4 @@
-# 💶 Expense Tracker
+# 💶 Trézo
 
 > Un suivi de budget clair : chaque flux bancaire classé, chaque catégorie plafonnée, chaque mois comparable au précédent.
 
@@ -8,13 +8,15 @@
 ![EF Core](https://img.shields.io/badge/EF%20Core-10-512BD4?logo=nuget&logoColor=white)
 ![Postgres](https://img.shields.io/badge/PostgreSQL-Npgsql-336791?logo=postgresql&logoColor=white)
 ![i18n](https://img.shields.io/badge/i18n-FR%20%7C%20EN-informational)
+![Tests](https://img.shields.io/badge/tests-100%20passing-brightgreen?logo=xunit&logoColor=white)
 ![CI/CD](https://github.com/quentinplet/expense-tracker/actions/workflows/ci-cd.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Application web de suivi budgétaire personnel : transactions classées par catégorie,
 budgets mensuels (par catégorie ou global) avec reconduction automatique, charges
-récurrentes générées en tâche de fond, dashboard avec graphiques, et interface
-bilingue français/anglais avec bascule instantanée.
+récurrentes générées en tâche de fond, import CSV de relevé bancaire, notifications
+in-app, dashboard avec graphiques, et interface bilingue français/anglais avec
+bascule instantanée.
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
@@ -50,8 +52,16 @@ Pas d'inscription publique pour l'instant — deux comptes de démo :
 - **Charges récurrentes** — dépenses ou revenus périodiques (hebdo/mensuel/annuel),
   génération automatique de la transaction à échéance, rattrapage des occurrences
   manquées après un arrêt du service
-- **Dashboard** — net cumulé, répartition des dépenses par catégorie (donut), courbe
-  dépenses/revenus sur 12 mois, transactions récentes
+- **Import CSV** — upload d'un relevé bancaire, détection auto de l'encodage/séparateur
+  et mapping des colonnes, prévisualisation ligne par ligne, dédoublonnage par hash
+  recalculé côté serveur, détection de conflit avec les charges récurrentes
+- **Notifications in-app** — budget franchissant 90 %/100 %, charge récurrente générée,
+  vérifié après chaque écriture de transaction sans jamais faire échouer celle-ci
+- **Dashboard** — net cumulé, répartition des dépenses par catégorie (mois ou 12
+  derniers mois glissants), courbe d'évolution, budgets et charges à venir, actions
+  rapides, transactions récentes
+- **Compte utilisateur** — inscription avec jeu de catégories de départ personnel,
+  gestion du profil (nom, mot de passe, email), suppression de compte
 - **Bilingue FR/EN** — bascule instantanée sans rechargement (ngx-translate côté
   Angular, `IStringLocalizer` côté API pour les messages d'erreur), montants et dates
   formatés selon la locale active
@@ -59,8 +69,7 @@ Pas d'inscription publique pour l'instant — deux comptes de démo :
   token en cookie httpOnly), isolation stricte des données par utilisateur
 
 Hors périmètre pour l'instant : multi-devise, comptes bancaires multiples avec solde
-réel, import CSV de relevé, notifications in-app, inscription publique. Détail complet
-du scope dans [`context/project-overview.md`](context/project-overview.md).
+réel, page Rapports détaillée, synchronisation bancaire automatique.
 
 ---
 
@@ -87,7 +96,9 @@ métier :
 | Auth JWT + isolation multi-tenant                                   | Sécurité applicative, autorisation au niveau des données, refresh token                              |
 | Architecture en couches (Controller → Service/Repository → EF Core) | Séparation des responsabilités, DTOs, injection de dépendances                                       |
 | Jobs planifiés idempotents (`BackgroundService`)                    | Reconduction de budgets et génération de charges récurrentes, sans doublon même après un redémarrage |
+| Import CSV avec dédoublonnage                                       | Parsing robuste (encodage, séparateur FR), idempotence, workflow de prévisualisation                 |
 | Bilinguisme FR/EN de bout en bout                                   | i18n complète — front et back — souvent absente des projets portfolio                                |
+| Tests unitaires (xUnit + Moq)                                       | 100 tests sur les règles métier critiques — isolation multi-tenant, agrégations, jobs idempotents    |
 | CI/CD GitHub Actions → Azure                                        | Pipeline build + test + déploiement automatique sur push                                             |
 
 ---
@@ -113,8 +124,28 @@ Controller ──▶ Service / Repository ──▶ DbContext (EF Core) ──�
 
 Isolation multi-tenant imposée par la signature des méthodes de repository
 (`GetByIdAsync(id, userId, ct)`) plutôt que par convention — le compilateur empêche
-d'oublier le filtre `UserId`. Détail complet dans
-[`context/project-overview.md`](context/project-overview.md).
+d'oublier le filtre `UserId`.
+
+---
+
+## 🧪 Tests
+
+100 tests unitaires backend (`API.Tests`, xUnit + Moq — tout est mocké, aucune base de
+données requise) : `dotnet test expense-tracker.slnx`. Couvrent notamment :
+
+- **Isolation multi-tenant** — chaque contrôleur refuse l'accès à une ressource
+  n'appartenant pas à l'utilisateur courant (403), jamais un simple oubli de filtre
+- **Règles métier** — cohérence `Category.Type`/`Transaction.Type`, immuabilité de
+  `CategoryId`/`Month` sur un budget, cascade de réaffectation à la suppression d'une
+  catégorie (transactions, budgets, charges récurrentes)
+- **Agrégations** — `Spent`/`Remaining` d'un budget, répartition par catégorie du
+  dashboard (mois vs 12 derniers mois glissants), courbe d'évolution bornée
+- **Jobs planifiés** — reconduction automatique des budgets et génération des charges
+  récurrentes, y compris le rattrapage de plusieurs échéances manquées en un seul
+  passage, de façon idempotente (rejouer le job ne crée jamais de doublon)
+- **Notifications** — seuils de budget à 90 %/100 % indépendants, jamais dupliqués
+
+Exécutés automatiquement en CI à chaque push/PR (voir [CI/CD](#-cicd)).
 
 ---
 
@@ -162,17 +193,16 @@ HTTPS — nécessaire pour matcher les origines autorisées par le CORS de l'API
 ## 🔄 CI/CD
 
 Un pipeline GitHub Actions unique (`.github/workflows/ci-cd.yml`) build et teste l'API
-et le client à chaque push/PR, puis déploie automatiquement sur push vers `main` :
-l'API sur Azure App Service, le front sur Azure Static Web Apps.
+(100 tests xUnit, rapport détaillé publié dans l'onglet Summary du run) et le client à
+chaque push/PR, puis déploie automatiquement sur push vers `main` : l'API sur Azure App
+Service, le front sur Azure Static Web Apps.
 
 ---
 
 ## 🗺️ Roadmap
 
-Voir [`context/current-feature.md`](context/current-feature.md) pour l'historique
-détaillé de chaque fonctionnalité livrée. Prochains chantiers : import CSV de relevé
-bancaire, notifications in-app, inscription publique, comptes bancaires avec solde
-réel.
+Prochains chantiers : page Rapports (comparaisons mensuelles détaillées), comptes
+bancaires multiples avec solde réel.
 
 ---
 
