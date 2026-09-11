@@ -26,12 +26,7 @@ bascule instantanée.
 
 **[calm-glacier-08876b503.5.azurestaticapps.net](https://calm-glacier-08876b503.5.azurestaticapps.net)**
 
-Pas d'inscription publique pour l'instant — deux comptes de démo :
-
-| Utilisateur | Mot de passe | Contenu                                                                                 |
-| ----------- | ------------ | --------------------------------------------------------------------------------------- |
-| `john`      | `Pa$$w0rd`   | Jeu de données réaliste (transactions, budgets, charges récurrentes sur plusieurs mois) |
-| `admin`     | `Pa$$w0rd`   | Compte vide, rôle Admin                                                                 |
+Inscription libre — créez votre propre compte pour tester l'application.
 
 > L'API et le front tournent sur des paliers gratuits Azure (App Service F1) et une base
 > Neon gratuite : le premier appel après une période d'inactivité peut prendre quelques
@@ -87,9 +82,7 @@ réel, page Rapports détaillée, synchronisation bancaire automatique.
 
 ## 🤔 Pourquoi ce projet
 
-Le domaine (suivi de budget) est volontairement simple — la profondeur technique est
-concentrée sur des chantiers concrets et démontrables plutôt que sur la complexité
-métier :
+Ce projet met l'accent sur des chantiers techniques concrets et démontrables :
 
 | Chantier                                                            | Ce que ça démontre                                                                                   |
 | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -173,8 +166,9 @@ dotnet run --project .
 # API disponible sur https://localhost:5001
 ```
 
-Au démarrage, l'API applique les migrations en attente puis initialise les comptes de
-démo (`john` / `admin`, voir [Démo live](#-démo-live)) et leurs données associées.
+Au démarrage, l'API applique les migrations en attente puis initialise deux comptes
+de démo (`john` / `admin`, mot de passe `Pa$$w0rd`) avec des données associées,
+utiles pour tester en local.
 
 ### Frontend (`/client`)
 
