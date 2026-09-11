@@ -12,10 +12,15 @@ public class FakeUnitOfWork
     public Mock<ICategoryRepository> CategoryRepository { get; } = new();
     public Mock<IBudgetRepository> BudgetRepository { get; } = new();
     public Mock<IRecurringTransactionRepository> RecurringTransactionRepository { get; } = new();
+    public Mock<INotificationRepository> NotificationRepository { get; } = new();
 
     private readonly Mock<IUnitOfWork> _mock = new();
 
     public IUnitOfWork Uow => _mock.Object;
+
+    /// Exposed for assertions on IUnitOfWork itself (e.g. Verify(u => u.Complete())
+    /// call counts) that don't belong to any single repository mock above.
+    public Mock<IUnitOfWork> Mock => _mock;
 
     public FakeUnitOfWork()
     {
@@ -23,6 +28,7 @@ public class FakeUnitOfWork
         _mock.SetupGet(u => u.CategoryRepository).Returns(CategoryRepository.Object);
         _mock.SetupGet(u => u.BudgetRepository).Returns(BudgetRepository.Object);
         _mock.SetupGet(u => u.RecurringTransactionRepository).Returns(RecurringTransactionRepository.Object);
+        _mock.SetupGet(u => u.NotificationRepository).Returns(NotificationRepository.Object);
         _mock.Setup(u => u.Complete()).ReturnsAsync(true);
     }
 
