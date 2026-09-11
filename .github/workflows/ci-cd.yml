@@ -9,6 +9,9 @@ on:
 jobs:
   build-test-api:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -16,7 +19,13 @@ jobs:
           dotnet-version: '10.0.x'
       - run: dotnet restore expense-tracker.slnx
       - run: dotnet build expense-tracker.slnx --no-restore --configuration Release
-      - run: dotnet test expense-tracker.slnx --no-build --configuration Release
+      - run: dotnet test expense-tracker.slnx --no-build --configuration Release --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults
+      - uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Backend Tests
+          path: TestResults/*.trx
+          reporter: dotnet-trx
 
   build-test-client:
     runs-on: ubuntu-latest
