@@ -56,7 +56,8 @@
       "deleteMany": "Voulez-vous vraiment supprimer les transactions sélectionnées ?",
       "deleted": "Transaction supprimée",
       "deletedMany": "Transactions supprimées",
-      "deleteFailed": "La suppression a échoué."
+      "deleteFailed": "La suppression a échoué.",
+      "editCategory": "Cliquer pour changer la catégorie"
     },
     "columns": {
       "label": "Libellé",

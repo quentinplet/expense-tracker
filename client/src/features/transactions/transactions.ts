@@ -1,5 +1,14 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, computed, DestroyRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  OnInit,
+  signal,
+  viewChildren,
+  ViewChild,
+} from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -7,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { Select } from 'primeng/select';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { TransactionService } from '@/core/services/transaction-service';
@@ -15,6 +24,7 @@ import {
   CreateTransactionDto,
   Transaction,
   TransactionParams,
+  TransactionType,
   UpdateTransactionDto,
 } from '@/types/transaction';
 import { DatePicker } from 'primeng/datepicker';
@@ -43,7 +53,7 @@ import { CategoryBadge } from '@/shared/components/category-badge/category-badge
     ButtonModule,
     ToolbarModule,
     InputTextModule,
-    SelectModule,
+    Select,
     InputIconModule,
     IconFieldModule,
     TransactionModalForm,
@@ -139,6 +149,79 @@ export class Transactions implements OnInit {
       name: transaction.categoryName,
       translationKey: transaction.categoryTranslationKey,
     };
+  }
+
+  /**
+   * Options du sélecteur inline de catégorie (colonne Catégorie), restreintes au
+   * sens de la transaction éditée — `Type` est immuable (§9), donc il n'y a
+   * jamais lieu de proposer les catégories de l'autre sens ici.
+   */
+  protected categoryOptionsFor(type: TransactionType) {
+    this.translate.currentLang();
+    return this.categories()
+      .filter((categorie) => categorie.type === type)
+      .map((categorie) => ({
+        id: categorie.id,
+        label: this.categoryNamePipe.transform(categorie),
+        color: categorie.color as string | null,
+        icon: categorie.icon as string | null,
+      }));
+  }
+
+  /** Ligne dont la catégorie est en cours d'édition inline — une seule à la fois. */
+  protected editingCategoryId = signal<string | null>(null);
+
+  /**
+   * Au plus une instance rendue à la fois (`editingCategoryId` n'autorise qu'une
+   * ligne éditée). Interroge par variable de template plutôt que par type `Select`
+   * seul, sinon le select du filtre catégorie serait aussi capté.
+   */
+  private inlineCategorySelects = viewChildren('inlineCatSelect', { read: Select });
+
+  /**
+   * Ouvre le select directement plutôt que de le laisser fermé après le clic sur
+   * la pill — même schéma que le focus du montant dans `TransactionModalForm.onShow` :
+   * `setTimeout` pour laisser le rendu du `@if` passer avant d'appeler `show()`.
+   */
+  protected startEditCategory(transaction: Transaction) {
+    this.editingCategoryId.set(transaction.id);
+    setTimeout(() => this.inlineCategorySelects()[0]?.show());
+  }
+
+  protected onInlineCategoryChange(transaction: Transaction, categoryId: string) {
+    if (categoryId === transaction.categoryId) return;
+
+    const payload: UpdateTransactionDto = {
+      label: transaction.label,
+      note: transaction.note ?? null,
+      type: transaction.type,
+      categoryId,
+      amount: transaction.amount,
+      date: transaction.date,
+    };
+
+    this.transactionService.updateTransaction(transaction.id, payload).subscribe({
+      next: (updatedTransaction) => {
+        this.transactions.update((transactions) =>
+          transactions.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)),
+        );
+        this.editingCategoryId.set(null);
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('common.success'),
+          detail: this.translate.instant('transaction.form.updated'),
+          life: 3000,
+        });
+      },
+      error: () => {
+        this.editingCategoryId.set(null);
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('common.error'),
+          detail: this.translate.instant('transaction.form.updateFailed'),
+        });
+      },
+    });
   }
 
   /** Segmenté `Tout | Dépenses | Revenus` : la valeur nulle est l'option « Tout ». */

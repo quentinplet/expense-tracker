@@ -56,7 +56,8 @@
       "deleteMany": "Are you sure you want to delete the selected transactions?",
       "deleted": "Transaction deleted",
       "deletedMany": "Transactions deleted",
-      "deleteFailed": "Deletion failed."
+      "deleteFailed": "Deletion failed.",
+      "editCategory": "Click to change category"
     },
     "columns": {
       "label": "Label",

@@ -195,17 +195,60 @@
           </td>
 
           <td>
-            <span
-              class="inline-block rounded-md px-2 py-1 text-xs font-semibold"
-              [style.color]="transaction.categoryColor || 'var(--p-surface-400)'"
-              [style.background-color]="
-                'color-mix(in oklch, ' +
-                (transaction.categoryColor || 'var(--p-surface-400)') +
-                ' 15%, transparent)'
-              "
-            >
-              {{ categoryOf(transaction) | categoryName }}
-            </span>
+            <!--
+              Raccourci : changer uniquement la catégorie sans ouvrir le dialogue
+              d'édition complet. La pill se change en p-select au clic ; `show()`
+              rappelé juste après (même schéma que le focus du montant dans
+              TransactionModalForm) pour ouvrir directement la liste plutôt que
+              d'exiger un second clic.
+            -->
+            @if (editingCategoryId() === transaction.id) {
+              <p-select
+                #inlineCatSelect
+                [options]="categoryOptionsFor(transaction.type)"
+                optionLabel="label"
+                optionValue="id"
+                [ngModel]="transaction.categoryId"
+                (ngModelChange)="onInlineCategoryChange(transaction, $event)"
+                (onHide)="editingCategoryId.set(null)"
+                appendTo="body"
+                [style]="{ minWidth: '11rem' }"
+              >
+                <ng-template #selectedItem let-option>
+                  @if (option) {
+                    <span class="flex items-center gap-2">
+                      <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+                      {{ option.label }}
+                    </span>
+                  }
+                </ng-template>
+                <ng-template #item let-option>
+                  <span class="flex items-center gap-2">
+                    <app-category-badge [icon]="option.icon" [color]="option.color" size="sm" />
+                    {{ option.label }}
+                  </span>
+                </ng-template>
+              </p-select>
+            } @else {
+              <span
+                class="inline-block cursor-pointer rounded-md px-2 py-1 text-xs font-semibold transition-opacity hover:opacity-75"
+                role="button"
+                tabindex="0"
+                [attr.aria-label]="'transaction.list.editCategory' | translate"
+                [pTooltip]="'transaction.list.editCategory' | translate"
+                tooltipPosition="top"
+                (click)="startEditCategory(transaction)"
+                (keydown.enter)="startEditCategory(transaction)"
+                [style.color]="transaction.categoryColor || 'var(--p-surface-400)'"
+                [style.background-color]="
+                  'color-mix(in oklch, ' +
+                  (transaction.categoryColor || 'var(--p-surface-400)') +
+                  ' 15%, transparent)'
+                "
+              >
+                {{ categoryOf(transaction) | categoryName }}
+              </span>
+            }
           </td>
 
           <td class="text-sm text-surface-500 dark:text-surface-400">
