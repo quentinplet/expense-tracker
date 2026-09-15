@@ -13,10 +13,11 @@ import { FormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
-import { InputTextModule } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
+import { Textarea } from 'primeng/textarea';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { CategorieService } from '@/core/services/categorie-service';
 import { Categorie } from '@/types/categorie';
@@ -52,8 +53,9 @@ const NEW_CATEGORY_OPTION_ID = '__new-category__';
     Button,
     Checkbox,
     Select,
-    InputTextModule,
+    Textarea,
     Tag,
+    TooltipModule,
     TranslatePipe,
     CategoryBadge,
     CategoryFormDialog,

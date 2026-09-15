@@ -125,7 +125,14 @@
             } @else if (row.source.hasRecurringConflict) {
               <p-tag severity="info" [value]="'import.preview.conflict' | translate" />
             } @else {
-              <p-tag severity="success" [value]="'import.preview.ready' | translate" />
+              <!-- Icône plutôt qu'un tag texte : « Prêt » n'apportait rien de plus
+                   que l'absence des trois autres tags, et prêtait à confusion. -->
+              <i
+                class="pi pi-check-circle text-lg text-green-500"
+                role="img"
+                [attr.aria-label]="'import.preview.ready' | translate"
+                [pTooltip]="'import.preview.ready' | translate"
+              ></i>
             }
           </td>
         </tr>
