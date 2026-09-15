@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { Home } from '../features/home/home';
 import { Auth } from '../features/account/auth/auth';
 import { Dashboard } from '@/features/dashboard/dashboard';
 import { Transactions } from '@/features/transactions/transactions';

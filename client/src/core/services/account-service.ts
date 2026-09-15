@@ -68,8 +68,7 @@ export class AccountService {
                 this.setCurrentUser(user);
               }
             },
-            error: (err) => {
-              console.log('Token refresh failed:', err);
+            error: () => {
               this.logout();
             },
           });

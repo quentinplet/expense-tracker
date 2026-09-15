@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AccountService } from '../services/account-service';
 import { MessageService } from 'primeng/api';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const accountService = inject(AccountService);
   const toast = inject(MessageService);
   const router = inject(Router);
