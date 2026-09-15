@@ -10,6 +10,12 @@ import { Scope } from '../../month';
 const MAX_SLICES = 6;
 const OTHER_COLOR = '#6b7280';
 
+/** Clé partagée par les deux catégories verrouillées « Other » (§9 de l'overview) —
+ *  sert à les distinguer d'une vraie catégorie utilisateur pour qu'elles ne
+ *  s'affichent jamais comme une part individuelle, toujours noyées dans le seau
+ *  "au-delà de MAX_SLICES" plutôt qu'à côté de lui sous un nom quasi identique. */
+const LOCKED_OTHER_TRANSLATION_KEY = 'category.system.other';
+
 /** Même convention que ThemeService/LanguageService : `app.<nom>`. */
 const SCOPE_STORAGE_KEY = 'app.dashboardCategoryScope';
 
@@ -79,8 +85,11 @@ export class CategoryDonut {
     this.translate.currentLang();
 
     const items = this.scope() === 'all' ? this.yearBreakdown() : this.monthBreakdown();
-    const head = items.slice(0, MAX_SLICES);
-    const tail = items.slice(MAX_SLICES);
+    const regular = items.filter((c) => c.translationKey !== LOCKED_OTHER_TRANSLATION_KEY);
+    const lockedOther = items.filter((c) => c.translationKey === LOCKED_OTHER_TRANSLATION_KEY);
+
+    const head = regular.slice(0, MAX_SLICES);
+    const tail = [...regular.slice(MAX_SLICES), ...lockedOther];
 
     const slices: Slice[] = head.map((c) => ({
       key: c.categoryId,
