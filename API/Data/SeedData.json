@@ -123,7 +123,7 @@
       "name": "Other",
       "enabled": true,
       "transactionTypeId": 1,
-      "icon": "pi-ellipsis-h",
+      "icon": "pi-box",
       "color": "#6b7280",
       "translationKey": "category.system.other",
       "isLocked": true
@@ -133,7 +133,7 @@
       "name": "Other",
       "enabled": true,
       "transactionTypeId": 2,
-      "icon": "pi-ellipsis-h",
+      "icon": "pi-box",
       "color": "#84cc16",
       "translationKey": "category.system.other",
       "isLocked": true
