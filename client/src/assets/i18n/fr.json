@@ -107,11 +107,7 @@
     }
   },
   "dashboard": {
-    "greeting": {
-      "morning": "Bonjour, {{name}} 👋",
-      "afternoon": "Bon après-midi, {{name}} 👋",
-      "evening": "Bonsoir, {{name}} 👋"
-    },
+    "title": "Tableau de bord",
     "overviewFor": "Voici votre vue d'ensemble au {{date}}.",
     "totals": {
       "income": "Revenus du mois",

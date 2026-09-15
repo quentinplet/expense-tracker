@@ -4,7 +4,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AccountService } from '@/core/services/account-service';
 import { DashboardService } from '@/core/services/dashboard-service';
 import { BudgetService } from '@/core/services/budget-service';
 import { RecurringTransactionService } from '@/core/services/recurring-transaction-service';
@@ -40,7 +39,6 @@ import { currentMonthKey, isValidMonthKey, MonthKey } from './month';
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
-  private accountService = inject(AccountService);
   private dashboardService = inject(DashboardService);
   private budgetService = inject(BudgetService);
   private recurringTransactionService = inject(RecurringTransactionService);
@@ -53,17 +51,6 @@ export class Dashboard {
 
   protected locale = computed(() => this.languageService.current());
   protected today = new Date();
-
-  /** Salutation selon l'heure d'ouverture. Le nom reste vide tant que le profil
-   *  n'est pas chargé : « Bonjour,  👋 » vaut mieux qu'un placeholder qui clignote. */
-  protected greeting = computed(() => {
-    const hour = this.today.getHours();
-    const moment = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
-    return {
-      key: `dashboard.greeting.${moment}`,
-      name: this.accountService.currentUser()?.firstName ?? '',
-    };
-  });
 
   /**
    * Le mois vit dans l'URL : rafraîchir, partager un lien ou revenir en arrière

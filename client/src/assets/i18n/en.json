@@ -107,11 +107,7 @@
     }
   },
   "dashboard": {
-    "greeting": {
-      "morning": "Good morning, {{name}} 👋",
-      "afternoon": "Good afternoon, {{name}} 👋",
-      "evening": "Good evening, {{name}} 👋"
-    },
+    "title": "Dashboard",
     "overviewFor": "Here's your financial overview for {{date}}.",
     "totals": {
       "income": "Income this month",
