@@ -46,16 +46,25 @@
           </td>
           <td class="min-w-96 max-w-xl">
             @if (row.source.isValid) {
-              <input
-                pInputText
-                type="text"
+              <!--
+                Textarea plutôt qu'un input à une ligne : un libellé long se coupait
+                sans aucun signe visuel qu'il continuait. `autoResize` fait grandir le
+                champ avec le texte au lieu de le tronquer ; `keydown.enter` bloqué
+                pour empêcher un retour ligne dans ce qui reste un libellé sur une
+                seule ligne logique.
+              -->
+              <textarea
+                pTextarea
+                rows="1"
+                [autoResize]="true"
                 [ngModel]="row.label"
                 (ngModelChange)="updateLabel(i, $event)"
+                (keydown.enter)="$event.preventDefault()"
                 [maxlength]="200"
                 [dt]="fieldTokens"
-                class="w-full truncate"
+                class="w-full"
                 fluid
-              />
+              ></textarea>
             } @else {
               <span class="block truncate text-sm text-surface-500 dark:text-surface-400">{{
                 row.source.suggestedLabel

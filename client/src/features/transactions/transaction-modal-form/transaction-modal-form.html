@@ -182,16 +182,24 @@
         <label for="label" class="mb-2 block text-sm font-semibold">
           {{ 'transaction.form.label' | translate }}
         </label>
-        <input
+        <!--
+          Textarea plutôt qu'un input à une ligne : un libellé long se coupait sans
+          aucun signe visuel qu'il continuait. `autoResize` fait grandir le champ avec
+          le texte au lieu de le tronquer ; `keydown.enter` intercepté pour garder le
+          raccourci « ↵ pour valider » du dialogue plutôt que d'insérer un retour ligne.
+        -->
+        <textarea
           formControlName="label"
-          type="text"
-          pInputText
+          pTextarea
           id="label"
+          rows="1"
+          [autoResize]="true"
           [placeholder]="'transaction.form.labelPlaceholder' | translate"
           [invalid]="showErrors() && form.controls.label.invalid"
           [dt]="fieldTokens"
+          (keydown.enter)="$event.preventDefault(); onSubmit()"
           fluid
-        />
+        ></textarea>
         @if (showErrors() && form.controls.label.invalid) {
           <small class="mt-2 block text-sm text-red-500">
             {{ 'transaction.form.labelRequired' | translate }}
