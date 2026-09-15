@@ -8,7 +8,6 @@ import {
   output,
   signal,
   SimpleChanges,
-  viewChild,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -91,8 +90,6 @@ export class TransactionModalForm implements OnChanges {
   private categoryNamePipe = inject(CategoryNamePipe);
   private categorieService = inject(CategorieService);
   private messageService = inject(MessageService);
-
-  private amountInput = viewChild<AmountInput>('amountInput');
 
   protected readonly newCategoryOptionId = NEW_CATEGORY_OPTION_ID;
   protected categoryFormVisible = signal(false);
@@ -283,16 +280,6 @@ export class TransactionModalForm implements OnChanges {
         });
       },
     });
-  }
-
-  /**
-   * Le focus va au montant, le champ que l'on vient saisir (§2). Le p-dialog le poserait
-   * sinon sur le premier élément focusable depuis un `setTimeout` calé sur la durée de
-   * transition — donc après le nôtre — et ce blur marquait le montant `touched`. D'où
-   * `[focusOnShow]="false"` sur le dialogue.
-   */
-  onShow() {
-    setTimeout(() => this.amountInput()?.focus());
   }
 
   onClose() {

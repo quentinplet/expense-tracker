@@ -9,7 +9,6 @@
   [focusOnShow]="false"
   appendTo="body"
   styleClass="transaction-dialog"
-  (onShow)="onShow()"
   (onHide)="onClose()"
 >
   <ng-template #content>
@@ -73,7 +72,6 @@
           {{ 'transaction.form.amount' | translate }}
         </label>
         <app-amount-input
-          #amountInput
           formControlName="amount"
           inputId="amount"
           [placeholder]="'transaction.form.amountPlaceholder' | translate"
